@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "namespace": "customer_form.components",
+  "components": [
+    {
+      "name": "AddressForm",
+      "content": {
+        "type": "VerticalStack",
+        "properties": {
+          "spacing": 6
+        },
+        "children": [
+          {
+            "id": "streetLabel",
+            "type": "Label",
+            "properties": {
+              "text": { "$resource": "streetLabel" }
+            }
+          },
+          {
+            "id": "streetTextBox",
+            "type": "TextBox",
+            "properties": {
+              "text": ""
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "application": {
+    "name": "AddressFormComponents",
+    "startupWindow": "mainWindow"
+  },
+  "windows": []
+}

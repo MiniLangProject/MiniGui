@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "namespace": "customer_form.windows",
+  "windows": [
+    {
+      "id": "mainWindow",
+      "type": "Window",
+      "properties": {
+        "title": { "$resource": "windowTitle" },
+        "width": 560,
+        "height": 300
+      },
+      "layout": {
+        "type": "VerticalStack",
+        "properties": {
+          "padding": 14,
+          "spacing": 8
+        },
+        "children": [
+          {
+            "id": "nameLabel",
+            "type": "Label",
+            "properties": {
+              "text": { "$resource": "nameLabel" }
+            }
+          },
+          {
+            "id": "nameTextBox",
+            "type": "TextBox",
+            "properties": {
+              "text": ""
+            }
+          },
+          {
+            "id": "customerAddress",
+            "type": "AddressForm"
+          },
+          {
+            "id": "saveButton",
+            "type": "Button",
+            "properties": {
+              "text": { "$resource": "saveText" }
+            },
+            "events": {
+              "click": "onSaveClick"
+            }
+          },
+          {
+            "id": "statusLabel",
+            "type": "Label",
+            "properties": {
+              "text": ""
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "application": {
+    "name": "CustomerFormWindow",
+    "startupWindow": "mainWindow"
+  }
+}

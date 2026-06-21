@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://minilang.local/minigui.schema.json",
+  "title": "MiniGui MSON",
+  "type": "object",
+  "required": ["version", "namespace", "application", "windows"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "version": { "const": 1 },
+    "namespace": { "type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_]*(\\.[A-Za-z_][A-Za-z0-9_]*)*$" },
+    "codeBehind": { "type": "string" },
+    "imports": { "type": "array", "items": { "type": "string" } },
+    "resources": { "type": "object" },
+    "application": {
+      "type": "object",
+      "required": ["name", "startupWindow"],
+      "properties": {
+        "name": { "type": "string" },
+        "startupWindow": { "type": "string" },
+        "events": { "type": "object" }
+      },
+      "additionalProperties": false
+    },
+    "windows": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/window" }
+    },
+    "components": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/component" }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "component": {
+      "type": "object",
+      "required": ["name", "content"],
+      "properties": {
+        "name": { "type": "string" },
+        "parameters": { "type": "array", "items": { "type": "string" } },
+        "codeBehind": { "type": "string" },
+        "content": { "$ref": "#/$defs/node" }
+      },
+      "additionalProperties": false
+    },
+    "window": {
+      "type": "object",
+      "required": ["id", "type", "layout"],
+      "properties": {
+        "id": { "type": "string" },
+        "type": { "const": "Window" },
+        "properties": { "type": "object" },
+        "events": { "type": "object" },
+        "layout": { "$ref": "#/$defs/node" }
+      },
+      "additionalProperties": false
+    },
+    "node": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "id": { "type": "string" },
+        "type": {
+          "type": "string",
+          "enum": [
+            "VerticalStack",
+            "HorizontalStack",
+            "Grid",
+            "Canvas",
+            "Label",
+            "Button",
+            "TextBox",
+            "TextArea",
+            "CheckBox",
+            "RadioButton",
+            "Panel",
+            "GroupBox",
+            "ComboBox",
+            "ListBox",
+            "ScrollBar",
+            "Slider",
+            "ProgressBar",
+            "TabControl",
+            "MenuBar",
+            "StatusBar",
+            "ToolBar",
+            "TreeView",
+            "ListView",
+            "Table",
+            "DatePicker"
+          ]
+        },
+        "properties": { "type": "object" },
+        "events": { "type": "object" },
+        "children": { "type": "array", "items": { "$ref": "#/$defs/node" } },
+        "rows": { "type": "array" },
+        "columns": { "type": "array" },
+        "grid": { "type": "object" },
+        "parameters": { "type": "object" }
+      },
+      "additionalProperties": false
+    }
+  }
+}

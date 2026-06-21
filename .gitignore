@@ -1,0 +1,6 @@
+examples/*/build/
+tests/tmp/
+build/
+tools/tmp/
+*.exe
+*.mlo

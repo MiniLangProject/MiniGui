@@ -1,0 +1,355 @@
+{
+  "$schema": "../../schemas/minigui.schema.json",
+  "version": 1,
+  "namespace": "control_gallery",
+  "codeBehind": "app.ml",
+  "resources": {
+    "windowTitle": "MiniGui Control Gallery",
+    "heading": "MiniGui controls and attributes"
+  },
+  "application": {
+    "name": "ControlGallery",
+    "startupWindow": "mainWindow"
+  },
+  "windows": [
+    {
+      "id": "mainWindow",
+      "type": "Window",
+      "properties": {
+        "title": { "$resource": "windowTitle" },
+        "width": 880,
+        "height": 760,
+        "startPosition": "centerScreen"
+      },
+      "events": {
+        "load": "onMainWindowLoad",
+        "close": "onMainWindowClose",
+        "resized": "onMainWindowResized"
+      },
+      "layout": {
+        "type": "VerticalStack",
+        "properties": { "padding": 12, "spacing": 8 },
+        "children": [
+          {
+            "id": "mainMenu",
+            "type": "MenuBar",
+            "properties": {
+              "items": ["File", "Edit", "View", "Help"],
+              "height": 24,
+              "width": "fill",
+              "tooltip": "Top level application menu"
+            },
+            "events": { "clicked": "onActionClicked" }
+          },
+          {
+            "id": "mainToolBar",
+            "type": "ToolBar",
+            "properties": {
+              "items": ["New", "Open", "Save", "Refresh"],
+              "height": 30,
+              "width": "fill"
+            },
+            "events": { "click": "onActionClicked" }
+          },
+          {
+            "id": "titleLabel",
+            "type": "Label",
+            "properties": {
+              "text": { "$resource": "heading" },
+              "height": 24,
+              "width": "fill"
+            }
+          },
+          {
+            "id": "galleryTabs",
+            "type": "TabControl",
+            "properties": {
+              "items": ["Inputs", "Selection", "Layout", "Feedback", "Data"],
+              "selectedIndex": 0,
+              "height": 520,
+              "width": "fill",
+              "minWidth": 520,
+              "alignment": "fill"
+            },
+            "events": { "selected": "onTabSelected" },
+            "children": [
+              {
+                "id": "inputPanel",
+                "type": "Panel",
+                "properties": {
+                  "height": 130,
+                  "width": "fill",
+                  "padding": 8,
+                  "spacing": 8,
+                  "dock": "top"
+                },
+                "children": [
+                  {
+                    "type": "HorizontalStack",
+                    "properties": { "spacing": 8 },
+                    "children": [
+                      {
+                        "id": "nameLabel",
+                        "type": "Label",
+                        "properties": { "text": "Name", "width": 80, "tabIndex": 1 }
+                      },
+                      {
+                        "id": "nameTextBox",
+                        "type": "TextBox",
+                        "properties": { "text": "Ada", "width": "fill", "minWidth": 220, "enabled": true, "tooltip": "Editable name field", "tabIndex": 2 },
+                        "events": { "changed": "onNameChanged" }
+                      },
+                      {
+                        "id": "birthDatePicker",
+                        "type": "DatePicker",
+                        "properties": { "width": 150, "tabIndex": 3 },
+                        "events": { "changed": "onDateChanged" }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "notesTextArea",
+                    "type": "TextArea",
+                    "properties": {
+                      "text": "Notes can span multiple lines.",
+                      "height": 70,
+                      "width": "fill",
+                      "visible": true
+                    },
+                    "events": { "change": "onNotesChanged" }
+                  }
+                ]
+              },
+              {
+                "id": "optionsGroupBox",
+                "type": "GroupBox",
+                "properties": {
+                  "text": "Selection controls",
+                  "height": 112,
+                  "width": "fill",
+                  "padding": 10,
+                  "spacing": 8
+                },
+                "children": [
+                  {
+                    "id": "consentCheckBox",
+                    "type": "CheckBox",
+                    "properties": { "text": "Enable advanced actions", "checked": true },
+                    "events": { "clicked": "onConsentClicked" }
+                  },
+                  {
+                    "type": "HorizontalStack",
+                    "properties": { "spacing": 8 },
+                    "children": [
+                      {
+                        "id": "radioEmail",
+                        "type": "RadioButton",
+                        "properties": { "text": "Email", "checked": true, "width": 120 },
+                        "events": { "click": "onModeClicked" }
+                      },
+                      {
+                        "id": "radioPhone",
+                        "type": "RadioButton",
+                        "properties": { "text": "Phone", "checked": false, "width": 120 },
+                        "events": { "click": "onModeClicked" }
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "selectionPanel",
+                "type": "Panel",
+                "properties": {
+                  "height": 126,
+                  "width": "fill",
+                  "padding": 8,
+                  "spacing": 8
+                },
+                "children": [
+                  {
+                    "type": "Grid",
+                    "properties": { "spacing": 8, "columns": 2 },
+                    "children": [
+                      {
+                        "id": "countryComboBox",
+                        "type": "ComboBox",
+                        "properties": {
+                          "items": ["Germany", "United States", "France"],
+                          "selectedIndex": 0,
+                          "width": "fill",
+                          "minWidth": 220
+                        },
+                        "events": { "selected": "onCountrySelected" }
+                      },
+                      {
+                        "id": "cityListBox",
+                        "type": "ListBox",
+                        "properties": {
+                          "items": ["Berlin", "Bonn", "Hamburg"],
+                          "selectedIndex": 1,
+                          "height": 72,
+                          "width": "fill"
+                        },
+                        "events": { "change": "onCitySelected" }
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "layoutPanel",
+                "type": "Panel",
+                "properties": {
+                  "height": 86,
+                  "width": "fill",
+                  "padding": 8,
+                  "spacing": 8
+                },
+                "children": [
+                  {
+                    "type": "HorizontalStack",
+                    "properties": { "spacing": 8 },
+                    "children": [
+                      {
+                        "id": "primaryButton",
+                        "type": "Button",
+                        "properties": {
+                          "text": "Apply",
+                          "width": 120,
+                          "height": 30
+                        },
+                        "events": { "click": "onPrimaryButtonClick" }
+                      },
+                      {
+                        "id": "disabledButton",
+                        "type": "Button",
+                        "properties": {
+                          "text": "Disabled until Apply",
+                          "width": 180,
+                          "height": 30,
+                          "enabled": false
+                        },
+                        "events": { "click": "onDisabledButtonClick" }
+                      },
+                      {
+                        "id": "hiddenLabel",
+                        "type": "Label",
+                        "properties": {
+                          "text": "Initially hidden",
+                          "width": 220,
+                          "height": 24,
+                          "visible": false
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "feedbackPanel",
+                "type": "Panel",
+                "properties": {
+                  "height": 92,
+                  "width": "fill",
+                  "padding": 8,
+                  "spacing": 8
+                },
+                "children": [
+                  {
+                    "type": "HorizontalStack",
+                    "properties": { "spacing": 8 },
+                    "children": [
+                      {
+                        "id": "volumeLabel",
+                        "type": "Label",
+                        "properties": { "text": "Volume: 25", "width": 120 }
+                      },
+                      {
+                        "id": "volumeScrollBar",
+                        "type": "Slider",
+                        "properties": {
+                          "orientation": "horizontal",
+                          "minimum": 0,
+                          "maximum": 100,
+                          "value": 25,
+                          "smallStep": 5,
+                          "largeStep": 20,
+                          "width": "fill",
+                          "minWidth": 260,
+                          "height": 32
+                        },
+                        "events": { "valueChanged": "onVolumeScrolled" }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "progressBar",
+                    "type": "ProgressBar",
+                    "properties": {
+                      "minimum": 0,
+                      "maximum": 100,
+                      "value": 35,
+                      "height": 24,
+                      "width": "fill"
+                    },
+                    "events": { "valueChanged": "onProgressChanged" }
+                  }
+                ]
+              },
+              {
+                "id": "dataPanel",
+                "type": "Panel",
+                "properties": {
+                  "height": 170,
+                  "width": "fill",
+                  "padding": 8,
+                  "spacing": 8
+                },
+                "children": [
+                  {
+                    "type": "Grid",
+                    "properties": { "spacing": 8, "columns": 2 },
+                    "children": [
+                      {
+                        "id": "navigationTree",
+                        "type": "TreeView",
+                        "properties": {
+                          "items": ["Customers", "Orders", "Reports"],
+                          "height": 120,
+                          "width": "fill"
+                        },
+                        "events": { "selected": "onTreeSelected" }
+                      },
+                      {
+                        "id": "customerTable",
+                        "type": "Table",
+                        "properties": {
+                          "items": ["Ada Lovelace", "Grace Hopper", "Margaret Hamilton"],
+                          "selectedIndex": 0,
+                          "height": 120,
+                          "width": "fill"
+                        },
+                        "events": { "selected": "onTableSelected" }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "statusLabel",
+            "type": "StatusBar",
+            "properties": { "text": "Ready", "height": 24, "width": "fill" }
+          },
+          {
+            "id": "resultLabel",
+            "type": "Label",
+            "properties": { "text": "", "height": 24, "width": "fill" }
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "$schema": "../../schemas/minigui.schema.json",
+  "version": 1,
+  "namespace": "hello_gui",
+  "codeBehind": "app.ml",
+  "resources": {
+    "windowTitle": "MiniGui Hello",
+    "headline": "Willkommen bei MiniGui"
+  },
+  "application": {
+    "name": "HelloGui",
+    "startupWindow": "mainWindow"
+  },
+  "windows": [
+    {
+      "id": "mainWindow",
+      "type": "Window",
+      "properties": {
+        "title": { "$resource": "windowTitle" },
+        "width": 480,
+        "height": 220,
+        "startPosition": "centerScreen"
+      },
+      "events": {
+        "load": "onMainWindowLoad",
+        "close": "onMainWindowClose"
+      },
+      "layout": {
+        "type": "VerticalStack",
+        "properties": {
+          "padding": 14,
+          "spacing": 8
+        },
+        "children": [
+          {
+            "id": "headlineLabel",
+            "type": "Label",
+            "properties": {
+              "text": { "$resource": "headline" }
+            }
+          },
+          {
+            "id": "nameTextBox",
+            "type": "TextBox",
+            "properties": {
+              "text": ""
+            },
+            "events": {
+              "textChanged": "onNameChanged"
+            }
+          },
+          {
+            "id": "greetButton",
+            "type": "Button",
+            "properties": {
+              "text": "Begruessen"
+            },
+            "events": {
+              "click": "onGreetButtonClick"
+            }
+          },
+          {
+            "id": "resultLabel",
+            "type": "Label",
+            "properties": {
+              "text": ""
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

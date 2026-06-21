@@ -1,0 +1,16 @@
+{
+  "$schema": "../../schemas/minigui.schema.json",
+  "version": 1,
+  "namespace": "customer_form",
+  "codeBehind": "app.ml",
+  "imports": [
+    "resources/common.mson",
+    "components/address-form.mson",
+    "windows/main-window.mson"
+  ],
+  "application": {
+    "name": "CustomerForm",
+    "startupWindow": "mainWindow"
+  },
+  "windows": []
+}

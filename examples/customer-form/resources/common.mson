@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "namespace": "customer_form.resources",
+  "resources": {
+    "windowTitle": "Kundenformular",
+    "nameLabel": "Name",
+    "streetLabel": "Strasse",
+    "saveText": "Speichern"
+  },
+  "application": {
+    "name": "CustomerFormResources",
+    "startupWindow": "mainWindow"
+  },
+  "windows": []
+}
