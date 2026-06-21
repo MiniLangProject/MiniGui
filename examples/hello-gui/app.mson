@@ -5,7 +5,7 @@
   "codeBehind": "app.ml",
   "resources": {
     "windowTitle": "MiniGui Hello",
-    "headline": "Willkommen bei MiniGui"
+    "headline": "Welcome to MiniGui"
   },
   "application": {
     "name": "HelloGui",
@@ -53,7 +53,7 @@
             "id": "greetButton",
             "type": "Button",
             "properties": {
-              "text": "Begruessen"
+              "text": "Greet"
             },
             "events": {
               "click": "onGreetButtonClick"

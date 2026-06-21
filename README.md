@@ -1,21 +1,30 @@
 # MiniGui
 
-MiniGui ist eine GUI-Library fuer MiniLang, mit der sich einfache Desktop-GUIs
-schnell bauen lassen. Die Oberflaeche wird deklarativ in `.mson` beschrieben,
-die Logik bleibt in normalem MiniLang-Code. MiniGui erzeugt daraus MiniLang-Code,
-bindet die Event-Handler aus deiner Code-behind-Datei ein und kompiliert daraus
-eine native Windows-Anwendung.
+MiniGui is a GUI library for MiniLang that helps you build simple desktop
+applications quickly. You describe the user interface declaratively in `.mson`,
+keep the application logic in normal MiniLang code, and let MiniGui generate and
+compile the glue code for a native Windows application.
 
-Kurz gesagt:
+In short:
 
-- `.mson` beschreibt Fenster, Layouts, Controls, Attribute und Events.
-- `.ml` enthaelt die Anwendungslogik.
-- `tools/minigui.ml` ist das MiniGui-CLI.
-- `MiniGuiLib/minigui.ml` ist die Runtime-Library fuer native Win32-Controls.
+- `.mson` describes windows, layouts, controls, attributes, and events.
+- `.ml` contains your application logic and event handlers.
+- `tools/minigui.ml` is the MiniGui command-line tool.
+- `MiniGuiLib/minigui.ml` is the runtime library for native Win32 controls.
 
-## Projektaufbau
+## Screenshot
 
-MiniGui ist ein eigenes Projekt und liegt parallel zum MiniLang-Compiler:
+The minimal hello example is built from `examples/hello-gui/app.mson` and
+`examples/hello-gui/app.ml`.
+
+![MiniGui hello example at startup](docs/images/hello-gui-start.png)
+
+![MiniGui hello example after greeting](docs/images/hello-gui-greeting.png)
+
+## Project Layout
+
+MiniGui is its own project and is expected to live next to the MiniLang
+compiler checkouts:
 
 ```text
 MiniGui/
@@ -31,19 +40,18 @@ MiniGui/
     build/mlc_win64.exe
 ```
 
-Der Python-Compiler ist fuer MiniGui aktuell die schnellere Wahl.
+The Python compiler is currently the faster compiler for MiniGui builds.
 
-## Schnellstart
+## Quick Start
 
-MiniGui selbst ist in MiniLang geschrieben. Baue zuerst das CLI mit dem
-Python-Compiler:
+MiniGui itself is written in MiniLang. Build the CLI with the Python compiler:
 
 ```powershell
 cd C:\Users\nilsk\Desktop\MiniGui\MiniGui
 py -3.14 ..\MiniLangCompilerPy\mlc_win64.py .\tools\minigui.ml .\tools\minigui.exe -I . -I ..\MiniLangCompilerPy
 ```
 
-Danach kannst du eine GUI validieren, Code generieren oder direkt bauen:
+Validate, generate, and build the hello example:
 
 ```powershell
 .\tools\minigui.exe validate .\examples\hello-gui\app.mson
@@ -51,7 +59,7 @@ Danach kannst du eine GUI validieren, Code generieren oder direkt bauen:
 .\tools\minigui.exe build .\examples\hello-gui\app.mson --output .\examples\hello-gui\build\hello-gui.exe --compiler ..\MiniLangCompilerPy\mlc_win64.py
 ```
 
-Die fertige Anwendung startest du wie jedes andere Windows-Programm:
+Run the finished application:
 
 ```powershell
 .\examples\hello-gui\build\hello-gui.exe
@@ -65,17 +73,17 @@ Die fertige Anwendung startest du wie jedes andere Windows-Programm:
 .\tools\minigui.exe build <app.mson> --output <app.exe>
 ```
 
-Wichtige Optionen:
+Useful options:
 
-- `--compiler <path>` waehlt den MiniLang-Compiler.
-- `--output <file>` setzt Ausgabe-Datei fuer generierten Code oder `.exe`.
-- `--code-behind <file>` ueberschreibt `codeBehind` aus der `.mson`.
-- `--generated-dir <dir>` setzt das Zielverzeichnis fuer generierte Dateien.
-- `--include-dir <dir>` fuegt Suchpfade fuer MSON-Imports hinzu.
-- `--no-compile` erzeugt nur `.gui.ml`, ohne daraus eine `.exe` zu bauen.
-- `--keep-generated` behaelt generierte Dateien beim Build.
+- `--compiler <path>` selects the MiniLang compiler.
+- `--output <file>` sets the generated source or executable output path.
+- `--code-behind <file>` overrides the `codeBehind` value from `.mson`.
+- `--generated-dir <dir>` chooses the directory for generated files.
+- `--include-dir <dir>` adds MSON import search paths.
+- `--no-compile` generates `.gui.ml` without compiling an executable.
+- `--keep-generated` keeps generated files after `build`.
 
-## Eine minimale Anwendung
+## A Minimal Application
 
 `app.mson`:
 
@@ -106,7 +114,7 @@ Wichtige Optionen:
           {
             "id": "headlineLabel",
             "type": "Label",
-            "properties": { "text": "Willkommen bei MiniGui" }
+            "properties": { "text": "Welcome to MiniGui" }
           },
           {
             "id": "nameTextBox",
@@ -117,7 +125,7 @@ Wichtige Optionen:
           {
             "id": "greetButton",
             "type": "Button",
-            "properties": { "text": "Begruessen" },
+            "properties": { "text": "Greet" },
             "events": { "click": "onGreetButtonClick" }
           },
           {
@@ -149,20 +157,21 @@ end function
 function onGreetButtonClick(ui, event)
   name = MiniGui.Control.getText(ui.nameTextBox)
   if name == "" then
-    MiniGui.Control.setText(ui.resultLabel, "Bitte einen Namen eingeben.")
+    MiniGui.Control.setText(ui.resultLabel, "Please enter a name.")
   else
-    MiniGui.Control.setText(ui.resultLabel, "Hallo, " + name + "!")
+    MiniGui.Control.setText(ui.resultLabel, "Hello, " + name + "!")
   end if
   return 0
 end function
 ```
 
-Der Generator erzeugt fuer jedes Control mit `id` ein Feld im `ui`-Objekt. Im
-Beispiel sind das `ui.nameTextBox`, `ui.greetButton` und `ui.resultLabel`.
+For every control with an `id`, the generator creates a field on the generated
+`ui` object. In the example above you can access `ui.nameTextBox`,
+`ui.greetButton`, and `ui.resultLabel`.
 
-## MSON-Grundstruktur
+## MSON Structure
 
-Eine MiniGui-Datei ist JSON mit der Endung `.mson`.
+An MSON file is JSON with the `.mson` extension.
 
 ```json
 {
@@ -180,43 +189,43 @@ Eine MiniGui-Datei ist JSON mit der Endung `.mson`.
 }
 ```
 
-Pflichtfelder:
+Required fields:
 
-- `version`: aktuell immer `1`.
-- `namespace`: MiniLang-Package der generierten Anwendung.
-- `application.name`: Anzeigename der Anwendung.
-- `application.startupWindow`: `id` des Startfensters.
-- `windows`: Liste der Fenster.
+- `version`: currently always `1`.
+- `namespace`: the MiniLang package for the generated application.
+- `application.name`: the application name.
+- `application.startupWindow`: the `id` of the startup window.
+- `windows`: the list of windows.
 
-Optionale Felder:
+Optional fields:
 
-- `codeBehind`: MiniLang-Datei mit Event-Handlern.
-- `resources`: wiederverwendbare Werte.
-- `imports`: weitere `.mson`-Dateien.
-- `components`: eigene wiederverwendbare UI-Bausteine.
+- `codeBehind`: MiniLang file containing event handlers.
+- `resources`: reusable values resolved at generation time.
+- `imports`: additional `.mson` files.
+- `components`: reusable UI building blocks.
 
 ## Layouts
 
-Layouts gruppieren und positionieren Controls.
+Layouts group and position controls.
 
 ### VerticalStack
 
-Ordnet Kinder von oben nach unten an.
+Arranges children from top to bottom.
 
 ```json
 {
   "type": "VerticalStack",
   "properties": { "padding": 12, "spacing": 8 },
   "children": [
-    { "id": "titleLabel", "type": "Label", "properties": { "text": "Titel" } },
-    { "id": "saveButton", "type": "Button", "properties": { "text": "Speichern" } }
+    { "id": "titleLabel", "type": "Label", "properties": { "text": "Title" } },
+    { "id": "saveButton", "type": "Button", "properties": { "text": "Save" } }
   ]
 }
 ```
 
 ### HorizontalStack
 
-Ordnet Kinder von links nach rechts an.
+Arranges children from left to right.
 
 ```json
 {
@@ -231,7 +240,8 @@ Ordnet Kinder von links nach rechts an.
 
 ### Grid
 
-Verteilt Kinder in Spalten. `columns` gibt die Spaltenanzahl an.
+Distributes children across columns. The `columns` property sets the column
+count.
 
 ```json
 {
@@ -246,7 +256,7 @@ Verteilt Kinder in Spalten. `columns` gibt die Spaltenanzahl an.
 
 ### Canvas
 
-Erlaubt feste Positionierung mit `x` und `y`.
+Places controls at fixed `x` and `y` coordinates.
 
 ```json
 {
@@ -257,26 +267,26 @@ Erlaubt feste Positionierung mit `x` und `y`.
 }
 ```
 
-## Gemeinsame Attribute
+## Common Attributes
 
-Diese Properties koennen bei Controls genutzt werden:
+These properties can be used on controls:
 
-- `text`: sichtbarer Text.
-- `width`, `height`: Zahl, `"auto"` oder `"fill"`.
-- `x`, `y`: Position im `Canvas`.
-- `visible`: `true` oder `false`.
-- `enabled`: `true` oder `false`.
-- `margin`: reserviert fuer Layout-Abstaende.
-- `horizontalAlignment`: `"left"`, `"center"`, `"right"`, `"fill"` oder `"stretch"`.
-- `verticalAlignment`: `"top"`, `"center"`, `"bottom"`, `"fill"` oder `"stretch"`.
-- `alignment`: Kurzform fuer horizontales Alignment.
-- `dock`: aktuell besonders nuetzlich mit `"fill"`.
-- `fill`: `true` setzt die Breite auf den verfuegbaren Platz.
-- `minWidth`, `minHeight`, `maxWidth`, `maxHeight`: Groessenbegrenzungen.
-- `tooltip`: Text fuer Tooltips.
-- `tabIndex`: Reihenfolge fuer Tastatur-Navigation.
+- `text`: visible text.
+- `width`, `height`: a number, `"auto"`, or `"fill"`.
+- `x`, `y`: position inside a `Canvas`.
+- `visible`: `true` or `false`.
+- `enabled`: `true` or `false`.
+- `margin`: reserved for layout spacing.
+- `horizontalAlignment`: `"left"`, `"center"`, `"right"`, `"fill"`, or `"stretch"`.
+- `verticalAlignment`: `"top"`, `"center"`, `"bottom"`, `"fill"`, or `"stretch"`.
+- `alignment`: shorthand for horizontal alignment.
+- `dock`: especially useful with `"fill"`.
+- `fill`: `true` sets the width to the available space.
+- `minWidth`, `minHeight`, `maxWidth`, `maxHeight`: size constraints.
+- `tooltip`: tooltip text.
+- `tabIndex`: keyboard navigation order.
 
-Beispiel:
+Example:
 
 ```json
 {
@@ -288,7 +298,7 @@ Beispiel:
     "minWidth": 220,
     "enabled": true,
     "visible": true,
-    "tooltip": "Name eingeben",
+    "tooltip": "Enter a name",
     "tabIndex": 1
   }
 }
@@ -296,33 +306,33 @@ Beispiel:
 
 ## Controls
 
-MiniGui unterstuetzt aktuell diese Controls:
+MiniGui currently supports these controls:
 
-| Control | Zweck | Wichtige Properties | Events |
+| Control | Purpose | Important properties | Events |
 | --- | --- | --- | --- |
-| `Label` | Text anzeigen | `text` | - |
-| `Button` | Aktion ausloesen | `text` | `click`, `clicked` |
-| `TextBox` | einzeilige Eingabe | `text`, `placeholder` | `textChanged`, `changed`, `change` |
-| `TextArea` | mehrzeilige Eingabe | `text`, `placeholder` | `textChanged`, `changed`, `change` |
-| `CheckBox` | Ja/Nein-Auswahl | `text`, `checked` | `click`, `clicked` |
-| `RadioButton` | Auswahl innerhalb einer Gruppe | `text`, `checked` | `click`, `clicked` |
-| `Panel` | Container ohne Rahmen | `padding`, `spacing`, `children` | - |
-| `GroupBox` | Container mit Beschriftung | `text`, `padding`, `spacing`, `children` | - |
-| `ComboBox` | Dropdown-Auswahl | `items`, `selectedIndex` | `selectionChanged`, `selected`, `changed`, `change` |
-| `ListBox` | Listen-Auswahl | `items`, `selectedIndex` | `selectionChanged`, `selected`, `changed`, `change` |
-| `ScrollBar` | Scroll-/Wertsteuerung | `orientation`, `minimum`, `maximum`, `value`, `smallStep`, `largeStep` | `scrollChanged`, `valueChanged`, `changed`, `change` |
-| `Slider` | Trackbar fuer Werte | `orientation`, `minimum`, `maximum`, `value`, `smallStep`, `largeStep` | `scrollChanged`, `valueChanged`, `changed`, `change` |
-| `ProgressBar` | Fortschritt anzeigen | `minimum`, `maximum`, `value` | `scrollChanged`, `valueChanged`, `changed`, `change` |
-| `TabControl` | Reiter-Oberflaeche | `items`, `selectedIndex`, `children` | `selectionChanged`, `selected`, `changed`, `change` |
-| `MenuBar` | Menueleiste | `items` | `click`, `clicked` |
-| `ToolBar` | Werkzeugleiste | `items` | `click`, `clicked` |
-| `StatusBar` | Statuszeile | `text` | - |
-| `TreeView` | Baumansicht | `items` | `selectionChanged`, `selected`, `changed`, `change` |
-| `ListView` | Listen-/Reportansicht | `items`, `selectedIndex` | `selectionChanged`, `selected`, `changed`, `change` |
-| `Table` | Tabellenartige Liste, aktuell ueber `ListView` | `items`, `selectedIndex` | `selectionChanged`, `selected`, `changed`, `change` |
-| `DatePicker` | Datumsauswahl | `text` | `textChanged`, `changed`, `change` |
+| `Label` | Display text | `text` | - |
+| `Button` | Trigger an action | `text` | `click`, `clicked` |
+| `TextBox` | Single-line input | `text`, `placeholder` | `textChanged`, `changed`, `change` |
+| `TextArea` | Multi-line input | `text`, `placeholder` | `textChanged`, `changed`, `change` |
+| `CheckBox` | Boolean choice | `text`, `checked` | `click`, `clicked` |
+| `RadioButton` | Choice inside a group | `text`, `checked` | `click`, `clicked` |
+| `Panel` | Borderless container | `padding`, `spacing`, `children` | - |
+| `GroupBox` | Labeled container | `text`, `padding`, `spacing`, `children` | - |
+| `ComboBox` | Drop-down selection | `items`, `selectedIndex` | `selectionChanged`, `selected`, `changed`, `change` |
+| `ListBox` | List selection | `items`, `selectedIndex` | `selectionChanged`, `selected`, `changed`, `change` |
+| `ScrollBar` | Scroll or value control | `orientation`, `minimum`, `maximum`, `value`, `smallStep`, `largeStep` | `scrollChanged`, `valueChanged`, `changed`, `change` |
+| `Slider` | Trackbar value control | `orientation`, `minimum`, `maximum`, `value`, `smallStep`, `largeStep` | `scrollChanged`, `valueChanged`, `changed`, `change` |
+| `ProgressBar` | Display progress | `minimum`, `maximum`, `value` | `scrollChanged`, `valueChanged`, `changed`, `change` |
+| `TabControl` | Tabbed interface | `items`, `selectedIndex`, `children` | `selectionChanged`, `selected`, `changed`, `change` |
+| `MenuBar` | Application menu bar | `items` | `click`, `clicked` |
+| `ToolBar` | Toolbar | `items` | `click`, `clicked` |
+| `StatusBar` | Status line | `text` | - |
+| `TreeView` | Tree navigation | `items` | `selectionChanged`, `selected`, `changed`, `change` |
+| `ListView` | List/report view | `items`, `selectedIndex` | `selectionChanged`, `selected`, `changed`, `change` |
+| `Table` | Table-like list, currently backed by `ListView` | `items`, `selectedIndex` | `selectionChanged`, `selected`, `changed`, `change` |
+| `DatePicker` | Date input | `text` | `textChanged`, `changed`, `change` |
 
-## Control-Beispiele
+## Control Examples
 
 ### Button
 
@@ -330,29 +340,29 @@ MiniGui unterstuetzt aktuell diese Controls:
 {
   "id": "saveButton",
   "type": "Button",
-  "properties": { "text": "Speichern", "width": 120, "height": 30 },
+  "properties": { "text": "Save", "width": 120, "height": 30 },
   "events": { "click": "onSaveClick" }
 }
 ```
 
 ```minilang
 function onSaveClick(ui, event)
-  MiniGui.Control.setText(ui.statusBar, "Gespeichert")
+  MiniGui.Control.setText(ui.statusBar, "Saved")
   return 0
 end function
 ```
 
-### TextBox und TextArea
+### TextBox and TextArea
 
 ```json
 {
   "id": "notesTextArea",
   "type": "TextArea",
   "properties": {
-    "text": "Notizen",
+    "text": "Notes",
     "height": 80,
     "width": "fill",
-    "placeholder": "Notizen eingeben"
+    "placeholder": "Enter notes"
   },
   "events": { "change": "onNotesChanged" }
 }
@@ -360,18 +370,18 @@ end function
 
 ```minilang
 function onNotesChanged(ui, event)
-  MiniGui.Control.setText(ui.statusBar, "Text geaendert: " + event.newValue)
+  MiniGui.Control.setText(ui.statusBar, "Text changed: " + event.newValue)
   return 0
 end function
 ```
 
-### CheckBox und RadioButton
+### CheckBox and RadioButton
 
 ```json
 {
   "id": "advancedCheckBox",
   "type": "CheckBox",
-  "properties": { "text": "Erweiterte Optionen", "checked": true },
+  "properties": { "text": "Advanced options", "checked": true },
   "events": { "click": "onAdvancedClicked" }
 }
 ```
@@ -384,7 +394,7 @@ function onAdvancedClicked(ui, event)
 end function
 ```
 
-### ComboBox und ListBox
+### ComboBox and ListBox
 
 ```json
 {
@@ -402,12 +412,12 @@ end function
 ```minilang
 function onCountrySelected(ui, event)
   selected = MiniGui.Control.getSelectedText(ui.countryComboBox)
-  MiniGui.Control.setText(ui.resultLabel, "Land: " + selected)
+  MiniGui.Control.setText(ui.resultLabel, "Country: " + selected)
   return 0
 end function
 ```
 
-### Slider, ScrollBar und ProgressBar
+### Slider, ScrollBar, and ProgressBar
 
 ```json
 {
@@ -435,14 +445,14 @@ function onVolumeChanged(ui, event)
 end function
 ```
 
-### Panel und GroupBox
+### Panel and GroupBox
 
 ```json
 {
   "id": "customerGroup",
   "type": "GroupBox",
   "properties": {
-    "text": "Kunde",
+    "text": "Customer",
     "height": 120,
     "width": "fill",
     "padding": 10,
@@ -462,7 +472,7 @@ end function
   "id": "tabs",
   "type": "TabControl",
   "properties": {
-    "items": ["Eingabe", "Daten"],
+    "items": ["Input", "Data"],
     "selectedIndex": 0,
     "height": 220,
     "width": "fill"
@@ -475,7 +485,7 @@ end function
 }
 ```
 
-### ToolBar, MenuBar und StatusBar
+### ToolBar, MenuBar, and StatusBar
 
 ```json
 {
@@ -498,7 +508,7 @@ end function
 }
 ```
 
-### TreeView, ListView, Table und DatePicker
+### TreeView, ListView, Table, and DatePicker
 
 ```json
 {
@@ -534,10 +544,10 @@ end function
 }
 ```
 
-## Events und Code-behind
+## Events and Code-Behind
 
-Event-Handler stehen in der Code-behind-Datei und muessen genau zwei Parameter
-haben:
+Event handlers live in the code-behind file and must accept exactly two
+parameters:
 
 ```minilang
 function onSomething(ui, event)
@@ -545,21 +555,21 @@ function onSomething(ui, event)
 end function
 ```
 
-`ui` ist der generierte Zugriff auf Fenster und Controls. `event` enthaelt:
+`ui` is the generated handle to windows and controls. `event` contains:
 
-- `sender`: Control, das das Event ausgeloest hat.
-- `eventType`: Name des Events.
-- `oldValue`: vorheriger Wert, falls vorhanden.
-- `newValue`: neuer Wert, falls vorhanden.
-- `cancel`: kann bei `close` auf `true` gesetzt werden.
+- `sender`: the control that raised the event.
+- `eventType`: the event name.
+- `oldValue`: previous value, when available.
+- `newValue`: new value, when available.
+- `cancel`: can be set to `true` in a `close` handler.
 
-Fenster-Events:
+Window events:
 
 - `load`
 - `close`
 - `resized`
 
-Beispiel fuer `close`:
+Close-event example:
 
 ```json
 {
@@ -574,15 +584,15 @@ Beispiel fuer `close`:
 function onMainWindowClose(ui, event)
   if MiniGui.Control.getText(ui.nameTextBox) == "" then
     event.cancel = true
-    MiniGui.Control.setText(ui.statusBar, "Bitte zuerst einen Namen eingeben.")
+    MiniGui.Control.setText(ui.statusBar, "Please enter a name first.")
   end if
   return 0
 end function
 ```
 
-## Runtime-API
+## Runtime API
 
-Die wichtigsten Funktionen aus `MiniGui.Control`:
+The most useful functions from `MiniGui.Control`:
 
 ```minilang
 MiniGui.Control.setText(control, "Text")
@@ -598,7 +608,7 @@ MiniGui.Control.setSize(control, 200, 30)
 checked = MiniGui.Control.isChecked(control)
 MiniGui.Control.setChecked(control, true)
 
-MiniGui.Control.addItem(control, "Eintrag")
+MiniGui.Control.addItem(control, "Item")
 MiniGui.Control.setItems(control, ["A", "B", "C"])
 MiniGui.Control.clearItems(control)
 index = MiniGui.Control.getSelectedIndex(control)
@@ -615,12 +625,12 @@ MiniGui.Control.setValue(control, 35)
 value = MiniGui.Control.getValue(control)
 ```
 
-`setValue` und `getValue` sind praktisch fuer `Slider`, `ScrollBar` und
-`ProgressBar`. Fuer `ComboBox` und `ListBox` nutzt du die Selection-Funktionen.
+`setValue` and `getValue` are useful for `Slider`, `ScrollBar`, and
+`ProgressBar`. For `ComboBox` and `ListBox`, use the selection functions.
 
-## Ressourcen
+## Resources
 
-Ressourcen sind einfache Werte, die beim Generieren ersetzt werden.
+Resources are simple values that are resolved while generating MiniLang code.
 
 ```json
 {
@@ -650,10 +660,10 @@ Ressourcen sind einfache Werte, die beim Generieren ersetzt werden.
 }
 ```
 
-## Imports und Komponenten
+## Imports and Components
 
-`imports` laedt weitere `.mson`-Dateien relativ zur importierenden Datei oder
-aus den `--include-dir`-Suchpfaden.
+`imports` loads additional `.mson` files relative to the importing file or from
+the `--include-dir` search paths.
 
 ```json
 {
@@ -661,7 +671,7 @@ aus den `--include-dir`-Suchpfaden.
 }
 ```
 
-Komponenten sind wiederverwendbare UI-Bausteine:
+Components are reusable UI building blocks:
 
 ```json
 {
@@ -681,7 +691,7 @@ Komponenten sind wiederverwendbare UI-Bausteine:
 }
 ```
 
-Verwendung:
+Use the component by its name:
 
 ```json
 {
@@ -690,17 +700,18 @@ Verwendung:
 }
 ```
 
-Wenn eine Komponente mehrfach verwendet wird, praefixt MiniGui interne IDs mit
-der Instanz-ID.
+When a component is used multiple times, MiniGui prefixes internal IDs with the
+instance ID.
 
-## Beispiele im Repository
+## Examples
 
-- `examples/hello-gui`: kleine Anwendung mit TextBox, Button, Label und Events.
-- `examples/control-gallery`: Test- und Demo-Anwendung fuer alle Controls,
-  Attribute, Layouts und Event-Pfade.
-- `examples/customer-form`: Beispiel fuer Imports, Ressourcen und Komponenten.
+- `examples/hello-gui`: a small application with `TextBox`, `Button`, `Label`,
+  and event handlers.
+- `examples/control-gallery`: a test and demo application covering all
+  controls, attributes, layouts, and event binding paths.
+- `examples/customer-form`: an example for imports, resources, and components.
 
-Control Gallery bauen:
+Build the control gallery:
 
 ```powershell
 .\examples\control-gallery\build.ps1
@@ -708,34 +719,34 @@ Control Gallery bauen:
 
 ## Tests
 
-Die MiniGui-Tests bauen das CLI, validieren die Beispielanwendungen, pruefen
-generierten Code, starten GUI-Smoke-Tests und testen Interaktionen wie Button,
-Slider und Resize-Verhalten.
+The MiniGui test suite builds the CLI, validates the example applications,
+checks generated code, starts GUI smoke tests, and verifies interactions such as
+button clicks, slider changes, and resize behavior.
 
 ```powershell
 .\tests\minigui\run_minigui_tests.ps1
 ```
 
-## Compiler-Anforderungen
+## Compiler Requirements
 
-MiniGui nutzt native Interop-Funktionen des MiniLang-Compilers:
+MiniGui uses native interop helpers from the MiniLang compiler:
 
 - `nativeCallback(fn, "wndproc")`
 - `nativeBytesPtr(bytes)`
 - `nativeRawValue(value)`
 - `nativeValueFromRaw(int)`
 
-Diese Funktionen werden von `MiniGuiLib` fuer Win32-Fenster, Window-Procedures,
-native Handles und Callback-Bruecken verwendet.
+`MiniGuiLib` uses these helpers for Win32 windows, window procedures, native
+handles, and callback bridges.
 
-## MiniGui erweitern
+## Extending MiniGui
 
-Um ein neues Control hinzuzufuegen:
+To add a new control:
 
-1. Control-Metadaten und Validierung in `tools/minigui.ml` erweitern.
-2. Runtime-Konstruktor in `MiniGuiLib/minigui.ml` implementieren.
-3. Schema in `schemas/minigui.schema.json` ergaenzen.
-4. Control Gallery und Tests erweitern.
+1. Extend control metadata and validation in `tools/minigui.ml`.
+2. Implement the runtime constructor in `MiniGuiLib/minigui.ml`.
+3. Update `schemas/minigui.schema.json`.
+4. Extend the control gallery and tests.
 
-Die oeffentliche MSON-Struktur sollte stabil bleiben: Anwendungen beschreiben
-weiterhin deklarativ die UI, waehrend die Runtime die nativen Details kapselt.
+The public MSON shape should stay stable: applications describe the UI
+declaratively while the runtime hides native implementation details.

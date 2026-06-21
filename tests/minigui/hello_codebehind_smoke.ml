@@ -16,6 +16,6 @@ function main(args)
   ui = SmokeUi(label)
   MiniGui.Events.bindLoad(app, win, miniguiEvent0, ui)
   MiniGui.Window.show(win)
-  if MiniGui.Control.getText(label) != "Bereit." then return 1 end if
+  if MiniGui.Control.getText(label) != "Ready." then return 1 end if
   return 0
 end function
