@@ -137,6 +137,22 @@ function asInt(v, fallback)
   return fallback
 end function
 
+function intPart(value)
+  text = "" + value
+  outv = ""
+  if len(text) > 0 then
+    for i = 0 to len(text) - 1
+      ch = text[i]
+      if ch == "." then break end if
+      outv = outv + ch
+    end for
+  end if
+  if outv == "" or outv == "-" then outv = "0" end if
+  n = toNumber(outv)
+  if typeof(n) == "int" then return n end if
+  return 0
+end function
+
 function asBool(v, fallback)
   if hasValue(v) and v.kind == "bool" then return v.flag end if
   return fallback
@@ -1163,6 +1179,12 @@ function addGeneratedNode(lines, fields, result, path, node, parentVar, x, y, wi
     if valign == "fill" or valign == "stretch" then h = clampDimension(result, path, node, "height", height) end if
     if valign == "bottom" then y = y + height - h end if
     if valign == "center" then y = y + ((height - h) >> 1) end if
+    x = intPart(x)
+    y = intPart(y)
+    w = intPart(w)
+    h = intPart(h)
+    if w < 1 then w = 1 end if
+    if h < 1 then h = 1 end if
     if typ == "CheckBox" or typ == "RadioButton" then
       checked = "false"
       if boolProp(result, path, node, "checked", false) then checked = "true" end if

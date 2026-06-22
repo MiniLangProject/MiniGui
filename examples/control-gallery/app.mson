@@ -74,6 +74,11 @@
             "events": { "selected": "onTabSelected" },
             "children": [
               {
+                "id": "inputsPage",
+                "type": "Panel",
+                "properties": { "height": 540, "width": "fill", "padding": 8, "spacing": 8 },
+                "children": [
+              {
                 "id": "inputPanel",
                 "type": "Panel",
                 "properties": {
@@ -142,7 +147,14 @@
                     "events": { "change": "onNotesChanged" }
                   }
                 ]
+              }
+                ]
               },
+              {
+                "id": "selectionPage",
+                "type": "Panel",
+                "properties": { "height": 540, "width": "fill", "padding": 8, "spacing": 8 },
+                "children": [
               {
                 "id": "optionsGroupBox",
                 "type": "GroupBox",
@@ -219,7 +231,14 @@
                     ]
                   }
                 ]
+              }
+                ]
               },
+              {
+                "id": "layoutPage",
+                "type": "Panel",
+                "properties": { "height": 540, "width": "fill", "padding": 8, "spacing": 8 },
+                "children": [
               {
                 "id": "layoutPanel",
                 "type": "Panel",
@@ -307,7 +326,14 @@
                     ]
                   }
                 ]
+              }
+                ]
               },
+              {
+                "id": "feedbackPage",
+                "type": "Panel",
+                "properties": { "height": 540, "width": "fill", "padding": 8, "spacing": 8 },
+                "children": [
               {
                 "id": "feedbackPanel",
                 "type": "Panel",
@@ -358,7 +384,14 @@
                     "events": { "valueChanged": "onProgressChanged" }
                   }
                 ]
+              }
+                ]
               },
+              {
+                "id": "dataPage",
+                "type": "Panel",
+                "properties": { "height": 540, "width": "fill", "padding": 8, "spacing": 8 },
+                "children": [
               {
                 "id": "dataPanel",
                 "type": "Panel",
@@ -414,12 +447,19 @@
                           {
                             "id": "scrollContentText",
                             "type": "TextArea",
-                            "properties": { "text": "Longer content can live inside a ScrollViewer.", "height": 64, "width": "fill", "readOnly": true }
+                            "properties": {
+                              "text": "Longer content can live inside a ScrollViewer.\nLine 2: scroll down to inspect more content.\nLine 3: the child control is moved by MiniGui.\nLine 4: wheel and scrollbar messages both update it.\nLine 5: end of the scroll sample.",
+                              "height": 220,
+                              "width": "fill",
+                              "readOnly": true
+                            }
                           }
                         ]
                       }
                     ]
                   }
+                ]
+              }
                 ]
               }
             ]

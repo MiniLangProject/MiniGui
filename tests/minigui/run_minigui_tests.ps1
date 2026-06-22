@@ -94,6 +94,12 @@ public class MiniGuiTestWin32 {
   public static extern int GetDlgCtrlID(IntPtr hWnd);
 
   [DllImport("user32.dll")]
+  public static extern bool IsWindowVisible(IntPtr hWnd);
+
+  [DllImport("user32.dll")]
+  public static extern IntPtr GetParent(IntPtr hWnd);
+
+  [DllImport("user32.dll")]
   public static extern IntPtr SendMessageW(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
 
   public struct RECT {
@@ -136,6 +142,8 @@ function Get-ChildWindows {
       Text = $text.ToString()
       Rect = $rect
       Id = [MiniGuiTestWin32]::GetDlgCtrlID($ChildHandle)
+      Visible = [MiniGuiTestWin32]::IsWindowVisible($ChildHandle)
+      Parent = [MiniGuiTestWin32]::GetParent($ChildHandle)
     })
     return $true
   }, [IntPtr]::Zero) | Out-Null
@@ -145,7 +153,7 @@ function Get-ChildWindows {
 
 function Get-StaticTextSnapshot {
   param([IntPtr]$WindowHandle)
-  return ((Get-ChildWindows $WindowHandle | Where-Object { $_.Class -eq "Static" } | ForEach-Object { $_.Text }) -join " | ")
+  return ((Get-ChildWindows $WindowHandle | Where-Object { $_.Visible -and ($_.Class -eq "Static" -or $_.Class -eq "Button") } | ForEach-Object { $_.Text }) -join " | ")
 }
 
 function Assert-GuiStarts {
@@ -182,6 +190,15 @@ function Assert-GuiStarts {
 function Assert-ControlGalleryInteractions {
   param([string]$Exe)
 
+  function Send-TabClick {
+    param($TabControl, [int]$Index)
+    $x = 24 + ($Index * 170)
+    $y = 12
+    $lParam = [IntPtr](($y -shl 16) -bor $x)
+    [MiniGuiTestWin32]::SendMessageW($TabControl.Handle, 513, [IntPtr]1, $lParam) | Out-Null
+    [MiniGuiTestWin32]::SendMessageW($TabControl.Handle, 514, [IntPtr]::Zero, $lParam) | Out-Null
+  }
+
   $process = Start-Process -FilePath $Exe -PassThru
   try {
     Start-Sleep -Milliseconds 1200
@@ -194,41 +211,54 @@ function Assert-ControlGalleryInteractions {
     }
 
     $children = Get-ChildWindows $process.MainWindowHandle
-    $apply = $children | Where-Object { $_.Class -eq "Button" -and $_.Text -eq "Apply" } | Select-Object -First 1
-    if (-not $apply) { throw "control-gallery interaction test did not find Apply button." }
     $menuBar = $children | Where-Object { $_.Class -eq "Static" -and $_.Text -eq "  File    Edit    View    Help" } | Select-Object -First 1
     if (-not $menuBar) { throw "control-gallery interaction test did not find MenuBar." }
     $toolBar = $children | Where-Object { $_.Class -eq "Static" -and $_.Text -eq "  New  |  Open  |  Save  |  Refresh" } | Select-Object -First 1
     if (-not $toolBar) { throw "control-gallery interaction test did not find ToolBar." }
-    $slider = $children | Where-Object { $_.Class -eq "msctls_trackbar32" } | Select-Object -First 1
-    if (-not $slider) { throw "control-gallery interaction test did not find Slider." }
+    $tabs = $children | Where-Object { $_.Class -eq "SysTabControl32" } | Select-Object -First 1
+    if (-not $tabs) { throw "control-gallery interaction test did not find TabControl." }
     foreach ($requiredClass in @("msctls_progress32", "SysTabControl32", "SysTreeView32", "SysListView32", "SysDateTimePick32", "msctls_statusbar32")) {
       if (-not ($children | Where-Object { $_.Class -eq $requiredClass } | Select-Object -First 1)) {
         throw "control-gallery interaction test did not find native class $requiredClass."
       }
     }
 
-    [MiniGuiTestWin32]::SendMessageW($process.MainWindowHandle, 273, [IntPtr]$apply.Id, $apply.Handle) | Out-Null
-    Start-Sleep -Milliseconds 300
-    $afterClick = Get-StaticTextSnapshot $process.MainWindowHandle
-    if ($afterClick -notmatch "Applied for Ada") {
-      throw "control-gallery Apply command did not update result text: $afterClick"
-    }
-
-    [MiniGuiTestWin32]::SendMessageW($process.MainWindowHandle, 273, [IntPtr]$toolBar.Id, $toolBar.Handle) | Out-Null
+    [MiniGuiTestWin32]::SendMessageW($toolBar.Handle, 514, [IntPtr]::Zero, [IntPtr]::Zero) | Out-Null
     Start-Sleep -Milliseconds 300
     $afterToolBar = Get-StaticTextSnapshot $process.MainWindowHandle
     if ($afterToolBar -notmatch "Action from mainToolBar") {
-      throw "control-gallery ToolBar command did not update result text: $afterToolBar"
+      throw "control-gallery ToolBar click did not update result text: $afterToolBar"
     }
 
-    [MiniGuiTestWin32]::SendMessageW($process.MainWindowHandle, 273, [IntPtr]$menuBar.Id, $menuBar.Handle) | Out-Null
+    [MiniGuiTestWin32]::SendMessageW($menuBar.Handle, 514, [IntPtr]::Zero, [IntPtr]::Zero) | Out-Null
     Start-Sleep -Milliseconds 300
     $afterMenuBar = Get-StaticTextSnapshot $process.MainWindowHandle
     if ($afterMenuBar -notmatch "Action from mainMenu") {
-      throw "control-gallery MenuBar command did not update result text: $afterMenuBar"
+      throw "control-gallery MenuBar click did not update result text: $afterMenuBar"
     }
 
+    Send-TabClick $tabs 1
+    Start-Sleep -Milliseconds 300
+    $afterSelectionTab = Get-StaticTextSnapshot $process.MainWindowHandle
+    if ($afterSelectionTab -notmatch "Enable advanced actions" -or $afterSelectionTab -match "Name \| Password") {
+      throw "control-gallery TabControl did not switch to Selection page: $afterSelectionTab"
+    }
+
+    Send-TabClick $tabs 2
+    Start-Sleep -Milliseconds 300
+    $apply = Get-ChildWindows $process.MainWindowHandle | Where-Object { $_.Visible -and $_.Class -eq "Button" -and $_.Text -eq "Apply" } | Select-Object -First 1
+    if (-not $apply) { throw "control-gallery interaction test did not find visible Apply button on Layout tab." }
+    [MiniGuiTestWin32]::SendMessageW($process.MainWindowHandle, 273, [IntPtr]$apply.Id, $apply.Handle) | Out-Null
+    Start-Sleep -Milliseconds 300
+    $afterClick = Get-StaticTextSnapshot $process.MainWindowHandle
+    if ($afterClick -notmatch "Applied for Ada" -or $afterClick -notmatch "Apply was clicked") {
+      throw "control-gallery Apply command did not update result text: $afterClick"
+    }
+
+    Send-TabClick $tabs 3
+    Start-Sleep -Milliseconds 300
+    $slider = Get-ChildWindows $process.MainWindowHandle | Where-Object { $_.Visible -and $_.Class -eq "msctls_trackbar32" } | Select-Object -First 1
+    if (-not $slider) { throw "control-gallery interaction test did not find visible Slider on Feedback tab." }
     [MiniGuiTestWin32]::SendMessageW($slider.Handle, 1029, [IntPtr]1, [IntPtr]55) | Out-Null
     $scrollWParam = [IntPtr]((55 -shl 16) -bor 5)
     [MiniGuiTestWin32]::SendMessageW($process.MainWindowHandle, 276, $scrollWParam, $slider.Handle) | Out-Null
@@ -236,6 +266,18 @@ function Assert-ControlGalleryInteractions {
     $afterSlider = Get-StaticTextSnapshot $process.MainWindowHandle
     if ($afterSlider -notmatch "Volume: 55") {
       throw "control-gallery Slider command did not update volume text: $afterSlider"
+    }
+
+    Send-TabClick $tabs 4
+    Start-Sleep -Milliseconds 300
+    $scrollContent = Get-ChildWindows $process.MainWindowHandle | Where-Object { $_.Visible -and $_.Class -eq "Edit" -and $_.Text -match "Longer content" } | Select-Object -First 1
+    if (-not $scrollContent) { throw "control-gallery interaction test did not find ScrollViewer content on Data tab." }
+    $beforeScrollTop = $scrollContent.Rect.Top
+    [MiniGuiTestWin32]::SendMessageW($scrollContent.Parent, 277, [IntPtr]1, [IntPtr]::Zero) | Out-Null
+    Start-Sleep -Milliseconds 300
+    $scrollContentAfter = Get-ChildWindows $process.MainWindowHandle | Where-Object { $_.Visible -and $_.Class -eq "Edit" -and $_.Text -match "Longer content" } | Select-Object -First 1
+    if ($scrollContentAfter.Rect.Top -ge $beforeScrollTop) {
+      throw "control-gallery ScrollViewer did not move content upward. Before $beforeScrollTop, after $($scrollContentAfter.Rect.Top)."
     }
 
     $beforeWidth = $slider.Rect.Right - $slider.Rect.Left

@@ -26,11 +26,12 @@ end function
 
 function onActionClicked(ui, event)
   MiniGui.Control.setText(ui.resultLabel, "Action from " + event.sender.id)
+  MiniGui.Control.setText(ui.statusLabel, "Dialog action: " + event.sender.id)
   return 0
 end function
 
 function onTabSelected(ui, event)
-  MiniGui.Control.setText(ui.statusLabel, "Tab event")
+  MiniGui.Control.setText(ui.statusLabel, "Tab selected: " + event.newValue)
   return 0
 end function
 

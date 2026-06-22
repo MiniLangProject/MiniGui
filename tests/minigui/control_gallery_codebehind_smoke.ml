@@ -82,7 +82,7 @@ function main(args)
   if MiniGui.Control.getText(resultLabel) != "Action from mainToolBar" then return 4 end if
 
   Gallery.onTabSelected(ui, MiniGui.Event(tabs, "selected", 0, 1, false))
-  if MiniGui.Control.getText(statusLabel) != "Tab event" then return 5 end if
+  if MiniGui.Control.getText(statusLabel) != "Tab selected: 1" then return 5 end if
 
   Gallery.onNameChanged(ui, MiniGui.Event(nameBox, "textChanged", "Ada", "Grace", false))
   if MiniGui.Control.getText(statusLabel) != "Name: Grace" then return 6 end if

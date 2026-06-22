@@ -46,6 +46,8 @@ extern function GetWindowTextLengthW(hwnd as ptr) from "user32.dll" returns int
 extern function GetClientRect(hwnd as ptr, rect as bytes) from "user32.dll" returns bool
 extern function MoveWindow(hwnd as ptr, x as int, y as int, width as int, height as int, repaint as bool) from "user32.dll" returns bool
 extern function RedrawWindow(hwnd as ptr, rect as ptr, region as ptr, flags as u32) from "user32.dll" returns bool
+extern function SetScrollRange(hwnd as ptr, bar as int, minimum as int, maximum as int, redraw as bool) from "user32.dll" returns bool
+extern function SetScrollPos(hwnd as ptr, bar as int, position as int, redraw as bool) from "user32.dll" returns int
 extern function SetTimer(hwnd as ptr, timerId as u32, elapsedMs as u32, timerProc as ptr) from "user32.dll" returns ptr
 extern function SetWindowLongPtrW(hwnd as ptr, index as int, newLong as ptr) from "user32.dll" returns ptr
 extern function GetWindowLongPtrW(hwnd as ptr, index as int) from "user32.dll" returns ptr
@@ -55,6 +57,7 @@ extern function LoadImageW(instance as ptr, name as wstr, imageType as u32, widt
 extern function MessageBoxW(hwnd as ptr, text as wstr, caption as wstr, flags as u32) from "user32.dll" returns int
 extern function CallWindowProcW(prev as ptr, hwnd as ptr, msg as u32, wParam as ptr, lParam as ptr) from "user32.dll" symbol "CallWindowProcW" returns ptr
 extern function DefWindowProcW(hwnd as ptr, msg as u32, wParam as ptr, lParam as ptr) from "user32.dll" returns ptr
+extern function RtlMoveMemory(dest as bytes, src as ptr, size as int) from "kernel32.dll" returns void
 extern function PostQuitMessage(exitCode as int) from "user32.dll" returns void
 extern function GetMessageW(msg as bytes, hwnd as ptr, msgMin as u32, msgMax as u32) from "user32.dll" returns int
 extern function TranslateMessage(msg as bytes) from "user32.dll" returns bool
@@ -69,8 +72,11 @@ const WM_TIMER = 275
 const WM_DESTROY = 2
 const WM_CLOSE = 16
 const WM_COMMAND = 273
+const WM_NOTIFY = 78
 const WM_HSCROLL = 276
 const WM_VSCROLL = 277
+const WM_MOUSEWHEEL = 522
+const WM_LBUTTONUP = 514
 const BN_CLICKED = 0
 const EN_CHANGE = 768
 const EM_LIMITTEXT = 197
@@ -98,7 +104,11 @@ const SBM_SETPOS = 224
 const SBM_GETPOS = 225
 const SBM_SETRANGE = 226
 const TCM_INSERTITEMW = 4926
+const TCM_GETITEMCOUNT = 4868
+const TCM_GETCURSEL = 4875
+const TCM_SETCURSEL = 4876
 const TCIF_TEXT = 1
+const TCN_SELCHANGE = -551
 const TBM_GETPOS = 1024
 const TBM_SETPOS = 1029
 const TBM_SETRANGEMIN = 1031
@@ -115,6 +125,7 @@ const SB_THUMBPOSITION = 4
 const SB_THUMBTRACK = 5
 const SB_TOP = 6
 const SB_BOTTOM = 7
+const SB_VERT = 1
 const IDC_ARROW = 32512
 const WS_OVERLAPPEDWINDOW = 13565952
 const WS_VISIBLE = 268435456
@@ -172,6 +183,8 @@ _activeApp = void
 _windowProcPtr = 0
 _timerProcPtr = 0
 _oldWindowProcPtr = 0
+_subclassHandles = []
+_subclassOldProcs = []
 _windowClassRegistered = false
 _windowClassNameBytes = void
 
@@ -197,6 +210,18 @@ end function
 
 function _readI32LE(buf, off)
   value = buf[off] | (buf[off + 1] << 8) | (buf[off + 2] << 16) | (buf[off + 3] << 24)
+  return value
+end function
+
+function _readS32LE(buf, off)
+  value = _readI32LE(buf, off)
+  if value >= 2147483648 then return value - 4294967296 end if
+  return value
+end function
+
+function _readPtrLE(buf, off)
+  value = buf[off] | (buf[off + 1] << 8) | (buf[off + 2] << 16) | (buf[off + 3] << 24)
+  value = value | (buf[off + 4] << 32) | (buf[off + 5] << 40) | (buf[off + 6] << 48) | (buf[off + 7] << 56)
   return value
 end function
 
@@ -239,6 +264,16 @@ function _asciiUtf16Z(text)
 end function
 
 function _defaultWndProc(hwnd, msg, wParam, lParam)
+  global _subclassHandles
+  global _subclassOldProcs
+  if len(_subclassHandles) > 0 then
+    for i = 0 to len(_subclassHandles) - 1
+      if _subclassHandles[i] == hwnd then
+        oldProc = _subclassOldProcs[i]
+        if oldProc != 0 then return CallWindowProcW(oldProc, hwnd, msg, wParam, lParam) end if
+      end if
+    end for
+  end if
   global _oldWindowProcPtr
   if _oldWindowProcPtr != 0 then
     return CallWindowProcW(_oldWindowProcPtr, hwnd, msg, wParam, lParam)
@@ -254,6 +289,24 @@ end function
 
 function _miniGuiWndProc(hwnd, msg, wParam, lParam)
   global _activeApp
+  if msg == WM_LBUTTONUP then
+    appClick = _activeApp
+    if appClick is void then appClick = _appForWindow(hwnd) end if
+    if appClick is void == false then
+      if Events.isControlKind(appClick, hwnd, "TabControl") then
+        tabClickX = lParam & 65535
+        if Events.dispatchTabClickedByHandle(appClick, hwnd, tabClickX) then
+          return 0
+        end if
+        return _defaultWndProc(hwnd, msg, wParam, lParam)
+      end if
+      if Events.dispatchClickByHandle(appClick, hwnd) then
+        return 0
+      end if
+    end if
+    return _defaultWndProc(hwnd, msg, wParam, lParam)
+  end if
+
   if msg == WM_COMMAND then
     app = _activeApp
     if app is void then app = _appForWindow(hwnd) end if
@@ -266,6 +319,22 @@ function _miniGuiWndProc(hwnd, msg, wParam, lParam)
     return _defaultWndProc(hwnd, msg, wParam, lParam)
   end if
 
+  if msg == WM_NOTIFY then
+    appNotify = _activeApp
+    if appNotify is void then appNotify = _appForWindow(hwnd) end if
+    if appNotify is void then return _defaultWndProc(hwnd, msg, wParam, lParam) end if
+    if lParam != 0 then
+      notifyHeader = bytes(24, 0)
+      RtlMoveMemory(notifyHeader, lParam, 24)
+      hwndFrom = _readPtrLE(notifyHeader, 0)
+      notifyCode = _readS32LE(notifyHeader, 16)
+      if Events.dispatchNotify(appNotify, hwndFrom, wParam, notifyCode) then
+        return 0
+      end if
+    end if
+    return _defaultWndProc(hwnd, msg, wParam, lParam)
+  end if
+
   if msg == WM_HSCROLL or msg == WM_VSCROLL then
     appScroll = _activeApp
     if appScroll is void then appScroll = _appForWindow(hwnd) end if
@@ -273,6 +342,25 @@ function _miniGuiWndProc(hwnd, msg, wParam, lParam)
     codeScroll = wParam & 65535
     posScroll = (wParam >> 16) & 65535
     if Events.dispatchScroll(appScroll, codeScroll, posScroll, lParam) then
+      return 0
+    end if
+    if lParam == 0 then
+      if Events.dispatchScrollViewer(appScroll, hwnd, codeScroll, posScroll) then
+        return 0
+      end if
+    end if
+    return _defaultWndProc(hwnd, msg, wParam, lParam)
+  end if
+
+  if msg == WM_MOUSEWHEEL then
+    appWheel = _activeApp
+    if appWheel is void then appWheel = _appForWindow(hwnd) end if
+    if appWheel is void then return _defaultWndProc(hwnd, msg, wParam, lParam) end if
+    wheelCode = SB_LINEDOWN
+    wheelDelta = (wParam >> 16) & 65535
+    if wheelDelta > 32767 then wheelDelta = wheelDelta - 65536 end if
+    if wheelDelta > 0 then wheelCode = SB_LINEUP end if
+    if Events.dispatchScrollViewer(appWheel, hwnd, wheelCode, 0) then
       return 0
     end if
     return _defaultWndProc(hwnd, msg, wParam, lParam)
@@ -381,10 +469,27 @@ end function
 
 function _installSpecificWindowProc(hwnd, cb)
   global _oldWindowProcPtr
+  global _subclassHandles
+  global _subclassOldProcs
   if cb == 0 then return false end if
   oldProc = SetWindowLongPtrW(hwnd, GWLP_WNDPROC, cb)
   if _oldWindowProcPtr == 0 and oldProc != 0 and oldProc != cb and oldProc != _windowProcPtr then
     _oldWindowProcPtr = oldProc
+  end if
+  if oldProc != 0 and oldProc != cb then
+    found = false
+    if len(_subclassHandles) > 0 then
+      for i = 0 to len(_subclassHandles) - 1
+        if _subclassHandles[i] == hwnd then
+          _subclassOldProcs[i] = oldProc
+          found = true
+        end if
+      end for
+    end if
+    if found == false then
+      _subclassHandles = _subclassHandles + [hwnd]
+      _subclassOldProcs = _subclassOldProcs + [oldProc]
+    end if
   end if
   return true
 end function
@@ -466,6 +571,16 @@ struct Application
 
   static function addControl(app, control)
     app.controls = app.controls + [control]
+    if control is void == false then
+      if control.parent is void == false then
+        if control.parent.kind == "TabControl" then
+          Control.updateTabPages(app, control.parent)
+        end if
+        if control.parent.kind == "ScrollViewer" then
+          Control.updateScrollViewer(app, control.parent)
+        end if
+      end if
+    end if
     return control
   end function
 
@@ -513,6 +628,13 @@ struct Application
           Control.moveCurrent(c, nx, ny, nw, nh)
         end if
       end for
+      for j = 0 to len(app.controls) - 1
+        rc = app.controls[j]
+        if rc is void == false then
+          if rc.kind == "TabControl" then Control.updateTabPages(app, rc) end if
+          if rc.kind == "ScrollViewer" then Control.updateScrollViewer(app, rc) end if
+        end if
+      end for
     end if
     Events.dispatchResize(app, window, oldSize, [clientWidth, clientHeight])
     RedrawWindow(window.handle, void, void, RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN | RDW_UPDATENOW)
@@ -544,6 +666,19 @@ struct Application
     return true
   end function
 
+  static function syncDynamicControls(app)
+    if app is void then return false end if
+    if len(app.controls) == 0 then return false end if
+    for i = 0 to len(app.controls) - 1
+      c = app.controls[i]
+      if c is void == false then
+        if c.kind == "TabControl" then Control.updateTabPages(app, c) end if
+        if c.kind == "ScrollViewer" then Control.updateScrollViewer(app, c) end if
+      end if
+    end for
+    return true
+  end function
+
   static function run(app)
     global _activeApp
     if app is void then return 1 end if
@@ -551,6 +686,7 @@ struct Application
     if app.startupWindow.handle is void then return 2 end if
 
     _activeApp = app
+    Application.syncDynamicControls(app)
     app.running = true
     msg = bytes(48, 0)
 
@@ -592,6 +728,8 @@ struct Window
   static function show(window)
     if window is void then return false end if
     if window.handle is void then return false end if
+    global _activeApp
+    if _activeApp is void == false then Application.syncDynamicControls(_activeApp) end if
     SetTimer(window.handle, 1, 100, _ensureTimerProc())
     ShowWindow(window.handle, SW_SHOW)
     UpdateWindow(window.handle)
@@ -779,6 +917,7 @@ struct Image
       bmp = LoadImageW(void, source, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE)
       if bmp != 0 then SendMessageW(hwnd, STM_SETIMAGE, IMAGE_BITMAP, bmp) end if
     end if
+    if hwnd != 0 then _installWindowProc(hwnd) end if
     c = NativeControl(id, "Image", hwnd, nid, label, x, y, width, height, true, true, label, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     return Application.addControl(app, c)
   end function
@@ -801,6 +940,7 @@ struct LinkLabel
     label = text
     if label == "" then label = url end if
     hwnd = CreateWindowExW(0, "STATIC", label, WS_CHILD | WS_VISIBLE | SS_LEFT | SS_NOTIFY, x, y, width, height, parent.handle, nid, void, void)
+    if hwnd != 0 then _installWindowProc(hwnd) end if
     c = NativeControl(id, "LinkLabel", hwnd, nid, label, x, y, width, height, true, true, label, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     return Application.addControl(app, c)
   end function
@@ -824,6 +964,8 @@ struct ScrollViewer
     if horizontalScroll then style = style | WS_HSCROLL end if
     if verticalScroll then style = style | WS_VSCROLL end if
     hwnd = CreateWindowExW(0, "STATIC", text, style, x, y, width, height, parent.handle, nid, void, void)
+    if hwnd != 0 then _installWindowProc(hwnd) end if
+    if hwnd != 0 then SetScrollRange(hwnd, SB_VERT, 0, 0, true) end if
     c = NativeControl(id, "ScrollViewer", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     return Application.addControl(app, c)
   end function
@@ -888,6 +1030,7 @@ struct TabControl
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
     hwnd = CreateWindowExW(0, "SysTabControl32", text, WS_CHILD | WS_VISIBLE, x, y, width, height, parent.handle, nid, void, void)
+    if hwnd != 0 then _installWindowProc(hwnd) end if
     c = NativeControl(id, "TabControl", hwnd, nid, text, x, y, width, height, true, true, text, selectedIndex, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     if len(items) > 0 then
       for i = 0 to len(items) - 1
@@ -917,6 +1060,7 @@ struct MenuBar
     label = text
     if label == "" and len(items) > 0 then label = "  " + _joinText(items, "    ") end if
     hwnd = CreateWindowExW(0, "STATIC", label, WS_CHILD | WS_VISIBLE | SS_LEFT | SS_NOTIFY, x, y, width, height, parent.handle, nid, void, void)
+    if hwnd != 0 then _installWindowProc(hwnd) end if
     c = NativeControl(id, "MenuBar", hwnd, nid, label, x, y, width, height, true, true, label, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     return Application.addControl(app, c)
   end function
@@ -940,6 +1084,7 @@ struct ToolBar
     label = text
     if label == "" and len(items) > 0 then label = "  " + _joinText(items, "  |  ") end if
     hwnd = CreateWindowExW(0, "STATIC", label, WS_CHILD | WS_VISIBLE | SS_LEFT | SS_NOTIFY, x, y, width, height, parent.handle, nid, void, void)
+    if hwnd != 0 then _installWindowProc(hwnd) end if
     c = NativeControl(id, "ToolBar", hwnd, nid, label, x, y, width, height, true, true, label, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     return Application.addControl(app, c)
   end function
@@ -1171,6 +1316,7 @@ struct Control
     if control.handle is void then return -1 end if
     if control.kind == "ComboBox" then return SendMessageW(control.handle, CB_GETCURSEL, 0, 0) end if
     if control.kind == "ListBox" then return SendMessageW(control.handle, LB_GETCURSEL, 0, 0) end if
+    if control.kind == "TabControl" then return SendMessageW(control.handle, TCM_GETCURSEL, 0, 0) end if
     return -1
   end function
 
@@ -1187,7 +1333,138 @@ struct Control
       control.lastSelection = Control.getSelectedIndex(control)
       return true
     end if
+    if control.kind == "TabControl" then
+      SendMessageW(control.handle, TCM_SETCURSEL, index, 0)
+      control.lastSelection = Control.getSelectedIndex(control)
+      global _activeApp
+      if _activeApp is void == false then
+        Control.updateTabPages(_activeApp, control)
+      end if
+      return true
+    end if
     return false
+  end function
+
+  static function updateTabPages(app, tabControl)
+    if app is void then return false end if
+    if tabControl is void then return false end if
+    if tabControl.kind != "TabControl" then return false end if
+    selected = Control.getSelectedIndex(tabControl)
+    if selected < 0 then selected = tabControl.lastSelection end if
+    if selected < 0 then selected = 0 end if
+    tabControl.lastSelection = selected
+    pageIndex = 0
+    if len(app.controls) > 0 then
+      for i = 0 to len(app.controls) - 1
+        c = app.controls[i]
+        if c is void == false then
+          if c.parent is void == false and c.parent.handle == tabControl.handle then
+            pageVisible = pageIndex == selected
+            Control.applyEffectiveVisible(c, pageVisible)
+            for j = 0 to len(app.controls) - 1
+              child = app.controls[j]
+              if child is void == false then
+                if Control.isDescendantOf(app, child, c) then
+                  Control.applyEffectiveVisible(child, pageVisible)
+                end if
+              end if
+            end for
+            pageIndex = pageIndex + 1
+          end if
+        end if
+      end for
+    end if
+    return true
+  end function
+
+  static function applyEffectiveVisible(control, parentVisible)
+    if control is void then return false end if
+    if control.handle is void then return false end if
+    if parentVisible and control.visible then
+      return ShowWindow(control.handle, SW_SHOW)
+    end if
+    return ShowWindow(control.handle, 0)
+  end function
+
+  static function isDescendantOf(app, control, ancestor)
+    if app is void then return false end if
+    if control is void then return false end if
+    if ancestor is void then return false end if
+    current = control
+    safety = 0
+    while current is void == false and safety < 64
+      safety = safety + 1
+      if current.parent is void then return false end if
+      if current.parent.handle == ancestor.handle then return true end if
+      parentHandle = current.parent.handle
+      foundParent = void
+      if len(app.controls) > 0 then
+        for i = 0 to len(app.controls) - 1
+          maybeParent = app.controls[i]
+          if maybeParent is void == false then
+            if maybeParent.handle == parentHandle then foundParent = maybeParent end if
+          end if
+        end for
+      end if
+      current = foundParent
+    end while
+    return false
+  end function
+
+  static function updateScrollViewer(app, scrollViewer)
+    if app is void then return false end if
+    if scrollViewer is void then return false end if
+    if scrollViewer.kind != "ScrollViewer" then return false end if
+    maxBottom = 0
+    if len(app.controls) > 0 then
+      for i = 0 to len(app.controls) - 1
+        child = app.controls[i]
+        if child is void == false then
+          if child.parent is void == false and child.parent.handle == scrollViewer.handle then
+            childBottom = child.baseY + child.baseHeight + 8
+            if childBottom > maxBottom then maxBottom = childBottom end if
+          end if
+        end if
+      end for
+    end if
+    maxScroll = maxBottom - scrollViewer.height
+    if maxScroll < 0 then maxScroll = 0 end if
+    scrollViewer.scrollMin = 0
+    scrollViewer.scrollMax = maxScroll
+    if scrollViewer.scrollValue > maxScroll then scrollViewer.scrollValue = maxScroll end if
+    if scrollViewer.scrollValue < 0 then scrollViewer.scrollValue = 0 end if
+    if scrollViewer.handle is void == false then
+      SetScrollRange(scrollViewer.handle, SB_VERT, 0, maxScroll, true)
+      SetScrollPos(scrollViewer.handle, SB_VERT, scrollViewer.scrollValue, true)
+    end if
+    return Control.scrollViewerTo(app, scrollViewer, scrollViewer.scrollValue)
+  end function
+
+  static function scrollViewerTo(app, scrollViewer, value)
+    if app is void then return false end if
+    if scrollViewer is void then return false end if
+    if scrollViewer.kind != "ScrollViewer" then return false end if
+    if value < scrollViewer.scrollMin then value = scrollViewer.scrollMin end if
+    if value > scrollViewer.scrollMax then value = scrollViewer.scrollMax end if
+    oldValue = scrollViewer.scrollValue
+    scrollViewer.scrollValue = value
+    if scrollViewer.handle is void == false then
+      SetScrollPos(scrollViewer.handle, SB_VERT, value, true)
+    end if
+    if len(app.controls) > 0 then
+      for i = 0 to len(app.controls) - 1
+        child = app.controls[i]
+        if child is void == false then
+          if child.parent is void == false and child.parent.handle == scrollViewer.handle then
+            Control.moveCurrent(child, child.baseX, child.baseY - value, child.width, child.height)
+          end if
+        end if
+      end for
+    end if
+    if oldValue != value then
+      RedrawWindow(scrollViewer.handle, void, void, RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN | RDW_UPDATENOW)
+    end if
+    return true
   end function
 
   static function getSelectedText(control)
@@ -1451,6 +1728,138 @@ struct Events
         Events.dispatch(b, "resized", oldValue, newValue)
       end if
     end for
+    return false
+  end function
+
+  static function dispatchNotify(app, hwndControl, nativeId, code)
+    if app is void then return false end if
+    for s = 0 to len(app.selectionBindings) - 1
+      b = app.selectionBindings[s]
+      c = b.control
+      if c is void == false then
+        if c.kind == "TabControl" and (c.handle == hwndControl or c.nativeId == nativeId) then
+          oldValue = c.lastSelection
+          newValue = Control.getSelectedIndex(c)
+          if newValue < 0 then newValue = oldValue end if
+          c.lastSelection = newValue
+          Control.updateTabPages(app, c)
+          if oldValue != newValue then
+            Events.dispatch(b, b.eventType, oldValue, newValue)
+          end if
+          return true
+        end if
+      end if
+    end for
+    return false
+  end function
+
+  static function dispatchClickByHandle(app, hwndControl)
+    if app is void then return false end if
+    for i = 0 to len(app.clickBindings) - 1
+      b = app.clickBindings[i]
+      c = b.control
+      if c is void == false then
+        if c.handle == hwndControl then
+          Events.dispatch(b, "click", false, true)
+          return true
+        end if
+      end if
+    end for
+    return false
+  end function
+
+  static function isControlKind(app, hwndControl, kind)
+    if app is void then return false end if
+    if len(app.controls) > 0 then
+      for i = 0 to len(app.controls) - 1
+        c = app.controls[i]
+        if c is void == false then
+          if c.handle == hwndControl and c.kind == kind then return true end if
+        end if
+      end for
+    end if
+    return false
+  end function
+
+  static function dispatchTabChangedByHandle(app, hwndControl)
+    if app is void then return false end if
+    for s = 0 to len(app.selectionBindings) - 1
+      b = app.selectionBindings[s]
+      c = b.control
+      if c is void == false then
+        if c.kind == "TabControl" and c.handle == hwndControl then
+          oldValue = c.lastSelection
+          newValue = Control.getSelectedIndex(c)
+          if newValue < 0 then newValue = oldValue end if
+          c.lastSelection = newValue
+          Control.updateTabPages(app, c)
+          if oldValue != newValue then
+            Events.dispatch(b, b.eventType, oldValue, newValue)
+          end if
+          return true
+        end if
+      end if
+    end for
+    return false
+  end function
+
+  static function dispatchTabClickedByHandle(app, hwndControl, x)
+    if app is void then return false end if
+    if len(app.selectionBindings) == 0 then return false end if
+    for s = 0 to len(app.selectionBindings) - 1
+      b = app.selectionBindings[s]
+      c = b.control
+      if c is void == false then
+        if c.kind == "TabControl" and c.handle == hwndControl then
+          count = SendMessageW(c.handle, TCM_GETITEMCOUNT, 0, 0)
+          if count <= 0 then count = 1 end if
+          tabWidth = _asInt(c.width / count)
+          if tabWidth < 1 then tabWidth = 1 end if
+          index = _asInt(x / tabWidth)
+          if index < 0 then index = 0 end if
+          if index >= count then index = count - 1 end if
+          oldValue = c.lastSelection
+          SendMessageW(c.handle, TCM_SETCURSEL, index, 0)
+          c.lastSelection = index
+          Control.updateTabPages(app, c)
+          if oldValue != index then
+            Events.dispatch(b, b.eventType, oldValue, index)
+          end if
+          return true
+        end if
+      end if
+    end for
+    return false
+  end function
+
+  static function dispatchScrollViewer(app, hwndControl, code, pos)
+    if app is void then return false end if
+    if len(app.controls) > 0 then
+      for i = 0 to len(app.controls) - 1
+        c = app.controls[i]
+        if c is void == false then
+          if c.kind == "ScrollViewer" and c.handle == hwndControl then
+            oldValue = c.scrollValue
+            newValue = oldValue
+            if code == SB_LINEUP then newValue = oldValue - c.smallStep end if
+            if code == SB_LINEDOWN then newValue = oldValue + c.smallStep end if
+            if code == SB_PAGEUP then newValue = oldValue - c.largeStep end if
+            if code == SB_PAGEDOWN then newValue = oldValue + c.largeStep end if
+            if code == SB_TOP then newValue = c.scrollMin end if
+            if code == SB_BOTTOM then newValue = c.scrollMax end if
+            if code == SB_THUMBPOSITION or code == SB_THUMBTRACK then newValue = pos end if
+            Control.scrollViewerTo(app, c, newValue)
+            if oldValue != c.scrollValue then
+              for s = 0 to len(app.scrollBindings) - 1
+                b = app.scrollBindings[s]
+                if b.control == c then Events.dispatch(b, b.eventType, oldValue, c.scrollValue) end if
+              end for
+            end if
+            return true
+          end if
+        end if
+      end for
+    end if
     return false
   end function
 
