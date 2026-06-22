@@ -271,6 +271,15 @@ function Assert-ControlGalleryInteractions {
 
     Send-TabClick $tabs 4
     Start-Sleep -Milliseconds 300
+    $dataChildren = Get-ChildWindows $process.MainWindowHandle
+    $tree = $dataChildren | Where-Object { $_.Visible -and $_.Class -eq "SysTreeView32" } | Select-Object -First 1
+    if (-not $tree) { throw "control-gallery interaction test did not find visible TreeView on Data tab." }
+    $treeCount = [MiniGuiTestWin32]::SendMessageW($tree.Handle, 4357, [IntPtr]::Zero, [IntPtr]::Zero).ToInt64()
+    if ($treeCount -ne 3) { throw "control-gallery TreeView item count was $treeCount, expected 3." }
+    $table = $dataChildren | Where-Object { $_.Visible -and $_.Class -eq "SysListView32" } | Select-Object -First 1
+    if (-not $table) { throw "control-gallery interaction test did not find visible Table on Data tab." }
+    $tableCount = [MiniGuiTestWin32]::SendMessageW($table.Handle, 4100, [IntPtr]::Zero, [IntPtr]::Zero).ToInt64()
+    if ($tableCount -ne 3) { throw "control-gallery Table item count was $tableCount, expected 3." }
     $scrollContent = Get-ChildWindows $process.MainWindowHandle | Where-Object { $_.Visible -and $_.Class -eq "Edit" -and $_.Text -match "Longer content" } | Select-Object -First 1
     if (-not $scrollContent) { throw "control-gallery interaction test did not find ScrollViewer content on Data tab." }
     $beforeScrollTop = $scrollContent.Rect.Top

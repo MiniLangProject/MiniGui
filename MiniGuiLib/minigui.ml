@@ -98,6 +98,20 @@ const LB_GETTEXT = 393
 const LB_GETTEXTLEN = 394
 const LB_RESETCONTENT = 388
 const LBN_SELCHANGE = 1
+const LVM_GETITEMCOUNT = 4100
+const LVM_DELETEALLITEMS = 4105
+const LVM_GETNEXTITEM = 4108
+const LVM_SETITEMSTATE = 4139
+const LVM_INSERTITEMW = 4173
+const LVM_INSERTCOLUMNW = 4193
+const LVN_ITEMCHANGED = -101
+const LVIF_TEXT = 1
+const LVCF_TEXT = 4
+const LVCF_WIDTH = 2
+const LVCF_SUBITEM = 8
+const LVIS_FOCUSED = 1
+const LVIS_SELECTED = 2
+const LVNI_SELECTED = 2
 const PBM_SETPOS = 1026
 const PBM_SETRANGE32 = 1030
 const SBM_SETPOS = 224
@@ -116,6 +130,12 @@ const TBM_SETRANGEMIN = 1031
 const TBM_SETRANGEMAX = 1032
 const TBM_SETPAGESIZE = 1045
 const TBM_SETLINESIZE = 1047
+const TVM_DELETEITEM = 4353
+const TVM_INSERTITEMW = 4402
+const TVN_SELCHANGEDW = -451
+const TVIF_TEXT = 1
+const TVI_ROOT = 4294901760
+const TVI_LAST = 4294901762
 const SB_SETTEXTW = 1035
 const SB_GETTEXTW = 1037
 const SB_LINEUP = 0
@@ -1168,6 +1188,7 @@ struct TreeView
     app.nextNativeId = app.nextNativeId + 1
     hwnd = CreateWindowExW(0, "SysTreeView32", text, WS_CHILD | WS_VISIBLE | WS_BORDER | TVS_HASLINES | TVS_LINESATROOT | TVS_HASBUTTONS, x, y, width, height, parent.handle, nid, void, void)
     c = NativeControl(id, "TreeView", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
+    Control.setItems(c, items)
     return Application.addControl(app, c)
   end function
 end struct
@@ -1179,6 +1200,10 @@ struct ListView
     app.nextNativeId = app.nextNativeId + 1
     hwnd = CreateWindowExW(0, "SysListView32", text, WS_CHILD | WS_VISIBLE | WS_BORDER | LVS_REPORT | LVS_SINGLESEL, x, y, width, height, parent.handle, nid, void, void)
     c = NativeControl(id, "ListView", hwnd, nid, text, x, y, width, height, true, true, text, selectedIndex, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
+    Control.ensureListViewColumn(c)
+    Control.setItems(c, items)
+    if selectedIndex >= 0 then Control.setSelectedIndex(c, selectedIndex) end if
+    c.lastSelection = Control.getSelectedIndex(c)
     return Application.addControl(app, c)
   end function
 end struct
@@ -1361,6 +1386,16 @@ struct Control
       control.lastSelection = -1
       return true
     end if
+    if control.kind == "ListView" then
+      SendMessageW(control.handle, LVM_DELETEALLITEMS, 0, 0)
+      control.lastSelection = -1
+      return true
+    end if
+    if control.kind == "TreeView" then
+      SendMessageW(control.handle, TVM_DELETEITEM, 0, TVI_ROOT)
+      control.lastSelection = -1
+      return true
+    end if
     return false
   end function
 
@@ -1369,7 +1404,47 @@ struct Control
     if control.handle is void then return -1 end if
     if control.kind == "ComboBox" then return SendMessageTextW(control.handle, CB_ADDSTRING, 0, text) end if
     if control.kind == "ListBox" then return SendMessageTextW(control.handle, LB_ADDSTRING, 0, text) end if
+    if control.kind == "ListView" then return Control.addListViewItem(control, text) end if
+    if control.kind == "TreeView" then return Control.addTreeViewItem(control, text) end if
     return -1
+  end function
+
+  static function ensureListViewColumn(control)
+    if control is void then return false end if
+    if control.handle is void then return false end if
+    if control.kind != "ListView" then return false end if
+    titleBytes = _asciiUtf16Z("Value")
+    column = bytes(40, 0)
+    _writeU32LE(column, 0, LVCF_TEXT | LVCF_WIDTH | LVCF_SUBITEM)
+    _writeU32LE(column, 8, control.width - 8)
+    _writePtrLE(column, 16, nativeBytesPtr(titleBytes))
+    _writeU32LE(column, 24, 5)
+    _writeU32LE(column, 28, 0)
+    SendMessageW(control.handle, LVM_INSERTCOLUMNW, 0, nativeBytesPtr(column))
+    return true
+  end function
+
+  static function addListViewItem(control, text)
+    textBytes = _asciiUtf16Z(text)
+    item = bytes(56, 0)
+    index = SendMessageW(control.handle, LVM_GETITEMCOUNT, 0, 0)
+    _writeU32LE(item, 0, LVIF_TEXT)
+    _writeU32LE(item, 4, index)
+    _writeU32LE(item, 8, 0)
+    _writePtrLE(item, 24, nativeBytesPtr(textBytes))
+    _writeU32LE(item, 32, len(text))
+    return SendMessageW(control.handle, LVM_INSERTITEMW, 0, nativeBytesPtr(item))
+  end function
+
+  static function addTreeViewItem(control, text)
+    textBytes = _asciiUtf16Z(text)
+    item = bytes(80, 0)
+    _writePtrLE(item, 0, 0)
+    _writePtrLE(item, 8, TVI_LAST)
+    _writeU32LE(item, 16, TVIF_TEXT)
+    _writePtrLE(item, 40, nativeBytesPtr(textBytes))
+    _writeU32LE(item, 48, len(text))
+    return SendMessageW(control.handle, TVM_INSERTITEMW, 0, nativeBytesPtr(item))
   end function
 
   static function setItems(control, items)
@@ -1388,6 +1463,7 @@ struct Control
     if control.kind == "ComboBox" then return SendMessageW(control.handle, CB_GETCURSEL, 0, 0) end if
     if control.kind == "ListBox" then return SendMessageW(control.handle, LB_GETCURSEL, 0, 0) end if
     if control.kind == "TabControl" then return SendMessageW(control.handle, TCM_GETCURSEL, 0, 0) end if
+    if control.kind == "ListView" then return SendMessageW(control.handle, LVM_GETNEXTITEM, -1, LVNI_SELECTED) end if
     return -1
   end function
 
@@ -1411,6 +1487,14 @@ struct Control
       if _activeApp is void == false then
         Control.updateTabPages(_activeApp, control)
       end if
+      return true
+    end if
+    if control.kind == "ListView" then
+      item = bytes(56, 0)
+      _writeU32LE(item, 12, LVIS_SELECTED | LVIS_FOCUSED)
+      _writeU32LE(item, 16, LVIS_SELECTED | LVIS_FOCUSED)
+      SendMessageW(control.handle, LVM_SETITEMSTATE, index, nativeBytesPtr(item))
+      control.lastSelection = Control.getSelectedIndex(control)
       return true
     end if
     return false
@@ -1817,6 +1901,24 @@ struct Events
           if oldValue != newValue then
             Events.dispatch(b, b.eventType, oldValue, newValue)
           end if
+          return true
+        end if
+        if c.kind == "ListView" and (c.handle == hwndControl or c.nativeId == nativeId) and code == LVN_ITEMCHANGED then
+          oldListValue = c.lastSelection
+          newListValue = Control.getSelectedIndex(c)
+          if newListValue < 0 then newListValue = oldListValue end if
+          c.lastSelection = newListValue
+          if oldListValue != newListValue then
+            Events.dispatch(b, b.eventType, oldListValue, newListValue)
+          end if
+          return true
+        end if
+        if c.kind == "TreeView" and (c.handle == hwndControl or c.nativeId == nativeId) and code == TVN_SELCHANGEDW then
+          oldTreeValue = c.lastSelection
+          newTreeValue = oldTreeValue + 1
+          if newTreeValue < 0 then newTreeValue = 0 end if
+          c.lastSelection = newTreeValue
+          Events.dispatch(b, b.eventType, oldTreeValue, newTreeValue)
           return true
         end if
       end if

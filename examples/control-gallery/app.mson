@@ -396,15 +396,15 @@
                 "id": "dataPanel",
                 "type": "Panel",
                 "properties": {
-                  "height": 170,
+                  "height": 390,
                   "width": "fill",
                   "padding": 8,
                   "spacing": 8
                 },
                 "children": [
                   {
-                    "type": "Grid",
-                    "properties": { "spacing": 8, "columns": 2 },
+                    "type": "HorizontalStack",
+                    "properties": { "spacing": 8 },
                     "children": [
                       {
                         "id": "navigationTree",
@@ -412,7 +412,7 @@
                         "properties": {
                           "items": ["Customers", "Orders", "Reports"],
                           "height": 120,
-                          "width": "fill"
+                          "width": 380
                         },
                         "events": { "selected": "onTreeSelected" }
                       },
@@ -423,38 +423,38 @@
                           "items": ["Ada Lovelace", "Grace Hopper", "Margaret Hamilton"],
                           "selectedIndex": 0,
                           "height": 120,
-                          "width": "fill"
+                          "width": 380
                         },
                         "events": { "selected": "onTableSelected" }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "dataScrollViewer",
+                    "type": "ScrollViewer",
+                    "properties": {
+                      "height": 170,
+                      "width": "fill",
+                      "verticalScroll": true,
+                      "horizontalScroll": false,
+                      "padding": 6,
+                      "spacing": 4
+                    },
+                    "children": [
+                      {
+                        "id": "scrollContentLabel",
+                        "type": "Label",
+                        "properties": { "text": "Scrollable content host", "height": 24, "width": "fill" }
                       },
                       {
-                        "id": "dataScrollViewer",
-                        "type": "ScrollViewer",
+                        "id": "scrollContentText",
+                        "type": "TextArea",
                         "properties": {
-                          "height": 120,
+                          "text": "Longer content can live inside a ScrollViewer.\nLine 2: scroll down to inspect more content.\nLine 3: the child control is moved by MiniGui.\nLine 4: wheel and scrollbar messages both update it.\nLine 5: end of the scroll sample.",
+                          "height": 220,
                           "width": "fill",
-                          "verticalScroll": true,
-                          "horizontalScroll": false,
-                          "padding": 6,
-                          "spacing": 4
-                        },
-                        "children": [
-                          {
-                            "id": "scrollContentLabel",
-                            "type": "Label",
-                            "properties": { "text": "Scrollable content host", "height": 24, "width": "fill" }
-                          },
-                          {
-                            "id": "scrollContentText",
-                            "type": "TextArea",
-                            "properties": {
-                              "text": "Longer content can live inside a ScrollViewer.\nLine 2: scroll down to inspect more content.\nLine 3: the child control is moved by MiniGui.\nLine 4: wheel and scrollbar messages both update it.\nLine 5: end of the scroll sample.",
-                              "height": 220,
-                              "width": "fill",
-                              "readOnly": true
-                            }
-                          }
-                        ]
+                          "readOnly": true
+                        }
                       }
                     ]
                   }
