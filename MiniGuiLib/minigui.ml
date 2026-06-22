@@ -107,6 +107,7 @@ const TCM_INSERTITEMW = 4926
 const TCM_GETITEMCOUNT = 4868
 const TCM_GETCURSEL = 4875
 const TCM_SETCURSEL = 4876
+const TCM_HITTEST = 4877
 const TCIF_TEXT = 1
 const TCN_SELCHANGE = -551
 const TBM_GETPOS = 1024
@@ -296,7 +297,8 @@ function _miniGuiWndProc(hwnd, msg, wParam, lParam)
     if appClick is void == false then
       if Events.isControlKind(appClick, hwnd, "TabControl") then
         tabClickX = lParam & 65535
-        if Events.dispatchTabClickedByHandle(appClick, hwnd, tabClickX) then
+        tabClickY = (lParam >> 16) & 65535
+        if Events.dispatchTabClickedByHandle(appClick, hwnd, tabClickX, tabClickY) then
           return 0
         end if
         return _defaultWndProc(hwnd, msg, wParam, lParam)
@@ -1872,7 +1874,7 @@ struct Events
     return false
   end function
 
-  static function dispatchTabClickedByHandle(app, hwndControl, x)
+  static function dispatchTabClickedByHandle(app, hwndControl, x, y)
     if app is void then return false end if
     if len(app.selectionBindings) == 0 then return false end if
     for s = 0 to len(app.selectionBindings) - 1
@@ -1880,13 +1882,11 @@ struct Events
       c = b.control
       if c is void == false then
         if c.kind == "TabControl" and c.handle == hwndControl then
-          count = SendMessageW(c.handle, TCM_GETITEMCOUNT, 0, 0)
-          if count <= 0 then count = 1 end if
-          tabWidth = _asInt(c.width / count)
-          if tabWidth < 1 then tabWidth = 1 end if
-          index = _asInt(x / tabWidth)
-          if index < 0 then index = 0 end if
-          if index >= count then index = count - 1 end if
+          hit = bytes(12, 0)
+          _writeU32LE(hit, 0, x)
+          _writeU32LE(hit, 4, y)
+          index = SendMessageW(c.handle, TCM_HITTEST, 0, nativeBytesPtr(hit))
+          if index < 0 then return false end if
           oldValue = c.lastSelection
           SendMessageW(c.handle, TCM_SETCURSEL, index, 0)
           c.lastSelection = index

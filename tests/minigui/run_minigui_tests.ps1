@@ -192,7 +192,8 @@ function Assert-ControlGalleryInteractions {
 
   function Send-TabClick {
     param($TabControl, [int]$Index)
-    $x = 24 + ($Index * 170)
+    $tabXs = @(30, 95, 155, 230, 300)
+    $x = $tabXs[$Index]
     $y = 12
     $lParam = [IntPtr](($y -shl 16) -bor $x)
     [MiniGuiTestWin32]::SendMessageW($TabControl.Handle, 513, [IntPtr]1, $lParam) | Out-Null
