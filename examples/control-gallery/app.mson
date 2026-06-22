@@ -18,7 +18,7 @@
       "properties": {
         "title": { "$resource": "windowTitle" },
         "width": 880,
-        "height": 760,
+        "height": 840,
         "startPosition": "centerScreen"
       },
       "events": {
@@ -66,7 +66,7 @@
             "properties": {
               "items": ["Inputs", "Selection", "Layout", "Feedback", "Data"],
               "selectedIndex": 0,
-              "height": 520,
+              "height": 600,
               "width": "fill",
               "minWidth": 520,
               "alignment": "fill"
@@ -77,7 +77,7 @@
                 "id": "inputPanel",
                 "type": "Panel",
                 "properties": {
-                  "height": 130,
+                  "height": 184,
                   "width": "fill",
                   "padding": 8,
                   "spacing": 8,
@@ -104,6 +104,29 @@
                         "type": "DatePicker",
                         "properties": { "width": 150, "tabIndex": 3 },
                         "events": { "changed": "onDateChanged" }
+                      }
+                    ]
+                  },
+                  {
+                    "type": "HorizontalStack",
+                    "properties": { "spacing": 8 },
+                    "children": [
+                      {
+                        "id": "passwordLabel",
+                        "type": "Label",
+                        "properties": { "text": "Password", "width": 80 }
+                      },
+                      {
+                        "id": "passwordBox",
+                        "type": "PasswordBox",
+                        "properties": { "width": "fill", "minWidth": 180, "maxLength": 24, "tooltip": "Masked input" },
+                        "events": { "change": "onSecretChanged" }
+                      },
+                      {
+                        "id": "quantityNumberBox",
+                        "type": "NumberBox",
+                        "properties": { "minimum": 1, "maximum": 99, "value": 3, "step": 1, "width": 90 },
+                        "events": { "valueChanged": "onQuantityChanged" }
                       }
                     ]
                   },
@@ -169,7 +192,7 @@
                 "children": [
                   {
                     "type": "Grid",
-                    "properties": { "spacing": 8, "columns": 2 },
+                    "properties": { "spacing": 8, "columns": 3 },
                     "children": [
                       {
                         "id": "countryComboBox",
@@ -201,7 +224,7 @@
                 "id": "layoutPanel",
                 "type": "Panel",
                 "properties": {
-                  "height": 86,
+                  "height": 190,
                   "width": "fill",
                   "padding": 8,
                   "spacing": 8
@@ -241,6 +264,45 @@
                           "height": 24,
                           "visible": false
                         }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "layoutSeparator",
+                    "type": "Separator",
+                    "properties": { "height": 8, "width": "fill", "orientation": "horizontal" }
+                  },
+                  {
+                    "type": "WrapPanel",
+                    "properties": { "spacing": 8 },
+                    "children": [
+                      {
+                        "id": "docsLink",
+                        "type": "LinkLabel",
+                        "properties": { "text": "MiniGui docs", "url": "https://github.com/MiniLangProject/MiniGui", "width": 140 },
+                        "events": { "click": "onLinkClicked" }
+                      },
+                      {
+                        "id": "logoImage",
+                        "type": "Image",
+                        "properties": { "text": "Image placeholder", "source": "", "width": 160, "height": 48, "stretch": "none" },
+                        "events": { "click": "onImageClicked" }
+                      }
+                    ]
+                  },
+                  {
+                    "type": "DockPanel",
+                    "properties": { "height": 40, "spacing": 6 },
+                    "children": [
+                      {
+                        "id": "dockLeftLabel",
+                        "type": "Label",
+                        "properties": { "text": "Dock left", "dock": "left", "width": 100 }
+                      },
+                      {
+                        "id": "dockFillLabel",
+                        "type": "Label",
+                        "properties": { "text": "Dock fill", "dock": "fill", "width": "fill" }
                       }
                     ]
                   }
@@ -331,6 +393,30 @@
                           "width": "fill"
                         },
                         "events": { "selected": "onTableSelected" }
+                      },
+                      {
+                        "id": "dataScrollViewer",
+                        "type": "ScrollViewer",
+                        "properties": {
+                          "height": 120,
+                          "width": "fill",
+                          "verticalScroll": true,
+                          "horizontalScroll": false,
+                          "padding": 6,
+                          "spacing": 4
+                        },
+                        "children": [
+                          {
+                            "id": "scrollContentLabel",
+                            "type": "Label",
+                            "properties": { "text": "Scrollable content host", "height": 24, "width": "fill" }
+                          },
+                          {
+                            "id": "scrollContentText",
+                            "type": "TextArea",
+                            "properties": { "text": "Longer content can live inside a ScrollViewer.", "height": 64, "width": "fill", "readOnly": true }
+                          }
+                        ]
                       }
                     ]
                   }

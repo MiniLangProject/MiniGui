@@ -267,6 +267,39 @@ Places controls at fixed `x` and `y` coordinates.
 }
 ```
 
+### DockPanel
+
+Docks children to the edges of the remaining area. Use child `dock` values
+`top`, `bottom`, `left`, `right`, or `fill`.
+
+```json
+{
+  "type": "DockPanel",
+  "properties": { "spacing": 6 },
+  "children": [
+    { "id": "toolbar", "type": "ToolBar", "properties": { "dock": "top", "height": 30, "items": ["Save"] } },
+    { "id": "status", "type": "StatusBar", "properties": { "dock": "bottom", "height": 24, "text": "Ready" } },
+    { "id": "content", "type": "Panel", "properties": { "dock": "fill" } }
+  ]
+}
+```
+
+### WrapPanel
+
+Places children left-to-right and wraps to the next row when the current row is
+full.
+
+```json
+{
+  "type": "WrapPanel",
+  "properties": { "spacing": 8 },
+  "children": [
+    { "id": "tagA", "type": "Button", "properties": { "text": "A", "width": 80 } },
+    { "id": "tagB", "type": "Button", "properties": { "text": "B", "width": 80 } }
+  ]
+}
+```
+
 ## Common Attributes
 
 These properties can be used on controls:
@@ -285,6 +318,9 @@ These properties can be used on controls:
 - `minWidth`, `minHeight`, `maxWidth`, `maxHeight`: size constraints.
 - `tooltip`: tooltip text.
 - `tabIndex`: keyboard navigation order.
+- `row`, `column`, `rowSpan`, `columnSpan`: reserved for richer grid placement.
+- `fontFamily`, `fontSize`, `fontWeight`: accepted styling metadata.
+- `foreground`, `background`, `borderColor`, `borderWidth`: accepted styling metadata.
 
 Example:
 
@@ -314,9 +350,15 @@ MiniGui currently supports these controls:
 | `Button` | Trigger an action | `text` | `click`, `clicked` |
 | `TextBox` | Single-line input | `text`, `placeholder` | `textChanged`, `changed`, `change` |
 | `TextArea` | Multi-line input | `text`, `placeholder` | `textChanged`, `changed`, `change` |
+| `PasswordBox` | Masked single-line input | `text`, `placeholder`, `maxLength`, `readOnly` | `textChanged`, `changed`, `change`, `submit`, `validating`, `validated` |
+| `NumberBox` | Numeric input | `minimum`, `maximum`, `value`, `step`, `readOnly` | `textChanged`, `valueChanged`, `changed`, `change` |
 | `CheckBox` | Boolean choice | `text`, `checked` | `click`, `clicked` |
 | `RadioButton` | Choice inside a group | `text`, `checked` | `click`, `clicked` |
+| `Image` | Bitmap image or image placeholder | `source`, `stretch`, `text` | `click`, `clicked` |
+| `Separator` | Horizontal or vertical separator | `orientation` | - |
+| `LinkLabel` | Clickable text link | `text`, `url`, `visited` | `click`, `clicked` |
 | `Panel` | Borderless container | `padding`, `spacing`, `children` | - |
+| `ScrollViewer` | Scrollable container host | `horizontalScroll`, `verticalScroll`, `padding`, `spacing`, `children` | - |
 | `GroupBox` | Labeled container | `text`, `padding`, `spacing`, `children` | - |
 | `ComboBox` | Drop-down selection | `items`, `selectedIndex` | `selectionChanged`, `selected`, `changed`, `change` |
 | `ListBox` | List selection | `items`, `selectedIndex` | `selectionChanged`, `selected`, `changed`, `change` |
@@ -371,6 +413,34 @@ end function
 ```minilang
 function onNotesChanged(ui, event)
   MiniGui.Control.setText(ui.statusBar, "Text changed: " + event.newValue)
+  return 0
+end function
+```
+
+### PasswordBox and NumberBox
+
+```json
+{
+  "id": "passwordBox",
+  "type": "PasswordBox",
+  "properties": { "maxLength": 32, "width": "fill" },
+  "events": { "change": "onPasswordChanged" }
+}
+```
+
+```json
+{
+  "id": "quantityNumberBox",
+  "type": "NumberBox",
+  "properties": { "minimum": 1, "maximum": 99, "value": 3, "step": 1 },
+  "events": { "valueChanged": "onQuantityChanged" }
+}
+```
+
+```minilang
+function onQuantityChanged(ui, event)
+  quantity = MiniGui.Control.getValue(ui.quantityNumberBox)
+  MiniGui.Control.setText(ui.statusBar, "Quantity: " + quantity)
   return 0
 end function
 ```
@@ -600,6 +670,8 @@ text = MiniGui.Control.getText(control)
 
 MiniGui.Control.setEnabled(control, true)
 MiniGui.Control.setVisible(control, false)
+MiniGui.Control.setReadOnly(control, true)
+MiniGui.Control.setMaxLength(control, 32)
 
 MiniGui.Control.setBounds(control, 20, 20, 200, 30)
 MiniGui.Control.setPosition(control, 20, 20)
@@ -626,7 +698,27 @@ value = MiniGui.Control.getValue(control)
 ```
 
 `setValue` and `getValue` are useful for `Slider`, `ScrollBar`, and
-`ProgressBar`. For `ComboBox` and `ListBox`, use the selection functions.
+`ProgressBar`, and `NumberBox`. For `ComboBox` and `ListBox`, use the selection
+functions.
+
+## Dialog API
+
+MiniGui includes basic native message boxes:
+
+```minilang
+MiniGui.Dialog.showInfo(ui.app, "Saved", "The record was saved.")
+MiniGui.Dialog.showWarning(ui.app, "Check input", "Some fields are incomplete.")
+MiniGui.Dialog.showError(ui.app, "Error", "The operation failed.")
+
+if MiniGui.Dialog.confirm(ui.app, "Close", "Close without saving?") then
+  MiniGui.Window.close(ui.mainWindow)
+end if
+```
+
+Stable API hooks also exist for `pickOpenFile`, `pickSaveFile`, `pickFolder`,
+and `pickColor`. The native picker implementations are intentionally isolated
+behind `MiniGui.Dialog` so application code does not need to change when those
+backends are expanded.
 
 ## Resources
 

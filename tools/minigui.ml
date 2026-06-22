@@ -807,38 +807,44 @@ function testPropertyNames(result, path, obj, allowed, context)
 end function
 
 function allowedControlEvents(typ)
-  if contains(["Button", "CheckBox", "RadioButton", "ToolBar", "MenuBar"], typ) then return ["click", "clicked"] end if
-  if contains(["TextBox", "TextArea", "DatePicker"], typ) then return ["textChanged", "changed", "change"] end if
+  if contains(["Button", "CheckBox", "RadioButton", "ToolBar", "MenuBar", "LinkLabel", "Image"], typ) then return ["click", "clicked"] end if
+  if contains(["TextBox", "TextArea", "PasswordBox", "DatePicker"], typ) then return ["textChanged", "changed", "change", "submit", "validating", "validated"] end if
+  if typ == "NumberBox" then return ["textChanged", "valueChanged", "changed", "change", "submit", "validating", "validated"] end if
   if contains(["ComboBox", "ListBox", "TabControl", "TreeView", "ListView", "Table"], typ) then return ["selectionChanged", "selected", "changed", "change"] end if
   if contains(["ScrollBar", "Slider", "ProgressBar"], typ) then return ["scrollChanged", "valueChanged", "changed", "change"] end if
   return []
 end function
 
 function commonControlProps()
-  return ["text", "width", "height", "x", "y", "visible", "enabled", "margin", "horizontalAlignment", "verticalAlignment", "alignment", "dock", "fill", "minWidth", "minHeight", "maxWidth", "maxHeight", "tooltip", "tabIndex"]
+  return ["text", "width", "height", "x", "y", "visible", "enabled", "margin", "horizontalAlignment", "verticalAlignment", "alignment", "dock", "fill", "minWidth", "minHeight", "maxWidth", "maxHeight", "tooltip", "tabIndex", "row", "column", "rowSpan", "columnSpan", "fontFamily", "fontSize", "fontWeight", "foreground", "background", "borderColor", "borderWidth"]
 end function
 
 function allowedControlProps(typ)
-  if contains(["TextBox", "TextArea"], typ) then return commonControlProps() + ["placeholder"] end if
+  if contains(["TextBox", "TextArea", "PasswordBox"], typ) then return commonControlProps() + ["placeholder", "readOnly", "maxLength", "inputType", "validationMessage"] end if
+  if typ == "NumberBox" then return commonControlProps() + ["placeholder", "readOnly", "maxLength", "minimum", "maximum", "value", "step", "decimals", "validationMessage"] end if
   if contains(["CheckBox", "RadioButton"], typ) then return commonControlProps() + ["checked"] end if
   if contains(["ComboBox", "ListBox", "TabControl", "TreeView", "ListView", "Table"], typ) then return commonControlProps() + ["items", "selectedIndex"] end if
   if contains(["ScrollBar", "Slider"], typ) then return commonControlProps() + ["orientation", "minimum", "maximum", "value", "smallStep", "largeStep"] end if
   if typ == "ProgressBar" then return commonControlProps() + ["minimum", "maximum", "value"] end if
   if contains(["MenuBar", "ToolBar"], typ) then return commonControlProps() + ["items"] end if
+  if typ == "Image" then return commonControlProps() + ["source", "stretch"] end if
+  if typ == "Separator" then return commonControlProps() + ["orientation"] end if
+  if typ == "LinkLabel" then return commonControlProps() + ["url", "visited"] end if
+  if typ == "ScrollViewer" then return commonControlProps() + ["padding", "spacing", "horizontalScroll", "verticalScroll", "autoHide", "scrollX", "scrollY"] end if
   if contains(["Button", "Label", "Panel", "GroupBox", "StatusBar", "DatePicker"], typ) then return commonControlProps() + ["padding", "spacing"] end if
   return []
 end function
 
 function isControl(typ)
-  return contains(["Label", "Button", "TextBox", "TextArea", "CheckBox", "RadioButton", "Panel", "GroupBox", "ComboBox", "ListBox", "ScrollBar", "Slider", "ProgressBar", "TabControl", "MenuBar", "StatusBar", "ToolBar", "TreeView", "ListView", "Table", "DatePicker"], typ)
+  return contains(["Label", "Button", "TextBox", "TextArea", "PasswordBox", "NumberBox", "CheckBox", "RadioButton", "Image", "Separator", "LinkLabel", "Panel", "ScrollViewer", "GroupBox", "ComboBox", "ListBox", "ScrollBar", "Slider", "ProgressBar", "TabControl", "MenuBar", "StatusBar", "ToolBar", "TreeView", "ListView", "Table", "DatePicker"], typ)
 end function
 
 function isContainerControl(typ)
-  return contains(["Panel", "GroupBox", "TabControl"], typ)
+  return contains(["Panel", "GroupBox", "TabControl", "ScrollViewer"], typ)
 end function
 
 function isLayout(typ)
-  return contains(["VerticalStack", "HorizontalStack", "Grid", "Canvas"], typ)
+  return contains(["VerticalStack", "HorizontalStack", "Grid", "Canvas", "DockPanel", "WrapPanel"], typ)
 end function
 
 function testControlProperties(result, path, typ, properties)
@@ -848,15 +854,15 @@ function testControlProperties(result, path, typ, properties)
   for i = 0 to len(properties.keys) - 1
     name = properties.keys[i]
     v = resourceValue(result, path, properties.values[i])
-    if contains(["x", "y", "selectedIndex", "tabIndex"], name) and v.kind != "number" then addError(result, path, "Property '" + name + "' on " + typ + " must be an integer.") end if
+    if contains(["x", "y", "selectedIndex", "tabIndex", "row", "column", "rowSpan", "columnSpan"], name) and v.kind != "number" then addError(result, path, "Property '" + name + "' on " + typ + " must be an integer.") end if
     if contains(["width", "height"], name) then
       if v.kind != "number" and v.kind != "string" then addError(result, path, "Property '" + name + "' on " + typ + " must be an integer, 'auto' or 'fill'.") end if
       if v.kind == "string" and v.text != "auto" and v.text != "fill" then addError(result, path, "Property '" + name + "' on " + typ + " must be an integer, 'auto' or 'fill'.") end if
     end if
-    if contains(["minimum", "maximum", "value", "smallStep", "largeStep", "padding", "spacing", "minWidth", "minHeight", "maxWidth", "maxHeight"], name) and v.kind != "number" then addError(result, path, "Property '" + name + "' on " + typ + " must be an integer.") end if
-    if contains(["visible", "enabled", "fill"], name) and v.kind != "bool" then addError(result, path, "Property '" + name + "' on " + typ + " must be a boolean.") end if
+    if contains(["minimum", "maximum", "value", "smallStep", "largeStep", "step", "decimals", "padding", "spacing", "minWidth", "minHeight", "maxWidth", "maxHeight", "fontSize", "borderWidth", "scrollX", "scrollY"], name) and v.kind != "number" then addError(result, path, "Property '" + name + "' on " + typ + " must be an integer.") end if
+    if contains(["visible", "enabled", "fill", "readOnly", "visited", "horizontalScroll", "verticalScroll", "autoHide"], name) and v.kind != "bool" then addError(result, path, "Property '" + name + "' on " + typ + " must be a boolean.") end if
     if name == "checked" and v.kind != "bool" then addError(result, path, "Property '" + name + "' on " + typ + " must be a boolean.") end if
-    if contains(["text", "placeholder", "orientation", "horizontalAlignment", "verticalAlignment", "alignment", "dock", "tooltip"], name) and v.kind != "string" then addError(result, path, "Property '" + name + "' on " + typ + " must be a string.") end if
+    if contains(["text", "placeholder", "orientation", "horizontalAlignment", "verticalAlignment", "alignment", "dock", "tooltip", "fontFamily", "fontWeight", "foreground", "background", "borderColor", "inputType", "validationMessage", "source", "stretch", "url"], name) and v.kind != "string" then addError(result, path, "Property '" + name + "' on " + typ + " must be a string.") end if
     if name == "orientation" and v.kind == "string" and v.text != "vertical" and v.text != "horizontal" then addError(result, path, "Property '" + name + "' on " + typ + " must be 'vertical' or 'horizontal'.") end if
     if name == "items" then
       if v.kind != "array" then addError(result, path, "Property '" + name + "' on " + typ + " must be an array of strings.")
@@ -892,7 +898,7 @@ function testLayoutNode(result, path, node, ids)
     end if
   end if
   if isLayout(typ) then
-    testPropertyNames(result, path, prop(node, "properties"), ["spacing", "padding", "width", "height", "margin", "visible", "enabled", "columns", "alignment", "dock", "fill", "minWidth", "minHeight", "maxWidth", "maxHeight"], typ + ".properties")
+    testPropertyNames(result, path, prop(node, "properties"), ["spacing", "padding", "width", "height", "margin", "visible", "enabled", "columns", "orientation", "itemWidth", "itemHeight", "alignment", "dock", "fill", "minWidth", "minHeight", "maxWidth", "maxHeight"], typ + ".properties")
   else if isControl(typ) then
     testControlProperties(result, path, typ, prop(node, "properties"))
     events = prop(node, "events")
@@ -1016,8 +1022,14 @@ function controlDefaultHeight(typ)
   if typ == "Button" then return 30 end if
   if typ == "TextBox" then return 26 end if
   if typ == "TextArea" then return 80 end if
+  if typ == "PasswordBox" then return 26 end if
+  if typ == "NumberBox" then return 26 end if
   if typ == "CheckBox" or typ == "RadioButton" then return 22 end if
+  if typ == "Image" then return 96 end if
+  if typ == "Separator" then return 8 end if
+  if typ == "LinkLabel" then return 24 end if
   if typ == "Panel" then return 120 end if
+  if typ == "ScrollViewer" then return 160 end if
   if typ == "GroupBox" then return 80 end if
   if typ == "ComboBox" then return 120 end if
   if typ == "ListBox" then return 96 end if
@@ -1102,9 +1114,15 @@ function createCallFor(typ)
   if typ == "Label" then return "MiniGui.Label.create" end if
   if typ == "Button" then return "MiniGui.Button.create" end if
   if typ == "TextArea" then return "MiniGui.TextArea.create" end if
+  if typ == "PasswordBox" then return "MiniGui.PasswordBox.create" end if
+  if typ == "NumberBox" then return "MiniGui.NumberBox.create" end if
   if typ == "CheckBox" then return "MiniGui.CheckBox.create" end if
   if typ == "RadioButton" then return "MiniGui.RadioButton.create" end if
+  if typ == "Image" then return "MiniGui.Image.create" end if
+  if typ == "Separator" then return "MiniGui.Separator.create" end if
+  if typ == "LinkLabel" then return "MiniGui.LinkLabel.create" end if
   if typ == "Panel" then return "MiniGui.Panel.create" end if
+  if typ == "ScrollViewer" then return "MiniGui.ScrollViewer.create" end if
   if typ == "GroupBox" then return "MiniGui.GroupBox.create" end if
   if typ == "ComboBox" then return "MiniGui.ComboBox.create" end if
   if typ == "ListBox" then return "MiniGui.ListBox.create" end if
@@ -1149,6 +1167,28 @@ function addGeneratedNode(lines, fields, result, path, node, parentVar, x, y, wi
       checked = "false"
       if boolProp(result, path, node, "checked", false) then checked = "true" end if
       lines = lines + [var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + checked + ")"]
+    else if typ == "NumberBox" then
+      numberMin = intProp(result, path, node, "minimum", 0)
+      numberMax = intProp(result, path, node, "maximum", 100)
+      numberValue = intProp(result, path, node, "value", numberMin)
+      numberStep = intProp(result, path, node, "step", 1)
+      lines = lines + [var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + numberMin + ", " + numberMax + ", " + numberValue + ", " + numberStep + ")"]
+    else if typ == "Image" then
+      source = stringProp(result, path, node, "source", "")
+      stretch = stringProp(result, path, node, "stretch", "none")
+      lines = lines + [var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + mlString(source) + ", " + mlString(stretch) + ")"]
+    else if typ == "Separator" then
+      sepOrientation = stringProp(result, path, node, "orientation", "horizontal")
+      lines = lines + [var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + mlString(sepOrientation) + ")"]
+    else if typ == "LinkLabel" then
+      url = stringProp(result, path, node, "url", "")
+      lines = lines + [var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + mlString(url) + ")"]
+    else if typ == "ScrollViewer" then
+      hscroll = "false"
+      vscroll = "true"
+      if boolProp(result, path, node, "horizontalScroll", false) then hscroll = "true" end if
+      if boolProp(result, path, node, "verticalScroll", true) == false then vscroll = "false" end if
+      lines = lines + [var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + hscroll + ", " + vscroll + ")"]
     else if typ == "ComboBox" or typ == "ListBox" or typ == "ListView" or typ == "Table" then
       items = stringArrayLiteral(result, path, node, "items")
       selectedIndex = intProp(result, path, node, "selectedIndex", -1)
@@ -1180,6 +1220,9 @@ function addGeneratedNode(lines, fields, result, path, node, parentVar, x, y, wi
     end if
     if boolProp(result, path, node, "enabled", true) == false then lines = lines + ["MiniGui.Control.setEnabled(" + var + ", false)"] end if
     if boolProp(result, path, node, "visible", true) == false then lines = lines + ["MiniGui.Control.setVisible(" + var + ", false)"] end if
+    if boolProp(result, path, node, "readOnly", false) then lines = lines + ["MiniGui.Control.setReadOnly(" + var + ", true)"] end if
+    maxLength = intProp(result, path, node, "maxLength", -1)
+    if maxLength >= 0 then lines = lines + ["MiniGui.Control.setMaxLength(" + var + ", " + maxLength + ")"] end if
     if contains(fields, var) == false then fields = fields + [var] end if
     if isContainerControl(typ) then
       childPadding = intProp(result, path, node, "padding", 8)
@@ -1216,22 +1259,25 @@ function addGeneratedNode(lines, fields, result, path, node, parentVar, x, y, wi
   end if
   if typ == "Grid" then
     cols = layoutInt(node, "columns", 2)
-    if cols != 2 then cols = 2 end if
-    cellW = (width - padding * 2 - spacing) >> 1
+    if cols < 1 then cols = 1 end if
+    cellW = (width - padding * 2 - spacing * (cols - 1)) / cols
+    if cellW < 1 then cellW = 1 end if
     cxg = x + padding
     cyg = y + padding
     rowMax = 0
     usedGrid = padding
     for gi = 0 to len(children) - 1
-      col = gi - ((gi >> 1) << 1)
-      gx = cxg
-      if col == 1 then gx = cxg + cellW + spacing end if
+      col = gi
+      while col >= cols
+        col = col - cols
+      end while
+      gx = cxg + col * (cellW + spacing)
       childTypeGrid = asString(prop(children[gi], "type"), "")
       childHGrid = dimensionProp(result, path, children[gi], "height", controlDefaultHeight(childTypeGrid))
       rg = addGeneratedNode(lines, fields, result, path, children[gi], parentVar, gx, cyg, cellW, childHGrid)
       lines = rg[0]; fields = rg[1]
       if rg[2] > rowMax then rowMax = rg[2] end if
-      if col == 1 or gi == len(children) - 1 then
+      if col == cols - 1 or gi == len(children) - 1 then
         cyg = cyg + rowMax + spacing
         usedGrid = usedGrid + rowMax + spacing
         rowMax = 0
@@ -1239,6 +1285,80 @@ function addGeneratedNode(lines, fields, result, path, node, parentVar, x, y, wi
     end for
     if len(children) > 0 then usedGrid = usedGrid - spacing end if
     return [lines, fields, usedGrid + padding]
+  end if
+  if typ == "DockPanel" then
+    rx = x + padding
+    ry = y + padding
+    rw = width - padding * 2
+    rh = height - padding * 2
+    usedDock = padding
+    for di = 0 to len(children) - 1
+      child = children[di]
+      childTypeDock = asString(prop(child, "type"), "")
+      dock = stringProp(result, path, child, "dock", "top")
+      if di == len(children) - 1 and dock == "top" then dock = "fill" end if
+      childW = dimensionProp(result, path, child, "width", rw)
+      childH = dimensionProp(result, path, child, "height", controlDefaultHeight(childTypeDock))
+      dx = rx
+      dy = ry
+      dw = rw
+      dh = childH
+      if dock == "bottom" then
+        dy = ry + rh - childH
+        dh = childH
+      else if dock == "left" then
+        dw = childW
+        dh = rh
+      else if dock == "right" then
+        dx = rx + rw - childW
+        dw = childW
+        dh = rh
+      else if dock == "fill" then
+        dw = rw
+        dh = rh
+      end if
+      rd = addGeneratedNode(lines, fields, result, path, child, parentVar, dx, dy, dw, dh)
+      lines = rd[0]; fields = rd[1]
+      if dock == "top" then
+        ry = ry + rd[2] + spacing
+        rh = rh - rd[2] - spacing
+      else if dock == "bottom" then
+        rh = rh - rd[2] - spacing
+      else if dock == "left" then
+        rx = rx + dw + spacing
+        rw = rw - dw - spacing
+      else if dock == "right" then
+        rw = rw - dw - spacing
+      end if
+      if rh < 1 then rh = 1 end if
+      if rw < 1 then rw = 1 end if
+    end for
+    return [lines, fields, height]
+  end if
+  if typ == "WrapPanel" then
+    wx = x + padding
+    wy = y + padding
+    rowHeight = 0
+    maxRight = x + width - padding
+    usedWrap = padding
+    for wi = 0 to len(children) - 1
+      childWrap = children[wi]
+      childTypeWrap = asString(prop(childWrap, "type"), "")
+      ww = stackSlotWidth(result, path, childWrap, 120)
+      wh = dimensionProp(result, path, childWrap, "height", controlDefaultHeight(childTypeWrap))
+      if wx > x + padding and wx + ww > maxRight then
+        wx = x + padding
+        wy = wy + rowHeight + spacing
+        usedWrap = usedWrap + rowHeight + spacing
+        rowHeight = 0
+      end if
+      rwc = addGeneratedNode(lines, fields, result, path, childWrap, parentVar, wx, wy, ww, wh)
+      lines = rwc[0]; fields = rwc[1]
+      if rwc[2] > rowHeight then rowHeight = rwc[2] end if
+      wx = wx + ww + spacing
+    end for
+    if len(children) > 0 then usedWrap = usedWrap + rowHeight end if
+    return [lines, fields, usedWrap + padding]
   end if
   if typ == "Canvas" then
     maxb = 0
@@ -1302,8 +1422,12 @@ function generateCode(result, outputPath)
     else if ev.eventName == "resized" then body = body + ["MiniGui.Events.bindResized(app, " + cid + ", " + wrapper + ", ui)"]
     else if ev.eventName == "click" or ev.eventName == "clicked" then body = body + ["MiniGui.Events.bindClick(app, " + cid + ", " + wrapper + ", ui)"]
     else if ev.eventName == "selectionChanged" or ev.eventName == "selected" then body = body + ["MiniGui.Events.bindSelectionChanged(app, " + cid + ", " + wrapper + ", ui)"]
-    else if ev.eventName == "scrollChanged" or ev.eventName == "valueChanged" then body = body + ["MiniGui.Events.bindScrollChanged(app, " + cid + ", " + wrapper + ", ui)"]
-    else if ev.eventName == "change" or ev.eventName == "changed" then body = body + ["MiniGui.Events.bindChange(app, " + cid + ", " + wrapper + ", ui)"]
+    else if ev.eventName == "scrollChanged" then body = body + ["MiniGui.Events.bindScrollChanged(app, " + cid + ", " + wrapper + ", ui)"]
+    else if ev.eventName == "valueChanged" then
+      if ev.controlType == "NumberBox" then body = body + ["MiniGui.Events.bindChange(app, " + cid + ", " + wrapper + ", ui)"]
+      else body = body + ["MiniGui.Events.bindScrollChanged(app, " + cid + ", " + wrapper + ", ui)"]
+      end if
+    else if ev.eventName == "change" or ev.eventName == "changed" or ev.eventName == "submit" or ev.eventName == "validating" or ev.eventName == "validated" then body = body + ["MiniGui.Events.bindChange(app, " + cid + ", " + wrapper + ", ui)"]
     else body = body + ["MiniGui.Events.bindTextChanged(app, " + cid + ", " + wrapper + ", ui)"]
     end if
   end for
@@ -1370,6 +1494,14 @@ function usage()
   print "  minigui build <app.mson> --output <app.exe> [--no-compile]"
 end function
 
+function compilerCommand(compiler, generated, outExe, libraryDir)
+  base = q(compiler)
+  if str.endsWith(compiler, ".py") or str.endsWith(compiler, ".PY") then
+    base = "py -3.14 " + q(compiler)
+  end if
+  return base + " " + q(generated) + " " + q(outExe) + " -I " + q(libraryDir) + " --subsystem gui"
+end function
+
 function writeValidation(result)
   if len(result.errors) > 0 then
     for i = 0 to len(result.errors) - 1
@@ -1410,7 +1542,7 @@ function main(args)
   outExe = opt(opts, "output")
   if outExe == "" then outExe = joinPath(dirname(normalizePath(msonPath)), "build\\app.exe") end if
   ensureDir(dirname(outExe))
-  cmd = "call " + q(opt(opts, "compiler")) + " " + q(generated) + " " + q(outExe) + " -I " + q(opt(opts, "libraryDir")) + " --subsystem gui"
+  cmd = compilerCommand(opt(opts, "compiler"), generated, outExe, opt(opts, "libraryDir"))
   rc = _wsystem(cmd)
   if rc != 0 then return rc end if
   print "Built: " + normalizePath(outExe)

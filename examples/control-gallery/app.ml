@@ -44,6 +44,16 @@ function onDateChanged(ui, event)
   return 0
 end function
 
+function onSecretChanged(ui, event)
+  MiniGui.Control.setText(ui.statusLabel, "Password changed")
+  return 0
+end function
+
+function onQuantityChanged(ui, event)
+  MiniGui.Control.setText(ui.resultLabel, "Quantity: " + MiniGui.Control.getValue(ui.quantityNumberBox))
+  return 0
+end function
+
 function onNotesChanged(ui, event)
   MiniGui.Control.setText(ui.statusLabel, "Notes changed")
   return 0
@@ -84,6 +94,16 @@ end function
 
 function onDisabledButtonClick(ui, event)
   MiniGui.Control.setText(ui.resultLabel, "Secondary action")
+  return 0
+end function
+
+function onLinkClicked(ui, event)
+  MiniGui.Control.setText(ui.resultLabel, "Documentation link clicked")
+  return 0
+end function
+
+function onImageClicked(ui, event)
+  MiniGui.Control.setText(ui.resultLabel, "Image clicked")
   return 0
 end function
 

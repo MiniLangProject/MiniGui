@@ -3,8 +3,8 @@ $ErrorActionPreference = "Stop"
 
 $Here = Split-Path -Parent $PSCommandPath
 $Root = [System.IO.Path]::GetFullPath((Join-Path $Here "..\.."))
-$CompilerRoot = [System.IO.Path]::GetFullPath((Join-Path $Root "..\MiniLangCompilerML"))
-$Compiler = Join-Path $CompilerRoot "build\mlc_win64.exe"
+$CompilerRoot = [System.IO.Path]::GetFullPath((Join-Path $Root "..\MiniLangCompilerPy"))
+$Compiler = Join-Path $CompilerRoot "mlc_win64.py"
 $ToolSource = Join-Path $Root "tools\minigui.ml"
 $Tool = Join-Path $Root "tools\minigui.exe"
 $Tmp = Join-Path $Root "tests\tmp\minigui"
@@ -29,6 +29,14 @@ function Invoke-Capture {
     }
   }
   return [pscustomobject]@{ ExitCode = $code; Output = ($out -join "`n") }
+}
+
+function Invoke-Compiler {
+  param([string[]]$Arguments)
+  if ($Compiler -like "*.py") {
+    return Invoke-Capture "py" (@("-3.14", $Compiler) + $Arguments)
+  }
+  return Invoke-Capture $Compiler $Arguments
 }
 
 function Assert-Ok {
@@ -234,7 +242,7 @@ if (Test-Path -LiteralPath $Tmp) {
 }
 New-Item -ItemType Directory -Force -Path $Tmp | Out-Null
 
-Assert-Ok (Invoke-Capture $Compiler @($ToolSource, $Tool, "-I", $Root, "-I", $CompilerRoot)) "compile MiniGui CLI"
+Assert-Ok (Invoke-Compiler @($ToolSource, $Tool, "-I", $Root, "-I", $CompilerRoot)) "compile MiniGui CLI"
 
 $hello = Join-Path $Root "examples\hello-gui\app.mson"
 $customer = Join-Path $Root "examples\customer-form\app.mson"
@@ -254,7 +262,7 @@ if ($h1 -ne $h2) { throw "Generated output is not deterministic." }
 Write-Host "OK: deterministic generation"
 
 $helloExe = Join-Path $Tmp "hello-gui.exe"
-Assert-Ok (Invoke-Capture $Tool @("build", $hello, "--output", $helloExe)) "build hello-gui"
+Assert-Ok (Invoke-Capture $Tool @("build", $hello, "--output", $helloExe, "--compiler", $Compiler, "--library-dir", $Root)) "build hello-gui"
 
 $galleryGen1 = Join-Path $Tmp "control-gallery1.gui.ml"
 $galleryGen2 = Join-Path $Tmp "control-gallery2.gui.ml"
@@ -268,9 +276,15 @@ Assert-FileContains $galleryGen1 "generated Label constructor" "MiniGui\.Label\.
 Assert-FileContains $galleryGen1 "generated Button constructor" "MiniGui\.Button\.create"
 Assert-FileContains $galleryGen1 "generated TextBox constructor" "MiniGui\.TextBox\.create"
 Assert-FileContains $galleryGen1 "generated TextArea constructor" "MiniGui\.TextArea\.create"
+Assert-FileContains $galleryGen1 "generated PasswordBox constructor" "MiniGui\.PasswordBox\.create"
+Assert-FileContains $galleryGen1 "generated NumberBox constructor" "MiniGui\.NumberBox\.create"
 Assert-FileContains $galleryGen1 "generated CheckBox constructor" "MiniGui\.CheckBox\.create"
 Assert-FileContains $galleryGen1 "generated RadioButton constructor" "MiniGui\.RadioButton\.create"
+Assert-FileContains $galleryGen1 "generated Image constructor" "MiniGui\.Image\.create"
+Assert-FileContains $galleryGen1 "generated Separator constructor" "MiniGui\.Separator\.create"
+Assert-FileContains $galleryGen1 "generated LinkLabel constructor" "MiniGui\.LinkLabel\.create"
 Assert-FileContains $galleryGen1 "generated Panel constructor" "MiniGui\.Panel\.create"
+Assert-FileContains $galleryGen1 "generated ScrollViewer constructor" "MiniGui\.ScrollViewer\.create"
 Assert-FileContains $galleryGen1 "generated GroupBox constructor" "MiniGui\.GroupBox\.create"
 Assert-FileContains $galleryGen1 "generated ComboBox constructor" "MiniGui\.ComboBox\.create"
 Assert-FileContains $galleryGen1 "generated ListBox constructor" "MiniGui\.ListBox\.create"
@@ -292,7 +306,7 @@ Assert-FileContains $galleryGen1 "generated enabled mutation" "MiniGui\.Control\
 Assert-FileContains $galleryGen1 "generated visible mutation" "MiniGui\.Control\.setVisible"
 
 $galleryExe = Join-Path $Tmp "control-gallery.exe"
-Assert-Ok (Invoke-Capture $Tool @("build", $gallery, "--output", $galleryExe)) "build control-gallery"
+Assert-Ok (Invoke-Capture $Tool @("build", $gallery, "--output", $galleryExe, "--compiler", $Compiler, "--library-dir", $Root)) "build control-gallery"
 Assert-GuiStarts $galleryExe "start control-gallery GUI" 25
 Assert-ControlGalleryInteractions $galleryExe
 
@@ -327,6 +341,11 @@ Write-Utf8NoBom $checkControlsMson @'
         "children": [
           { "id": "optInCheckBox", "type": "CheckBox", "properties": { "text": "Opt in", "checked": true }, "events": { "click": "onToggle" } },
           { "id": "choiceRadioButton", "type": "RadioButton", "properties": { "text": "Choice A", "checked": false }, "events": { "click": "onToggle" } },
+          { "id": "passwordBox", "type": "PasswordBox", "properties": { "maxLength": 20 }, "events": { "change": "onToggle" } },
+          { "id": "numberBox", "type": "NumberBox", "properties": { "minimum": 0, "maximum": 10, "value": 2, "step": 1 }, "events": { "valueChanged": "onToggle" } },
+          { "id": "image", "type": "Image", "properties": { "text": "Image", "source": "", "height": 40 }, "events": { "click": "onToggle" } },
+          { "id": "separator", "type": "Separator", "properties": { "height": 8, "orientation": "horizontal" } },
+          { "id": "link", "type": "LinkLabel", "properties": { "text": "Docs", "url": "https://github.com/MiniLangProject/MiniGui" }, "events": { "click": "onToggle" } },
           {
             "id": "detailsPanel",
             "type": "Panel",
@@ -342,6 +361,7 @@ Write-Utf8NoBom $checkControlsMson @'
           { "id": "volumeSlider", "type": "Slider", "properties": { "orientation": "horizontal", "minimum": 0, "maximum": 100, "value": 30, "smallStep": 5, "largeStep": 20, "height": 32, "width": "fill", "minWidth": 220 }, "events": { "valueChanged": "onScroll" } },
           { "id": "progressBar", "type": "ProgressBar", "properties": { "minimum": 0, "maximum": 100, "value": 40, "height": 24 }, "events": { "valueChanged": "onScroll" } },
           { "id": "tabs", "type": "TabControl", "properties": { "items": ["Inputs", "Data"], "selectedIndex": 0, "height": 80 }, "events": { "selected": "onSelection" } },
+          { "id": "scrollViewer", "type": "ScrollViewer", "properties": { "height": 80, "verticalScroll": true }, "children": [ { "id": "scrollLabel", "type": "Label", "properties": { "text": "Scroll content" } } ] },
           { "id": "menu", "type": "MenuBar", "properties": { "items": ["File", "Help"], "height": 24 }, "events": { "clicked": "onToggle" } },
           { "id": "toolbar", "type": "ToolBar", "properties": { "items": ["Save", "Refresh"], "height": 30 }, "events": { "click": "onToggle" } },
           { "id": "tree", "type": "TreeView", "properties": { "items": ["Root", "Child"], "height": 80 }, "events": { "selected": "onSelection" } },
@@ -361,56 +381,62 @@ Assert-Ok (Invoke-Capture $Tool @("generate", $checkControlsMson, "--output", $c
 Assert-FileContains $checkControlsGenerated "generated ScrollBar constructor" "MiniGui\.ScrollBar\.create"
 Assert-FileContains $checkControlsGenerated "generated ProgressBar constructor" "MiniGui\.ProgressBar\.create"
 Assert-FileContains $checkControlsGenerated "generated TabControl constructor" "MiniGui\.TabControl\.create"
+Assert-FileContains $checkControlsGenerated "generated PasswordBox constructor" "MiniGui\.PasswordBox\.create"
+Assert-FileContains $checkControlsGenerated "generated NumberBox constructor" "MiniGui\.NumberBox\.create"
+Assert-FileContains $checkControlsGenerated "generated Image constructor" "MiniGui\.Image\.create"
+Assert-FileContains $checkControlsGenerated "generated Separator constructor" "MiniGui\.Separator\.create"
+Assert-FileContains $checkControlsGenerated "generated LinkLabel constructor" "MiniGui\.LinkLabel\.create"
+Assert-FileContains $checkControlsGenerated "generated ScrollViewer constructor" "MiniGui\.ScrollViewer\.create"
 Assert-FileContains $checkControlsGenerated "generated MenuBar constructor" "MiniGui\.MenuBar\.create"
 Assert-FileContains $checkControlsGenerated "generated ToolBar constructor" "MiniGui\.ToolBar\.create"
 Assert-FileContains $checkControlsGenerated "generated TreeView constructor" "MiniGui\.TreeView\.create"
 Assert-FileContains $checkControlsGenerated "generated Table constructor" "MiniGui\.ListView\.create"
 Assert-FileContains $checkControlsGenerated "generated DatePicker constructor" "MiniGui\.DatePicker\.create"
 Assert-FileContains $checkControlsGenerated "generated StatusBar constructor" "MiniGui\.StatusBar\.create"
-Assert-Ok (Invoke-Capture $Tool @("build", $checkControlsMson, "--output", $checkControlsBuiltExe)) "build check controls MSON"
+Assert-Ok (Invoke-Capture $Tool @("build", $checkControlsMson, "--output", $checkControlsBuiltExe, "--compiler", $Compiler, "--library-dir", $Root)) "build check controls MSON"
 
 $smokeExe = Join-Path $Tmp "runtime-smoke.exe"
-Assert-Ok (Invoke-Capture $Compiler @((Join-Path $Root "tests\minigui\runtime_smoke.ml"), $smokeExe, "-I", $Root, "--subsystem", "gui")) "compile runtime smoke"
+Assert-Ok (Invoke-Compiler @((Join-Path $Root "tests\minigui\runtime_smoke.ml"), $smokeExe, "-I", $Root, "--subsystem", "gui")) "compile runtime smoke"
 Assert-Ok (Invoke-Capture $smokeExe @()) "run runtime smoke"
 
 $wmCommandExe = Join-Path $Tmp "wm-command-smoke.exe"
-Assert-Ok (Invoke-Capture $Compiler @((Join-Path $Root "tests\minigui\wm_command_smoke.ml"), $wmCommandExe, "-I", $Root, "--subsystem", "gui")) "compile WM_COMMAND smoke"
+Assert-Ok (Invoke-Compiler @((Join-Path $Root "tests\minigui\wm_command_smoke.ml"), $wmCommandExe, "-I", $Root, "--subsystem", "gui")) "compile WM_COMMAND smoke"
 Assert-Ok (Invoke-Capture $wmCommandExe @()) "run WM_COMMAND smoke"
 
 $checkControlsExe = Join-Path $Tmp "check-controls-smoke.exe"
-Assert-Ok (Invoke-Capture $Compiler @((Join-Path $Root "tests\minigui\check_controls_smoke.ml"), $checkControlsExe, "-I", $Root, "--subsystem", "gui")) "compile check controls smoke"
+Assert-Ok (Invoke-Compiler @((Join-Path $Root "tests\minigui\check_controls_smoke.ml"), $checkControlsExe, "-I", $Root, "--subsystem", "gui")) "compile check controls smoke"
 Assert-Ok (Invoke-Capture $checkControlsExe @()) "run check controls smoke"
 
 $resizeExe = Join-Path $Tmp "resize-smoke.exe"
-Assert-Ok (Invoke-Capture $Compiler @((Join-Path $Root "tests\minigui\resize_smoke.ml"), $resizeExe, "-I", $Root, "--subsystem", "gui")) "compile resize smoke"
+Assert-Ok (Invoke-Compiler @((Join-Path $Root "tests\minigui\resize_smoke.ml"), $resizeExe, "-I", $Root, "--subsystem", "gui")) "compile resize smoke"
 Assert-Ok (Invoke-Capture $resizeExe @()) "run resize smoke"
 
 $clientRectExe = Join-Path $Tmp "client-rect-smoke.exe"
-Assert-Ok (Invoke-Capture $Compiler @((Join-Path $Root "tests\minigui\client_rect_smoke.ml"), $clientRectExe, "-I", $Root, "--subsystem", "gui")) "compile client rect smoke"
+Assert-Ok (Invoke-Compiler @((Join-Path $Root "tests\minigui\client_rect_smoke.ml"), $clientRectExe, "-I", $Root, "--subsystem", "gui")) "compile client rect smoke"
 Assert-Ok (Invoke-Capture $clientRectExe @()) "run client rect smoke"
 
 $galleryCodeBehindExe = Join-Path $Tmp "control-gallery-codebehind-smoke.exe"
-Assert-Ok (Invoke-Capture $Compiler @((Join-Path $Root "tests\minigui\control_gallery_codebehind_smoke.ml"), $galleryCodeBehindExe, "-I", $Root, "--subsystem", "gui")) "compile control-gallery code-behind smoke"
+Assert-Ok (Invoke-Compiler @((Join-Path $Root "tests\minigui\control_gallery_codebehind_smoke.ml"), $galleryCodeBehindExe, "-I", $Root, "--subsystem", "gui")) "compile control-gallery code-behind smoke"
 Assert-Ok (Invoke-Capture $galleryCodeBehindExe @()) "run control-gallery code-behind smoke"
 
 $aliasExe = Join-Path $Tmp "codebehind-alias-smoke.exe"
-Assert-Ok (Invoke-Capture $Compiler @((Join-Path $Root "tests\minigui\codebehind_alias_smoke.ml"), $aliasExe, "-I", (Join-Path $Root "tests\minigui"))) "compile code-behind alias smoke"
+Assert-Ok (Invoke-Compiler @((Join-Path $Root "tests\minigui\codebehind_alias_smoke.ml"), $aliasExe, "-I", (Join-Path $Root "tests\minigui"))) "compile code-behind alias smoke"
 Assert-Ok (Invoke-Capture $aliasExe @()) "run code-behind alias smoke"
 
 $generatedCallbackExe = Join-Path $Tmp "generated-callback-smoke.exe"
-Assert-Ok (Invoke-Capture $Compiler @((Join-Path $Root "tests\minigui\generated_callback_smoke.ml"), $generatedCallbackExe, "-I", $Root, "-I", (Join-Path $Root "tests\minigui"), "--subsystem", "gui")) "compile generated callback smoke"
+Assert-Ok (Invoke-Compiler @((Join-Path $Root "tests\minigui\generated_callback_smoke.ml"), $generatedCallbackExe, "-I", $Root, "-I", (Join-Path $Root "tests\minigui"), "--subsystem", "gui")) "compile generated callback smoke"
 Assert-Ok (Invoke-Capture $generatedCallbackExe @()) "run generated callback smoke"
 
 $generatedMiniGuiCallbackExe = Join-Path $Tmp "generated-minigui-callback-smoke.exe"
-Assert-Ok (Invoke-Capture $Compiler @((Join-Path $Root "tests\minigui\generated_minigui_callback_smoke.ml"), $generatedMiniGuiCallbackExe, "-I", $Root, "-I", (Join-Path $Root "tests\minigui"), "--subsystem", "gui")) "compile generated MiniGui callback smoke"
+Assert-Ok (Invoke-Compiler @((Join-Path $Root "tests\minigui\generated_minigui_callback_smoke.ml"), $generatedMiniGuiCallbackExe, "-I", $Root, "-I", (Join-Path $Root "tests\minigui"), "--subsystem", "gui")) "compile generated MiniGui callback smoke"
 Assert-Ok (Invoke-Capture $generatedMiniGuiCallbackExe @()) "run generated MiniGui callback smoke"
 
 $helloCodeBehindExe = Join-Path $Tmp "hello-codebehind-smoke.exe"
-Assert-Ok (Invoke-Capture $Compiler @((Join-Path $Root "tests\minigui\hello_codebehind_smoke.ml"), $helloCodeBehindExe, "-I", $Root, "--subsystem", "gui")) "compile hello code-behind smoke"
+Assert-Ok (Invoke-Compiler @((Join-Path $Root "tests\minigui\hello_codebehind_smoke.ml"), $helloCodeBehindExe, "-I", $Root, "--subsystem", "gui")) "compile hello code-behind smoke"
 Assert-Ok (Invoke-Capture $helloCodeBehindExe @()) "run hello code-behind smoke"
 
 $helloFullUiExe = Join-Path $Tmp "hello-full-ui-smoke.exe"
-Assert-Ok (Invoke-Capture $Compiler @((Join-Path $Root "tests\minigui\hello_full_ui_smoke.ml"), $helloFullUiExe, "-I", $Root, "--subsystem", "gui")) "compile hello full UI smoke"
+Assert-Ok (Invoke-Compiler @((Join-Path $Root "tests\minigui\hello_full_ui_smoke.ml"), $helloFullUiExe, "-I", $Root, "--subsystem", "gui")) "compile hello full UI smoke"
 Assert-Ok (Invoke-Capture $helloFullUiExe @()) "run hello full UI smoke"
 
 $badJson = Join-Path $Tmp "bad-json.mson"

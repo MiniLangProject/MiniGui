@@ -50,6 +50,8 @@ extern function SetWindowLongPtrW(hwnd as ptr, index as int, newLong as ptr) fro
 extern function GetWindowLongPtrW(hwnd as ptr, index as int) from "user32.dll" returns ptr
 extern function SendMessageW(hwnd as ptr, msg as u32, wParam as ptr, lParam as ptr) from "user32.dll" returns ptr
 extern function SendMessageTextW(hwnd as ptr, msg as u32, wParam as ptr, lParam as wstr) from "user32.dll" symbol "SendMessageW" returns ptr
+extern function LoadImageW(instance as ptr, name as wstr, imageType as u32, width as int, height as int, flags as u32) from "user32.dll" returns ptr
+extern function MessageBoxW(hwnd as ptr, text as wstr, caption as wstr, flags as u32) from "user32.dll" returns int
 extern function CallWindowProcW(prev as ptr, hwnd as ptr, msg as u32, wParam as ptr, lParam as ptr) from "user32.dll" symbol "CallWindowProcW" returns ptr
 extern function DefWindowProcW(hwnd as ptr, msg as u32, wParam as ptr, lParam as ptr) from "user32.dll" returns ptr
 extern function PostQuitMessage(exitCode as int) from "user32.dll" returns void
@@ -70,6 +72,8 @@ const WM_HSCROLL = 276
 const WM_VSCROLL = 277
 const BN_CLICKED = 0
 const EN_CHANGE = 768
+const EM_LIMITTEXT = 197
+const EM_SETREADONLY = 207
 const BM_GETCHECK = 240
 const BM_SETCHECK = 241
 const BST_CHECKED = 1
@@ -114,11 +118,21 @@ const WS_VISIBLE = 268435456
 const WS_CHILD = 1073741824
 const WS_BORDER = 8388608
 const WS_VSCROLL = 2097152
+const WS_HSCROLL = 1048576
 const ES_AUTOHSCROLL = 128
 const ES_MULTILINE = 4
 const ES_AUTOVSCROLL = 64
 const ES_WANTRETURN = 4096
+const ES_PASSWORD = 32
+const ES_NUMBER = 8192
 const SS_LEFT = 0
+const SS_CENTERIMAGE = 512
+const SS_NOTIFY = 256
+const SS_ETCHEDHORZ = 16
+const SS_ETCHEDVERT = 17
+const STM_SETIMAGE = 370
+const IMAGE_BITMAP = 0
+const LR_LOADFROMFILE = 16
 const BS_PUSHBUTTON = 0
 const BS_AUTOCHECKBOX = 3
 const BS_AUTORADIOBUTTON = 9
@@ -137,6 +151,13 @@ const TBS_AUTOTICKS = 1
 const TBS_VERT = 2
 const DTS_SHORTDATEFORMAT = 0
 const SW_SHOW = 5
+const MB_OK = 0
+const MB_OKCANCEL = 1
+const MB_ICONERROR = 16
+const MB_ICONQUESTION = 32
+const MB_ICONWARNING = 48
+const MB_ICONINFORMATION = 64
+const IDOK = 1
 
 _activeApp = void
 _windowProcPtr = 0
@@ -582,6 +603,46 @@ struct Window
   end function
 end struct
 
+struct Dialog
+  static function _owner(app)
+    if app is void then return void end if
+    if app.startupWindow is void then return void end if
+    return app.startupWindow.handle
+  end function
+
+  static function showInfo(app, title, message)
+    return MessageBoxW(Dialog._owner(app), message, title, MB_OK | MB_ICONINFORMATION)
+  end function
+
+  static function showWarning(app, title, message)
+    return MessageBoxW(Dialog._owner(app), message, title, MB_OK | MB_ICONWARNING)
+  end function
+
+  static function showError(app, title, message)
+    return MessageBoxW(Dialog._owner(app), message, title, MB_OK | MB_ICONERROR)
+  end function
+
+  static function confirm(app, title, message)
+    return MessageBoxW(Dialog._owner(app), message, title, MB_OKCANCEL | MB_ICONQUESTION) == IDOK
+  end function
+
+  static function pickOpenFile(app, title, filter)
+    return ""
+  end function
+
+  static function pickSaveFile(app, title, filter)
+    return ""
+  end function
+
+  static function pickFolder(app, title)
+    return ""
+  end function
+
+  static function pickColor(app, title, fallback)
+    return fallback
+  end function
+end struct
+
 struct Label
   static function create(app, parent, id, text, x, y, width, height)
     hwnd = CreateWindowExW(0, "STATIC", text, WS_CHILD | WS_VISIBLE | SS_LEFT, x, y, width, height, parent.handle, void, void, void)
@@ -622,6 +683,30 @@ struct TextArea
   end function
 end struct
 
+struct PasswordBox
+  static function create(app, parent, id, text, x, y, width, height)
+    nid = app.nextNativeId
+    app.nextNativeId = app.nextNativeId + 1
+    style = WS_CHILD | WS_VISIBLE | WS_BORDER | ES_AUTOHSCROLL | ES_PASSWORD
+    hwnd = CreateWindowExW(0, "EDIT", text, style, x, y, width, height, parent.handle, nid, void, void)
+    c = NativeControl(id, "PasswordBox", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0)
+    return Application.addControl(app, c)
+  end function
+end struct
+
+struct NumberBox
+  static function create(app, parent, id, text, x, y, width, height, minimum, maximum, value, step)
+    nid = app.nextNativeId
+    app.nextNativeId = app.nextNativeId + 1
+    style = WS_CHILD | WS_VISIBLE | WS_BORDER | ES_AUTOHSCROLL | ES_NUMBER
+    startText = text
+    if startText == "" then startText = "" + value end if
+    hwnd = CreateWindowExW(0, "EDIT", startText, style, x, y, width, height, parent.handle, nid, void, void)
+    c = NativeControl(id, "NumberBox", hwnd, nid, startText, x, y, width, height, true, true, startText, -1, minimum, maximum, value, step, step, x, y, width, height, 0, 0)
+    return Application.addControl(app, c)
+  end function
+end struct
+
 struct CheckBox
   static function create(app, parent, id, text, x, y, width, height, checked)
     nid = app.nextNativeId
@@ -644,12 +729,63 @@ struct RadioButton
   end function
 end struct
 
+struct Image
+  static function create(app, parent, id, text, x, y, width, height, source, stretch)
+    nid = app.nextNativeId
+    app.nextNativeId = app.nextNativeId + 1
+    label = text
+    if label == "" then label = source end if
+    hwnd = CreateWindowExW(0, "STATIC", label, WS_CHILD | WS_VISIBLE | SS_LEFT | SS_CENTERIMAGE | SS_NOTIFY, x, y, width, height, parent.handle, nid, void, void)
+    if source != "" then
+      bmp = LoadImageW(void, source, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE)
+      if bmp != 0 then SendMessageW(hwnd, STM_SETIMAGE, IMAGE_BITMAP, bmp) end if
+    end if
+    c = NativeControl(id, "Image", hwnd, nid, label, x, y, width, height, true, true, label, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0)
+    return Application.addControl(app, c)
+  end function
+end struct
+
+struct Separator
+  static function create(app, parent, id, text, x, y, width, height, orientation)
+    style = WS_CHILD | WS_VISIBLE | SS_ETCHEDHORZ
+    if orientation == "vertical" then style = WS_CHILD | WS_VISIBLE | SS_ETCHEDVERT end if
+    hwnd = CreateWindowExW(0, "STATIC", text, style, x, y, width, height, parent.handle, void, void, void)
+    c = NativeControl(id, "Separator", hwnd, 0, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0)
+    return Application.addControl(app, c)
+  end function
+end struct
+
+struct LinkLabel
+  static function create(app, parent, id, text, x, y, width, height, url)
+    nid = app.nextNativeId
+    app.nextNativeId = app.nextNativeId + 1
+    label = text
+    if label == "" then label = url end if
+    hwnd = CreateWindowExW(0, "STATIC", label, WS_CHILD | WS_VISIBLE | SS_LEFT | SS_NOTIFY, x, y, width, height, parent.handle, nid, void, void)
+    c = NativeControl(id, "LinkLabel", hwnd, nid, label, x, y, width, height, true, true, label, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0)
+    return Application.addControl(app, c)
+  end function
+end struct
+
 struct Panel
   static function create(app, parent, id, text, x, y, width, height)
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
     hwnd = CreateWindowExW(0, "STATIC", text, WS_CHILD | WS_VISIBLE, x, y, width, height, parent.handle, nid, void, void)
     c = NativeControl(id, "Panel", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0)
+    return Application.addControl(app, c)
+  end function
+end struct
+
+struct ScrollViewer
+  static function create(app, parent, id, text, x, y, width, height, horizontalScroll, verticalScroll)
+    nid = app.nextNativeId
+    app.nextNativeId = app.nextNativeId + 1
+    style = WS_CHILD | WS_VISIBLE | WS_BORDER
+    if horizontalScroll then style = style | WS_HSCROLL end if
+    if verticalScroll then style = style | WS_VSCROLL end if
+    hwnd = CreateWindowExW(0, "STATIC", text, style, x, y, width, height, parent.handle, nid, void, void)
+    c = NativeControl(id, "ScrollViewer", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0)
     return Application.addControl(app, c)
   end function
 end struct
@@ -868,6 +1004,29 @@ struct Control
     return ShowWindow(control.handle, 0)
   end function
 
+  static function setReadOnly(control, readOnly)
+    if control is void then return false end if
+    if control.handle is void then return false end if
+    if control.kind == "TextBox" or control.kind == "TextArea" or control.kind == "PasswordBox" or control.kind == "NumberBox" then
+      flag = 0
+      if readOnly then flag = 1 end if
+      SendMessageW(control.handle, EM_SETREADONLY, flag, 0)
+      return true
+    end if
+    return false
+  end function
+
+  static function setMaxLength(control, maxLength)
+    if control is void then return false end if
+    if control.handle is void then return false end if
+    if maxLength < 0 then maxLength = 0 end if
+    if control.kind == "TextBox" or control.kind == "TextArea" or control.kind == "PasswordBox" or control.kind == "NumberBox" then
+      SendMessageW(control.handle, EM_LIMITTEXT, maxLength, 0)
+      return true
+    end if
+    return false
+  end function
+
   static function setBounds(control, x, y, width, height)
     if control is void then return false end if
     control.baseX = x
@@ -998,6 +1157,11 @@ struct Control
 
   static function setValueRange(control, minimum, maximum)
     if control is void then return false end if
+    if control.kind == "NumberBox" then
+      control.scrollMin = minimum
+      control.scrollMax = maximum
+      return true
+    end if
     if control.kind == "ProgressBar" then
       control.scrollMin = minimum
       control.scrollMax = maximum
@@ -1013,6 +1177,12 @@ struct Control
 
   static function setValue(control, value)
     if control is void then return false end if
+    if control.kind == "NumberBox" then
+      if value < control.scrollMin then value = control.scrollMin end if
+      if value > control.scrollMax then value = control.scrollMax end if
+      control.scrollValue = value
+      return Control.setText(control, "" + value)
+    end if
     if control.kind == "ProgressBar" then
       if value < control.scrollMin then value = control.scrollMin end if
       if value > control.scrollMax then value = control.scrollMax end if
@@ -1026,6 +1196,9 @@ struct Control
 
   static function getValue(control)
     if control is void then return 0 end if
+    if control.kind == "NumberBox" then
+      return _asInt(Control.getText(control))
+    end if
     if control.kind == "ProgressBar" then return control.scrollValue end if
     return Control.getScrollValue(control)
   end function
