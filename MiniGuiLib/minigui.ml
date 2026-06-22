@@ -104,6 +104,8 @@ const TBM_SETRANGEMIN = 1031
 const TBM_SETRANGEMAX = 1032
 const TBM_SETPAGESIZE = 1045
 const TBM_SETLINESIZE = 1047
+const SB_SETTEXTW = 1035
+const SB_GETTEXTW = 1037
 const SB_LINEUP = 0
 const SB_LINEDOWN = 1
 const SB_PAGEUP = 2
@@ -873,10 +875,12 @@ end struct
 
 struct MenuBar
   static function create(app, parent, id, text, x, y, width, height, items)
+    nid = app.nextNativeId
+    app.nextNativeId = app.nextNativeId + 1
     label = text
     if label == "" and len(items) > 0 then label = "  " + _joinText(items, "    ") end if
-    hwnd = CreateWindowExW(0, "STATIC", label, WS_CHILD | WS_VISIBLE | SS_LEFT, x, y, width, height, parent.handle, void, void, void)
-    c = NativeControl(id, "MenuBar", hwnd, 0, label, x, y, width, height, true, true, label, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0)
+    hwnd = CreateWindowExW(0, "STATIC", label, WS_CHILD | WS_VISIBLE | SS_LEFT | SS_NOTIFY, x, y, width, height, parent.handle, nid, void, void)
+    c = NativeControl(id, "MenuBar", hwnd, nid, label, x, y, width, height, true, true, label, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0)
     return Application.addControl(app, c)
   end function
 end struct
@@ -894,10 +898,12 @@ end struct
 
 struct ToolBar
   static function create(app, parent, id, text, x, y, width, height, items)
+    nid = app.nextNativeId
+    app.nextNativeId = app.nextNativeId + 1
     label = text
     if label == "" and len(items) > 0 then label = "  " + _joinText(items, "  |  ") end if
-    hwnd = CreateWindowExW(0, "STATIC", label, WS_CHILD | WS_VISIBLE | SS_LEFT, x, y, width, height, parent.handle, void, void, void)
-    c = NativeControl(id, "ToolBar", hwnd, 0, label, x, y, width, height, true, true, label, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0)
+    hwnd = CreateWindowExW(0, "STATIC", label, WS_CHILD | WS_VISIBLE | SS_LEFT | SS_NOTIFY, x, y, width, height, parent.handle, nid, void, void)
+    c = NativeControl(id, "ToolBar", hwnd, nid, label, x, y, width, height, true, true, label, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0)
     return Application.addControl(app, c)
   end function
 end struct
@@ -969,12 +975,26 @@ struct Control
     control.text = text
     control.lastText = text
     if control.handle is void then return false end if
+    if control.kind == "StatusBar" then
+      SendMessageTextW(control.handle, SB_SETTEXTW, 0, text)
+      return true
+    end if
     return SetWindowTextW(control.handle, text)
   end function
 
   static function getText(control)
     if control is void then return "" end if
     if control.handle is void then return control.text end if
+    if control.kind == "StatusBar" then
+      sbuf = bytes(1024, 0)
+      SendMessageW(control.handle, SB_GETTEXTW, 0, nativeBytesPtr(sbuf))
+      stext = decode16Z(sbuf)
+      if typeof(stext) == "string" then
+        control.text = stext
+        return stext
+      end if
+      return control.text
+    end if
     n = GetWindowTextLengthW(control.handle)
     if n < 0 then return control.text end if
     buf = bytes((n + 2) * 2, 0)

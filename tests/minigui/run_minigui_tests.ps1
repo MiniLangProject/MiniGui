@@ -196,6 +196,10 @@ function Assert-ControlGalleryInteractions {
     $children = Get-ChildWindows $process.MainWindowHandle
     $apply = $children | Where-Object { $_.Class -eq "Button" -and $_.Text -eq "Apply" } | Select-Object -First 1
     if (-not $apply) { throw "control-gallery interaction test did not find Apply button." }
+    $menuBar = $children | Where-Object { $_.Class -eq "Static" -and $_.Text -eq "  File    Edit    View    Help" } | Select-Object -First 1
+    if (-not $menuBar) { throw "control-gallery interaction test did not find MenuBar." }
+    $toolBar = $children | Where-Object { $_.Class -eq "Static" -and $_.Text -eq "  New  |  Open  |  Save  |  Refresh" } | Select-Object -First 1
+    if (-not $toolBar) { throw "control-gallery interaction test did not find ToolBar." }
     $slider = $children | Where-Object { $_.Class -eq "msctls_trackbar32" } | Select-Object -First 1
     if (-not $slider) { throw "control-gallery interaction test did not find Slider." }
     foreach ($requiredClass in @("msctls_progress32", "SysTabControl32", "SysTreeView32", "SysListView32", "SysDateTimePick32", "msctls_statusbar32")) {
@@ -209,6 +213,20 @@ function Assert-ControlGalleryInteractions {
     $afterClick = Get-StaticTextSnapshot $process.MainWindowHandle
     if ($afterClick -notmatch "Applied for Ada") {
       throw "control-gallery Apply command did not update result text: $afterClick"
+    }
+
+    [MiniGuiTestWin32]::SendMessageW($process.MainWindowHandle, 273, [IntPtr]$toolBar.Id, $toolBar.Handle) | Out-Null
+    Start-Sleep -Milliseconds 300
+    $afterToolBar = Get-StaticTextSnapshot $process.MainWindowHandle
+    if ($afterToolBar -notmatch "Action from mainToolBar") {
+      throw "control-gallery ToolBar command did not update result text: $afterToolBar"
+    }
+
+    [MiniGuiTestWin32]::SendMessageW($process.MainWindowHandle, 273, [IntPtr]$menuBar.Id, $menuBar.Handle) | Out-Null
+    Start-Sleep -Milliseconds 300
+    $afterMenuBar = Get-StaticTextSnapshot $process.MainWindowHandle
+    if ($afterMenuBar -notmatch "Action from mainMenu") {
+      throw "control-gallery MenuBar command did not update result text: $afterMenuBar"
     }
 
     [MiniGuiTestWin32]::SendMessageW($slider.Handle, 1029, [IntPtr]1, [IntPtr]55) | Out-Null
