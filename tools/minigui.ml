@@ -1256,9 +1256,16 @@ function addGeneratedNode(lines, fields, result, path, node, parentVar, x, y, wi
       if len(childNodes) > 0 then
         for childIndex = 0 to len(childNodes) - 1
           childType = asString(prop(childNodes[childIndex], "type"), "")
-          rChild = addGeneratedNode(lines, fields, result, path, childNodes[childIndex], var, childPadding, childY, w - childPadding * 2, controlDefaultHeight(childType))
+          childX = childPadding
+          childSlotY = childY
+          childSlotH = controlDefaultHeight(childType)
+          if typ == "TabControl" then
+            childSlotH = h - childY - childPadding
+            if childSlotH < 1 then childSlotH = controlDefaultHeight(childType) end if
+          end if
+          rChild = addGeneratedNode(lines, fields, result, path, childNodes[childIndex], var, childX, childSlotY, w - childPadding * 2, childSlotH)
           lines = rChild[0]; fields = rChild[1]
-          childY = childY + rChild[2] + childSpacing
+          if typ != "TabControl" then childY = childY + rChild[2] + childSpacing end if
         end for
       end if
     end if

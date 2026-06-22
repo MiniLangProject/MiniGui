@@ -185,6 +185,7 @@ _timerProcPtr = 0
 _oldWindowProcPtr = 0
 _subclassHandles = []
 _subclassOldProcs = []
+_resizeInitializedWindows = []
 _windowClassRegistered = false
 _windowClassNameBytes = void
 
@@ -473,9 +474,6 @@ function _installSpecificWindowProc(hwnd, cb)
   global _subclassOldProcs
   if cb == 0 then return false end if
   oldProc = SetWindowLongPtrW(hwnd, GWLP_WNDPROC, cb)
-  if _oldWindowProcPtr == 0 and oldProc != 0 and oldProc != cb and oldProc != _windowProcPtr then
-    _oldWindowProcPtr = oldProc
-  end if
   if oldProc != 0 and oldProc != cb then
     found = false
     if len(_subclassHandles) > 0 then
@@ -602,6 +600,40 @@ struct Application
     if window is void then return false end if
     if window.baseClientWidth <= 0 then return false end if
     if window.baseClientHeight <= 0 then return false end if
+    global _resizeInitializedWindows
+    initialized = false
+    if len(_resizeInitializedWindows) > 0 then
+      for initIdx = 0 to len(_resizeInitializedWindows) - 1
+        if _resizeInitializedWindows[initIdx] == window.handle then initialized = true end if
+      end for
+    end if
+    if initialized == false then
+      _resizeInitializedWindows = _resizeInitializedWindows + [window.handle]
+      window.width = clientWidth
+      window.height = clientHeight
+      window.baseClientWidth = clientWidth
+      window.baseClientHeight = clientHeight
+      window.baseParentWidth = clientWidth
+      window.baseParentHeight = clientHeight
+      if len(app.controls) > 0 then
+        for baseIdx = 0 to len(app.controls) - 1
+          baseControl = app.controls[baseIdx]
+          if baseControl is void == false then
+            baseControl.baseX = baseControl.x
+            baseControl.baseY = baseControl.y
+            baseControl.baseWidth = baseControl.width
+            baseControl.baseHeight = baseControl.height
+            if baseControl.parent is void == false then
+              baseControl.baseParentWidth = baseControl.parent.width
+              baseControl.baseParentHeight = baseControl.parent.height
+            end if
+          end if
+        end for
+      end if
+      Application.syncDynamicControls(app)
+      RedrawWindow(window.handle, void, void, RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN | RDW_UPDATENOW)
+      return true
+    end if
     oldSize = [window.width, window.height]
     window.width = clientWidth
     window.height = clientHeight
@@ -679,6 +711,31 @@ struct Application
     return true
   end function
 
+  static function redrawAll(app)
+    if app is void then return false end if
+    if len(app.controls) > 0 then
+      for i = 0 to len(app.controls) - 1
+        c = app.controls[i]
+        if c is void == false then
+          if c.handle is void == false then
+            RedrawWindow(c.handle, void, void, RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN | RDW_UPDATENOW)
+          end if
+        end if
+      end for
+    end if
+    if len(app.windows) > 0 then
+      for w = 0 to len(app.windows) - 1
+        win = app.windows[w]
+        if win is void == false then
+          if win.handle is void == false then
+            RedrawWindow(win.handle, void, void, RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN | RDW_UPDATENOW)
+          end if
+        end if
+      end for
+    end if
+    return true
+  end function
+
   static function run(app)
     global _activeApp
     if app is void then return 1 end if
@@ -713,14 +770,25 @@ struct Window
     useRegistered = _registerWindowClass()
     className = "MiniGuiWindow"
     if useRegistered == false then className = "#32770" end if
-    hwnd = CreateWindowExW(0, className, title, WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, 100, 100, width, height, void, void, void, void)
+    hwnd = CreateWindowExW(0, className, title, WS_OVERLAPPEDWINDOW, 100, 100, width, height, void, void, void, void)
     if hwnd == 0 and useRegistered then
-      hwnd = CreateWindowExW(0, "#32770", title, WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, 100, 100, width, height, void, void, void, void)
+      hwnd = CreateWindowExW(0, "#32770", title, WS_OVERLAPPEDWINDOW, 100, 100, width, height, void, void, void, void)
       useRegistered = false
     end if
     if hwnd != 0 then SetWindowLongPtrW(hwnd, GWLP_USERDATA, nativeRawValue(app)) end if
     if hwnd != 0 then _installWindowProc(hwnd) end if
-    win = NativeControl(id, "Window", hwnd, 0, title, 100, 100, width, height, true, true, title, -1, 0, 100, 0, 1, 10, 100, 100, width, height, width - 40, height - 80, void, width - 40, height - 80)
+    clientWidth = width
+    clientHeight = height
+    if hwnd != 0 then
+      rect = bytes(16, 0)
+      if GetClientRect(hwnd, rect) then
+        clientWidth = _readI32LE(rect, 8) - _readI32LE(rect, 0)
+        clientHeight = _readI32LE(rect, 12) - _readI32LE(rect, 4)
+      end if
+    end if
+    if clientWidth <= 0 then clientWidth = width end if
+    if clientHeight <= 0 then clientHeight = height end if
+    win = NativeControl(id, "Window", hwnd, 0, title, 100, 100, clientWidth, clientHeight, true, true, title, -1, 0, 100, 0, 1, 10, 100, 100, clientWidth, clientHeight, clientWidth, clientHeight, void, clientWidth, clientHeight)
     Application.addWindow(app, win)
     return win
   end function
@@ -734,6 +802,7 @@ struct Window
     ShowWindow(window.handle, SW_SHOW)
     UpdateWindow(window.handle)
     Events.dispatchLoad(window)
+    if _activeApp is void == false then Application.redrawAll(_activeApp) end if
     return true
   end function
 
