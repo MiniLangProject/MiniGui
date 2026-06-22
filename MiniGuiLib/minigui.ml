@@ -1042,6 +1042,7 @@ struct Panel
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
     hwnd = CreateWindowExW(0, "STATIC", text, WS_CHILD | WS_VISIBLE, x, y, width, height, parent.handle, nid, void, void)
+    if hwnd != 0 then _installWindowProc(hwnd) end if
     c = NativeControl(id, "Panel", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     return Application.addControl(app, c)
   end function
@@ -1067,6 +1068,7 @@ struct GroupBox
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
     hwnd = CreateWindowExW(0, "BUTTON", text, WS_CHILD | WS_VISIBLE | BS_GROUPBOX, x, y, width, height, parent.handle, nid, void, void)
+    if hwnd != 0 then _installWindowProc(hwnd) end if
     c = NativeControl(id, "GroupBox", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     return Application.addControl(app, c)
   end function

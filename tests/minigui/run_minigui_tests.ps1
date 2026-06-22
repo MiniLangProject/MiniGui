@@ -251,7 +251,7 @@ function Assert-ControlGalleryInteractions {
     if (-not $cityList) { throw "control-gallery interaction test did not find visible city ListBox." }
     [MiniGuiTestWin32]::SendMessageW($countryCombo.Handle, 334, [IntPtr]1, [IntPtr]::Zero) | Out-Null
     $comboChanged = [IntPtr]((1 -shl 16) -bor $countryCombo.Id)
-    [MiniGuiTestWin32]::SendMessageW($process.MainWindowHandle, 273, $comboChanged, $countryCombo.Handle) | Out-Null
+    [MiniGuiTestWin32]::SendMessageW($countryCombo.Parent, 273, $comboChanged, $countryCombo.Handle) | Out-Null
     Start-Sleep -Milliseconds 300
     $afterCountryChange = Get-StaticTextSnapshot $process.MainWindowHandle
     if ($afterCountryChange -notmatch "Country: United States") {
@@ -259,7 +259,7 @@ function Assert-ControlGalleryInteractions {
     }
     [MiniGuiTestWin32]::SendMessageW($cityList.Handle, 390, [IntPtr]1, [IntPtr]::Zero) | Out-Null
     $cityChanged = [IntPtr]((1 -shl 16) -bor $cityList.Id)
-    [MiniGuiTestWin32]::SendMessageW($process.MainWindowHandle, 273, $cityChanged, $cityList.Handle) | Out-Null
+    [MiniGuiTestWin32]::SendMessageW($cityList.Parent, 273, $cityChanged, $cityList.Handle) | Out-Null
     Start-Sleep -Milliseconds 300
     $afterCityChange = Get-StaticTextSnapshot $process.MainWindowHandle
     if ($afterCityChange -notmatch "City: San Francisco") {
@@ -270,7 +270,7 @@ function Assert-ControlGalleryInteractions {
     Start-Sleep -Milliseconds 300
     $apply = Get-ChildWindows $process.MainWindowHandle | Where-Object { $_.Visible -and $_.Class -eq "Button" -and $_.Text -eq "Apply" } | Select-Object -First 1
     if (-not $apply) { throw "control-gallery interaction test did not find visible Apply button on Layout tab." }
-    [MiniGuiTestWin32]::SendMessageW($process.MainWindowHandle, 273, [IntPtr]$apply.Id, $apply.Handle) | Out-Null
+    [MiniGuiTestWin32]::SendMessageW($apply.Parent, 273, [IntPtr]$apply.Id, $apply.Handle) | Out-Null
     Start-Sleep -Milliseconds 300
     $afterClick = Get-StaticTextSnapshot $process.MainWindowHandle
     if ($afterClick -notmatch "Applied for Ada" -or $afterClick -notmatch "Apply was clicked") {
@@ -283,7 +283,7 @@ function Assert-ControlGalleryInteractions {
     if (-not $slider) { throw "control-gallery interaction test did not find visible Slider on Feedback tab." }
     [MiniGuiTestWin32]::SendMessageW($slider.Handle, 1029, [IntPtr]1, [IntPtr]55) | Out-Null
     $scrollWParam = [IntPtr]((55 -shl 16) -bor 5)
-    [MiniGuiTestWin32]::SendMessageW($process.MainWindowHandle, 276, $scrollWParam, $slider.Handle) | Out-Null
+    [MiniGuiTestWin32]::SendMessageW($slider.Parent, 276, $scrollWParam, $slider.Handle) | Out-Null
     Start-Sleep -Milliseconds 300
     $afterSlider = Get-StaticTextSnapshot $process.MainWindowHandle
     if ($afterSlider -notmatch "Volume: 55") {
