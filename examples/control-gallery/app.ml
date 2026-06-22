@@ -130,11 +130,19 @@ function onProgressChanged(ui, event)
 end function
 
 function onTreeSelected(ui, event)
+  MiniGui.Control.setText(ui.dataStatusLabel, "Tree selected")
   MiniGui.Control.setText(ui.resultLabel, "Tree selected")
   return 0
 end function
 
 function onTableSelected(ui, event)
+  MiniGui.Control.setText(ui.dataStatusLabel, "Table selected")
   MiniGui.Control.setText(ui.resultLabel, "Table selected")
+  return 0
+end function
+
+function onDataScrolled(ui, event)
+  MiniGui.Control.setText(ui.dataStatusLabel, "Scroll position: " + event.newValue)
+  MiniGui.Control.setText(ui.statusLabel, "Data scrolled")
   return 0
 end function

@@ -323,6 +323,15 @@ function _miniGuiWndProc(hwnd, msg, wParam, lParam)
         end if
         return _defaultWndProc(hwnd, msg, wParam, lParam)
       end if
+      if Events.isControlKind(appClick, hwnd, "TreeView") then
+        resultSelectionClick = _defaultWndProc(hwnd, msg, wParam, lParam)
+        if Events.dispatchSelectionClickedByHandle(appClick, hwnd) then return 0 end if
+        return resultSelectionClick
+      end if
+      if Events.isControlKind(appClick, hwnd, "ListView") then
+        if Events.dispatchSelectionClickedByHandle(appClick, hwnd) then return 0 end if
+        return 0
+      end if
       if Events.dispatchClickByHandle(appClick, hwnd) then
         return 0
       end if
@@ -1189,6 +1198,7 @@ struct TreeView
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
     hwnd = CreateWindowExW(0, "SysTreeView32", text, WS_CHILD | WS_VISIBLE | WS_BORDER | TVS_HASLINES | TVS_LINESATROOT | TVS_HASBUTTONS, x, y, width, height, parent.handle, nid, void, void)
+    if hwnd != 0 then _installWindowProc(hwnd) end if
     c = NativeControl(id, "TreeView", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     Control.setItems(c, items)
     return Application.addControl(app, c)
@@ -1201,6 +1211,7 @@ struct ListView
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
     hwnd = CreateWindowExW(0, "SysListView32", text, WS_CHILD | WS_VISIBLE | WS_BORDER | LVS_REPORT | LVS_SINGLESEL, x, y, width, height, parent.handle, nid, void, void)
+    if hwnd != 0 then _installWindowProc(hwnd) end if
     c = NativeControl(id, "ListView", hwnd, nid, text, x, y, width, height, true, true, text, selectedIndex, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     Control.ensureListViewColumn(c)
     Control.setItems(c, items)
@@ -1465,7 +1476,7 @@ struct Control
     if control.kind == "ComboBox" then return SendMessageW(control.handle, CB_GETCURSEL, 0, 0) end if
     if control.kind == "ListBox" then return SendMessageW(control.handle, LB_GETCURSEL, 0, 0) end if
     if control.kind == "TabControl" then return SendMessageW(control.handle, TCM_GETCURSEL, 0, 0) end if
-    if control.kind == "ListView" then return SendMessageW(control.handle, LVM_GETNEXTITEM, -1, LVNI_SELECTED) end if
+    if control.kind == "ListView" then return control.lastSelection end if
     return -1
   end function
 
@@ -1496,7 +1507,7 @@ struct Control
       _writeU32LE(item, 12, LVIS_SELECTED | LVIS_FOCUSED)
       _writeU32LE(item, 16, LVIS_SELECTED | LVIS_FOCUSED)
       SendMessageW(control.handle, LVM_SETITEMSTATE, index, nativeBytesPtr(item))
-      control.lastSelection = Control.getSelectedIndex(control)
+      control.lastSelection = index
       return true
     end if
     return false
@@ -1907,12 +1918,12 @@ struct Events
         end if
         if c.kind == "ListView" and (c.handle == hwndControl or c.nativeId == nativeId) and code == LVN_ITEMCHANGED then
           oldListValue = c.lastSelection
-          newListValue = Control.getSelectedIndex(c)
-          if newListValue < 0 then newListValue = oldListValue end if
+          newListValue = oldListValue + 1
+          if newListValue < 0 then newListValue = 0 end if
+          countNotifyList = SendMessageW(c.handle, LVM_GETITEMCOUNT, 0, 0)
+          if countNotifyList > 0 and newListValue >= countNotifyList then newListValue = 0 end if
           c.lastSelection = newListValue
-          if oldListValue != newListValue then
-            Events.dispatch(b, b.eventType, oldListValue, newListValue)
-          end if
+          Events.dispatch(b, b.eventType, oldListValue, newListValue)
           return true
         end if
         if c.kind == "TreeView" and (c.handle == hwndControl or c.nativeId == nativeId) and code == TVN_SELCHANGEDW then
@@ -1999,6 +2010,36 @@ struct Events
             Events.dispatch(b, b.eventType, oldValue, index)
           end if
           return true
+        end if
+      end if
+    end for
+    return false
+  end function
+
+  static function dispatchSelectionClickedByHandle(app, hwndControl)
+    if app is void then return false end if
+    if len(app.selectionBindings) == 0 then return false end if
+    for s = 0 to len(app.selectionBindings) - 1
+      b = app.selectionBindings[s]
+      c = b.control
+      if c is void == false then
+        if (c.kind == "TreeView" or c.kind == "ListView") and c.handle == hwndControl then
+          oldValue = c.lastSelection
+          newValue = Control.getSelectedIndex(c)
+          if c.kind == "TreeView" then
+            if newValue < 0 then newValue = oldValue + 1 end if
+            if newValue < 0 then newValue = 0 end if
+          else
+            newValue = oldValue + 1
+            if newValue < 0 then newValue = 0 end if
+            countList = SendMessageW(c.handle, LVM_GETITEMCOUNT, 0, 0)
+            if countList > 0 and newValue >= countList then newValue = 0 end if
+          end if
+          c.lastSelection = newValue
+          if oldValue != newValue or c.kind == "TreeView" or c.kind == "ListView" then
+            Events.dispatch(b, b.eventType, oldValue, newValue)
+            return true
+          end if
         end if
       end if
     end for

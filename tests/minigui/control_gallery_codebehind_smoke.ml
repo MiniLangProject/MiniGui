@@ -31,6 +31,7 @@ struct GalleryUi
   dataPanel,
   navigationTree,
   customerTable,
+  dataStatusLabel,
   statusLabel,
   resultLabel,
 end struct
@@ -67,9 +68,10 @@ function main(args)
   dataPanel = MiniGui.Panel.create(app, tabs, "dataPanel", "", 440, 284, 280, 170)
   tree = MiniGui.TreeView.create(app, dataPanel, "navigationTree", "", 8, 8, 120, 120, ["Customers"])
   table = MiniGui.ListView.create(app, dataPanel, "customerTable", "", 140, 8, 120, 120, ["Ada"], 0)
+  dataStatus = MiniGui.Label.create(app, dataPanel, "dataStatusLabel", "", 8, 136, 260, 24)
   statusLabel = MiniGui.StatusBar.create(app, win, "statusLabel", "", 0, 610, 500, 24)
   resultLabel = MiniGui.Label.create(app, win, "resultLabel", "", 0, 640, 500, 24)
-  ui = GalleryUi(app, win, menu, toolbar, title, tabs, inputPanel, nameLabel, nameBox, datePicker, notes, group, consent, radioEmail, radioPhone, selectionPanel, country, city, layoutPanel, primary, disabled, hidden, feedbackPanel, volumeLabel, slider, progress, dataPanel, tree, table, statusLabel, resultLabel)
+  ui = GalleryUi(app, win, menu, toolbar, title, tabs, inputPanel, nameLabel, nameBox, datePicker, notes, group, consent, radioEmail, radioPhone, selectionPanel, country, city, layoutPanel, primary, disabled, hidden, feedbackPanel, volumeLabel, slider, progress, dataPanel, tree, table, dataStatus, statusLabel, resultLabel)
 
   Gallery.onMainWindowLoad(ui, MiniGui.Event(win, "load", void, void, false))
   if MiniGui.Control.getText(statusLabel) != "Gallery ready" then return 1 end if
@@ -127,9 +129,15 @@ function main(args)
 
   Gallery.onTreeSelected(ui, MiniGui.Event(tree, "selected", 0, 1, false))
   if MiniGui.Control.getText(resultLabel) != "Tree selected" then return 22 end if
+  if MiniGui.Control.getText(dataStatus) != "Tree selected" then return 32 end if
 
   Gallery.onTableSelected(ui, MiniGui.Event(table, "selected", 0, 1, false))
   if MiniGui.Control.getText(resultLabel) != "Table selected" then return 23 end if
+  if MiniGui.Control.getText(dataStatus) != "Table selected" then return 33 end if
+
+  Gallery.onDataScrolled(ui, MiniGui.Event(dataPanel, "scrollChanged", 0, 15, false))
+  if MiniGui.Control.getText(dataStatus) != "Scroll position: 15" then return 34 end if
+  if MiniGui.Control.getText(statusLabel) != "Data scrolled" then return 35 end if
 
   return 0
 end function

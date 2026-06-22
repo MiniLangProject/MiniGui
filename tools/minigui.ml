@@ -827,7 +827,7 @@ function allowedControlEvents(typ)
   if contains(["TextBox", "TextArea", "PasswordBox", "DatePicker"], typ) then return ["textChanged", "changed", "change", "submit", "validating", "validated"] end if
   if typ == "NumberBox" then return ["textChanged", "valueChanged", "changed", "change", "submit", "validating", "validated"] end if
   if contains(["ComboBox", "ListBox", "TabControl", "TreeView", "ListView", "Table"], typ) then return ["selectionChanged", "selected", "changed", "change"] end if
-  if contains(["ScrollBar", "Slider", "ProgressBar"], typ) then return ["scrollChanged", "valueChanged", "changed", "change"] end if
+  if contains(["ScrollBar", "Slider", "ProgressBar", "ScrollViewer"], typ) then return ["scrollChanged", "valueChanged", "changed", "change"] end if
   return []
 end function
 

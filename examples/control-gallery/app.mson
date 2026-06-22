@@ -421,7 +421,7 @@
                         "type": "Table",
                         "properties": {
                           "items": ["Ada Lovelace", "Grace Hopper", "Margaret Hamilton"],
-                          "selectedIndex": 0,
+                          "selectedIndex": -1,
                           "height": 120,
                           "width": 380
                         },
@@ -440,6 +440,7 @@
                       "padding": 6,
                       "spacing": 4
                     },
+                    "events": { "scrollChanged": "onDataScrolled" },
                     "children": [
                       {
                         "id": "scrollContentLabel",
@@ -457,6 +458,15 @@
                         }
                       }
                     ]
+                  },
+                  {
+                    "id": "dataStatusLabel",
+                    "type": "Label",
+                    "properties": {
+                      "text": "Select a tree item, table row, or scroll the content.",
+                      "height": 24,
+                      "width": "fill"
+                    }
                   }
                 ]
               }
