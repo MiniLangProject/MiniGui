@@ -1155,7 +1155,7 @@ function createCallFor(typ)
   return "MiniGui.TextBox.create"
 end function
 
-function addGeneratedNode(lines, fields, result, path, node, parentVar, x, y, width, height)
+function addGeneratedNode(lines, fields, result, path, node, parentVar, parentType, x, y, width, height)
   typ = asString(prop(node, "type"), "")
   if isControl(typ) then
     id = asString(prop(node, "id"), "")
@@ -1185,7 +1185,9 @@ function addGeneratedNode(lines, fields, result, path, node, parentVar, x, y, wi
     h = intPart(h)
     if w < 1 then w = 1 end if
     if h < 1 then h = 1 end if
-    if typ == "CheckBox" or typ == "RadioButton" then
+    if typ == "Panel" and parentType == "TabControl" then
+      lines = lines + [var + " = MiniGui.Panel.createTabPage(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ")"]
+    else if typ == "CheckBox" or typ == "RadioButton" then
       checked = "false"
       if boolProp(result, path, node, "checked", false) then checked = "true" end if
       lines = lines + [var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + checked + ")"]
@@ -1251,19 +1253,24 @@ function addGeneratedNode(lines, fields, result, path, node, parentVar, x, y, wi
       childSpacing = intProp(result, path, node, "spacing", 6)
       childY = childPadding
       if typ == "GroupBox" then childY = childPadding + 14 end if
-      if typ == "TabControl" then childY = childPadding + 30 end if
+      if typ == "TabControl" then childY = 30 end if
       childNodes = arrItems(prop(node, "children"))
       if len(childNodes) > 0 then
         for childIndex = 0 to len(childNodes) - 1
           childType = asString(prop(childNodes[childIndex], "type"), "")
           childX = childPadding
+          childW = w - childPadding * 2
+          if typ == "TabControl" then
+            childX = 0
+            childW = w
+          end if
           childSlotY = childY
           childSlotH = controlDefaultHeight(childType)
           if typ == "TabControl" then
-            childSlotH = h - childY - childPadding
+            childSlotH = h - childY
             if childSlotH < 1 then childSlotH = controlDefaultHeight(childType) end if
           end if
-          rChild = addGeneratedNode(lines, fields, result, path, childNodes[childIndex], var, childX, childSlotY, w - childPadding * 2, childSlotH)
+          rChild = addGeneratedNode(lines, fields, result, path, childNodes[childIndex], var, typ, childX, childSlotY, childW, childSlotH)
           lines = rChild[0]; fields = rChild[1]
           if typ != "TabControl" then childY = childY + rChild[2] + childSpacing end if
         end for
@@ -1279,7 +1286,7 @@ function addGeneratedNode(lines, fields, result, path, node, parentVar, x, y, wi
     maxh = 0
     for i = 0 to len(children) - 1
       slotW = stackSlotWidth(result, path, children[i], 120)
-      r = addGeneratedNode(lines, fields, result, path, children[i], parentVar, cx, y + padding, slotW, height - padding * 2)
+      r = addGeneratedNode(lines, fields, result, path, children[i], parentVar, parentType, cx, y + padding, slotW, height - padding * 2)
       lines = r[0]; fields = r[1]
       if r[2] > maxh then maxh = r[2] end if
       cx = cx + slotW + spacing
@@ -1303,7 +1310,7 @@ function addGeneratedNode(lines, fields, result, path, node, parentVar, x, y, wi
       gx = cxg + col * (cellW + spacing)
       childTypeGrid = asString(prop(children[gi], "type"), "")
       childHGrid = dimensionProp(result, path, children[gi], "height", controlDefaultHeight(childTypeGrid))
-      rg = addGeneratedNode(lines, fields, result, path, children[gi], parentVar, gx, cyg, cellW, childHGrid)
+      rg = addGeneratedNode(lines, fields, result, path, children[gi], parentVar, parentType, gx, cyg, cellW, childHGrid)
       lines = rg[0]; fields = rg[1]
       if rg[2] > rowMax then rowMax = rg[2] end if
       if col == cols - 1 or gi == len(children) - 1 then
@@ -1346,7 +1353,7 @@ function addGeneratedNode(lines, fields, result, path, node, parentVar, x, y, wi
         dw = rw
         dh = rh
       end if
-      rd = addGeneratedNode(lines, fields, result, path, child, parentVar, dx, dy, dw, dh)
+      rd = addGeneratedNode(lines, fields, result, path, child, parentVar, parentType, dx, dy, dw, dh)
       lines = rd[0]; fields = rd[1]
       if dock == "top" then
         ry = ry + rd[2] + spacing
@@ -1381,7 +1388,7 @@ function addGeneratedNode(lines, fields, result, path, node, parentVar, x, y, wi
         usedWrap = usedWrap + rowHeight + spacing
         rowHeight = 0
       end if
-      rwc = addGeneratedNode(lines, fields, result, path, childWrap, parentVar, wx, wy, ww, wh)
+      rwc = addGeneratedNode(lines, fields, result, path, childWrap, parentVar, parentType, wx, wy, ww, wh)
       lines = rwc[0]; fields = rwc[1]
       if rwc[2] > rowHeight then rowHeight = rwc[2] end if
       wx = wx + ww + spacing
@@ -1395,7 +1402,7 @@ function addGeneratedNode(lines, fields, result, path, node, parentVar, x, y, wi
       props = prop(children[c], "properties")
       cx2 = asInt(prop(props, "x"), x)
       cy2 = asInt(prop(props, "y"), y)
-      r2 = addGeneratedNode(lines, fields, result, path, children[c], parentVar, cx2, cy2, width, controlDefaultHeight(asString(prop(children[c], "type"), "")))
+      r2 = addGeneratedNode(lines, fields, result, path, children[c], parentVar, parentType, cx2, cy2, width, controlDefaultHeight(asString(prop(children[c], "type"), "")))
       lines = r2[0]; fields = r2[1]
       bottom = (cy2 - y) + r2[2]
       if bottom > maxb then maxb = bottom end if
@@ -1405,7 +1412,7 @@ function addGeneratedNode(lines, fields, result, path, node, parentVar, x, y, wi
   cy = y + padding
   usedTotal = padding
   for j = 0 to len(children) - 1
-    r3 = addGeneratedNode(lines, fields, result, path, children[j], parentVar, x + padding, cy, width - padding * 2, controlDefaultHeight(asString(prop(children[j], "type"), "")))
+    r3 = addGeneratedNode(lines, fields, result, path, children[j], parentVar, parentType, x + padding, cy, width - padding * 2, controlDefaultHeight(asString(prop(children[j], "type"), "")))
     lines = r3[0]; fields = r3[1]
     cy = cy + r3[2] + spacing
     usedTotal = usedTotal + r3[2] + spacing
@@ -1436,7 +1443,7 @@ function generateCode(result, outputPath)
     wh = asInt(resourceValue(result, path, prop(props, "height")), 400)
     body = body + ["", "// Window '" + wid + "' from " + path, wid + " = MiniGui.Window.create(app, " + mlString(wid) + ", " + mlString(title) + ", " + ww + ", " + wh + ")", "MiniGui.Window.installProc(" + wid + ", miniguiWindowProcPtr)", "MiniGui.Window.startResizeTimer(" + wid + ", miniguiTimerProcPtr)"]
     if contains(fields, wid) == false then fields = fields + [wid] end if
-    r = addGeneratedNode(body, fields, result, path, prop(w, "layout"), wid, 0, 0, ww - 40, wh - 80)
+    r = addGeneratedNode(body, fields, result, path, prop(w, "layout"), wid, "Window", 0, 0, ww - 40, wh - 80)
     body = r[0]; fields = r[1]
   end for
   body = body + ["", "ui = " + uiType + "(" + str.join(fields, ", ") + ")"]

@@ -119,6 +119,7 @@ const SBM_GETPOS = 225
 const SBM_SETRANGE = 226
 const TCM_INSERTITEMW = 4926
 const TCM_GETITEMCOUNT = 4868
+const TCM_GETITEMRECT = 4874
 const TCM_GETCURSEL = 4875
 const TCM_SETCURSEL = 4876
 const TCM_HITTEST = 4877
@@ -1107,6 +1108,25 @@ struct Panel
     c = NativeControl(id, "Panel", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     return Application.addControl(app, c)
   end function
+
+  static function createTabPage(app, tabControl, id, text, x, y, width, height)
+    nid = app.nextNativeId
+    app.nextNativeId = app.nextNativeId + 1
+    nativeParent = tabControl
+    nativeX = x
+    nativeY = y
+    if tabControl is void == false then
+      if tabControl.parent is void == false then
+        nativeParent = tabControl.parent
+        nativeX = tabControl.x + x
+        nativeY = tabControl.y + y
+      end if
+    end if
+    hwnd = CreateWindowExW(0, "STATIC", text, WS_CHILD | WS_VISIBLE, nativeX, nativeY, width, height, nativeParent.handle, nid, void, void)
+    if hwnd != 0 then _installWindowProc(hwnd) end if
+    c = NativeControl(id, "TabPage", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, tabControl, tabControl.width, tabControl.height)
+    return Application.addControl(app, c)
+  end function
 end struct
 
 struct ScrollViewer
@@ -1413,7 +1433,15 @@ struct Control
     control.width = width
     control.height = height
     if control.handle is void then return false end if
-    return MoveWindow(control.handle, x, y, width, height, true)
+    nativeX = x
+    nativeY = y
+    if control.kind == "TabPage" then
+      if control.parent is void == false then
+        nativeX = control.parent.x + x
+        nativeY = control.parent.y + y
+      end if
+    end if
+    return MoveWindow(control.handle, nativeX, nativeY, width, height, true)
   end function
 
   static function setPosition(control, x, y)
@@ -1607,6 +1635,30 @@ struct Control
     if app is void then return false end if
     if tabControl is void then return false end if
     if tabControl.kind != "TabControl" then return false end if
+    hasTabPages = false
+    if len(app.controls) > 0 then
+      for p = 0 to len(app.controls) - 1
+        pc = app.controls[p]
+        if pc is void == false then
+          if pc.kind == "TabPage" and pc.parent is void == false and pc.parent.handle == tabControl.handle then
+            hasTabPages = true
+          end if
+        end if
+      end for
+    end if
+    if hasTabPages and tabControl.handle is void == false then
+      tabHeaderWidth = tabControl.width
+      tabCount = SendMessageW(tabControl.handle, TCM_GETITEMCOUNT, 0, 0)
+      if tabCount > 0 then
+        tabRect = bytes(16, 0)
+        if SendMessageW(tabControl.handle, TCM_GETITEMRECT, tabCount - 1, nativeBytesPtr(tabRect)) != 0 then
+          tabHeaderWidth = _readI32LE(tabRect, 8) + 2
+          if tabHeaderWidth < 1 then tabHeaderWidth = tabControl.width end if
+          if tabHeaderWidth > tabControl.width then tabHeaderWidth = tabControl.width end if
+        end if
+      end if
+      MoveWindow(tabControl.handle, tabControl.x, tabControl.y, tabHeaderWidth, 30, true)
+    end if
     selected = Control.getSelectedIndex(tabControl)
     if selected < 0 then selected = tabControl.lastSelection end if
     if selected < 0 then selected = 0 end if
