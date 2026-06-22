@@ -75,7 +75,16 @@ function onModeClicked(ui, event)
 end function
 
 function onCountrySelected(ui, event)
-  MiniGui.Control.setText(ui.resultLabel, "Country: " + MiniGui.Control.getSelectedText(ui.countryComboBox))
+  country = MiniGui.Control.getSelectedText(ui.countryComboBox)
+  if country == "United States" then
+    MiniGui.Control.setItems(ui.cityListBox, ["New York", "San Francisco", "Seattle"])
+  else if country == "France" then
+    MiniGui.Control.setItems(ui.cityListBox, ["Paris", "Lyon", "Marseille"])
+  else
+    MiniGui.Control.setItems(ui.cityListBox, ["Berlin", "Bonn", "Hamburg"])
+  end if
+  MiniGui.Control.setSelectedIndex(ui.cityListBox, 0)
+  MiniGui.Control.setText(ui.resultLabel, "Country: " + country)
   return 0
 end function
 

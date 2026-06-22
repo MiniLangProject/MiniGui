@@ -244,6 +244,27 @@ function Assert-ControlGalleryInteractions {
     if ($afterSelectionTab -notmatch "Enable advanced actions" -or $afterSelectionTab -match "Name \| Password") {
       throw "control-gallery TabControl did not switch to Selection page: $afterSelectionTab"
     }
+    $selectionChildren = Get-ChildWindows $process.MainWindowHandle
+    $countryCombo = $selectionChildren | Where-Object { $_.Visible -and $_.Class -eq "ComboBox" } | Select-Object -First 1
+    if (-not $countryCombo) { throw "control-gallery interaction test did not find visible country ComboBox." }
+    $cityList = $selectionChildren | Where-Object { $_.Visible -and $_.Class -eq "ListBox" } | Select-Object -First 1
+    if (-not $cityList) { throw "control-gallery interaction test did not find visible city ListBox." }
+    [MiniGuiTestWin32]::SendMessageW($countryCombo.Handle, 334, [IntPtr]1, [IntPtr]::Zero) | Out-Null
+    $comboChanged = [IntPtr]((1 -shl 16) -bor $countryCombo.Id)
+    [MiniGuiTestWin32]::SendMessageW($process.MainWindowHandle, 273, $comboChanged, $countryCombo.Handle) | Out-Null
+    Start-Sleep -Milliseconds 300
+    $afterCountryChange = Get-StaticTextSnapshot $process.MainWindowHandle
+    if ($afterCountryChange -notmatch "Country: United States") {
+      throw "control-gallery country selection did not update result text: $afterCountryChange"
+    }
+    [MiniGuiTestWin32]::SendMessageW($cityList.Handle, 390, [IntPtr]1, [IntPtr]::Zero) | Out-Null
+    $cityChanged = [IntPtr]((1 -shl 16) -bor $cityList.Id)
+    [MiniGuiTestWin32]::SendMessageW($process.MainWindowHandle, 273, $cityChanged, $cityList.Handle) | Out-Null
+    Start-Sleep -Milliseconds 300
+    $afterCityChange = Get-StaticTextSnapshot $process.MainWindowHandle
+    if ($afterCityChange -notmatch "City: San Francisco") {
+      throw "control-gallery country selection did not update city list: $afterCityChange"
+    }
 
     Send-TabClick $tabs 2
     Start-Sleep -Milliseconds 300

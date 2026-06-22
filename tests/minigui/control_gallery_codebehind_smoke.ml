@@ -104,9 +104,10 @@ function main(args)
 
   Gallery.onCountrySelected(ui, MiniGui.Event(country, "selectionChanged", 0, "United States", false))
   if MiniGui.Control.getText(resultLabel) != "Country: United States" then return 12 end if
+  if MiniGui.Control.getSelectedText(city) != "New York" then return 31 end if
 
-  Gallery.onCitySelected(ui, MiniGui.Event(city, "change", 1, "Hamburg", false))
-  if MiniGui.Control.getText(resultLabel) != "City: Hamburg" then return 13 end if
+  Gallery.onCitySelected(ui, MiniGui.Event(city, "change", 1, "New York", false))
+  if MiniGui.Control.getText(resultLabel) != "City: New York" then return 13 end if
 
   Gallery.onPrimaryButtonClick(ui, MiniGui.Event(primary, "click", false, true, false))
   if MiniGui.Control.getText(resultLabel) != "Applied for Ada" then return 14 end if
