@@ -127,13 +127,13 @@ function main(args)
   Gallery.onProgressChanged(ui, MiniGui.Event(progress, "valueChanged", 35, 45, false))
   if MiniGui.Control.getText(statusLabel) != "Progress value changed" then return 21 end if
 
-  Gallery.onTreeSelected(ui, MiniGui.Event(tree, "selected", 0, 1, false))
-  if MiniGui.Control.getText(resultLabel) != "Tree selected" then return 22 end if
-  if MiniGui.Control.getText(dataStatus) != "Tree selected" then return 32 end if
+  Gallery.onTreeSelected(ui, MiniGui.Event(tree, "selected", 0, "Orders", false))
+  if MiniGui.Control.getText(resultLabel) != "Tree selected: Orders" then return 22 end if
+  if MiniGui.Control.getText(dataStatus) != "Orders loaded" then return 32 end if
 
   Gallery.onTableSelected(ui, MiniGui.Event(table, "selected", 0, 1, false))
   if MiniGui.Control.getText(resultLabel) != "Table selected" then return 23 end if
-  if MiniGui.Control.getText(dataStatus) != "Table selected" then return 33 end if
+  if MiniGui.Control.getText(dataStatus) != "Table row selected" then return 33 end if
 
   Gallery.onDataScrolled(ui, MiniGui.Event(dataPanel, "scrollChanged", 0, 15, false))
   if MiniGui.Control.getText(dataStatus) != "Scroll position: 15" then return 34 end if

@@ -130,13 +130,24 @@ function onProgressChanged(ui, event)
 end function
 
 function onTreeSelected(ui, event)
-  MiniGui.Control.setText(ui.dataStatusLabel, "Tree selected")
-  MiniGui.Control.setText(ui.resultLabel, "Tree selected")
+  section = "" + event.newValue
+  if section == "Orders" then
+    MiniGui.Control.setItems(ui.customerTable, ["Order #1001", "Order #1002", "Order #1003"])
+    MiniGui.Control.setText(ui.dataStatusLabel, "Orders loaded")
+  else if section == "Reports" then
+    MiniGui.Control.setItems(ui.customerTable, ["Revenue report", "Inventory report", "Activity report"])
+    MiniGui.Control.setText(ui.dataStatusLabel, "Reports loaded")
+  else
+    section = "Customers"
+    MiniGui.Control.setItems(ui.customerTable, ["Ada Lovelace", "Grace Hopper", "Margaret Hamilton"])
+    MiniGui.Control.setText(ui.dataStatusLabel, "Customers loaded")
+  end if
+  MiniGui.Control.setText(ui.resultLabel, "Tree selected: " + section)
   return 0
 end function
 
 function onTableSelected(ui, event)
-  MiniGui.Control.setText(ui.dataStatusLabel, "Table selected")
+  MiniGui.Control.setText(ui.dataStatusLabel, "Table row selected")
   MiniGui.Control.setText(ui.resultLabel, "Table selected")
   return 0
 end function

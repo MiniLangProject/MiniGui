@@ -301,18 +301,19 @@ function Assert-ControlGalleryInteractions {
     if (-not $table) { throw "control-gallery interaction test did not find visible Table on Data tab." }
     $tableCount = [MiniGuiTestWin32]::SendMessageW($table.Handle, 4100, [IntPtr]::Zero, [IntPtr]::Zero).ToInt64()
     if ($tableCount -ne 3) { throw "control-gallery Table item count was $tableCount, expected 3." }
-    $treeClick = [IntPtr]((18 -shl 16) -bor 18)
+    $treeClick = [IntPtr]((34 -shl 16) -bor 18)
+    [MiniGuiTestWin32]::SendMessageW($tree.Handle, 513, [IntPtr]1, $treeClick) | Out-Null
     [MiniGuiTestWin32]::SendMessageW($tree.Handle, 514, [IntPtr]::Zero, $treeClick) | Out-Null
     Start-Sleep -Milliseconds 300
     $afterTree = Get-StaticTextSnapshot $process.MainWindowHandle
-    if ($afterTree -notmatch "Tree selected") {
+    if ($afterTree -notmatch "Orders loaded") {
       throw "control-gallery TreeView selection did not update Data tab: $afterTree"
     }
     $tableClick = [IntPtr]((34 -shl 16) -bor 18)
     [MiniGuiTestWin32]::SendMessageW($table.Handle, 514, [IntPtr]::Zero, $tableClick) | Out-Null
     Start-Sleep -Milliseconds 300
     $afterTable = Get-StaticTextSnapshot $process.MainWindowHandle
-    if ($afterTable -notmatch "Table selected") {
+    if ($afterTable -notmatch "Table row selected") {
       throw "control-gallery Table selection did not update Data tab: $afterTable"
     }
     $scrollContent = Get-ChildWindows $process.MainWindowHandle | Where-Object { $_.Visible -and $_.Class -eq "Edit" -and $_.Text -match "Longer content" } | Select-Object -First 1

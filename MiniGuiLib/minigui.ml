@@ -131,9 +131,12 @@ const TBM_SETRANGEMAX = 1032
 const TBM_SETPAGESIZE = 1045
 const TBM_SETLINESIZE = 1047
 const TVM_DELETEITEM = 4353
+const TVM_GETNEXTITEM = 4362
+const TVM_GETITEMW = 4414
 const TVM_INSERTITEMW = 4402
 const TVN_SELCHANGEDW = -451
 const TVIF_TEXT = 1
+const TVGN_CARET = 9
 const TVI_ROOT = 4294901760
 const TVI_LAST = 4294901762
 const SB_SETTEXTW = 1035
@@ -285,6 +288,49 @@ function _asciiUtf16Z(text)
   return outv
 end function
 
+function _itemTextAt(itemsText, index)
+  current = ""
+  currentIndex = 0
+  if len(itemsText) > 0 then
+    for i = 0 to len(itemsText) - 1
+      ch = itemsText[i]
+      if ch == "\n" then
+        if currentIndex == index then return current end if
+        current = ""
+        currentIndex = currentIndex + 1
+      else
+        current = current + ch
+      end if
+    end for
+  end if
+  if currentIndex == index then return current end if
+  return ""
+end function
+
+function _itemCount(itemsText)
+  if itemsText == "" then return 0 end if
+  count = 1
+  for i = 0 to len(itemsText) - 1
+    if itemsText[i] == "\n" then count = count + 1 end if
+  end for
+  return count
+end function
+
+function _normalizeEditText(text)
+  outv = ""
+  prev = ""
+  for i = 0 to len(text) - 1
+    ch = text[i]
+    if ch == "\n" and prev != "\r" then
+      outv = outv + "\r\n"
+    else
+      outv = outv + ch
+    end if
+    prev = ch
+  end for
+  return outv
+end function
+
 function _defaultWndProc(hwnd, msg, wParam, lParam)
   global _subclassHandles
   global _subclassOldProcs
@@ -324,12 +370,16 @@ function _miniGuiWndProc(hwnd, msg, wParam, lParam)
         return _defaultWndProc(hwnd, msg, wParam, lParam)
       end if
       if Events.isControlKind(appClick, hwnd, "TreeView") then
+        selectionClickX = lParam & 65535
+        selectionClickY = (lParam >> 16) & 65535
         resultSelectionClick = _defaultWndProc(hwnd, msg, wParam, lParam)
-        if Events.dispatchSelectionClickedByHandle(appClick, hwnd) then return 0 end if
+        if Events.dispatchSelectionClickedByHandle(appClick, hwnd, selectionClickX, selectionClickY) then return 0 end if
         return resultSelectionClick
       end if
       if Events.isControlKind(appClick, hwnd, "ListView") then
-        if Events.dispatchSelectionClickedByHandle(appClick, hwnd) then return 0 end if
+        selectionClickX2 = lParam & 65535
+        selectionClickY2 = (lParam >> 16) & 65535
+        if Events.dispatchSelectionClickedByHandle(appClick, hwnd, selectionClickX2, selectionClickY2) then return 0 end if
         return 0
       end if
       if Events.dispatchClickByHandle(appClick, hwnd) then
@@ -954,8 +1004,9 @@ struct TextArea
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
     style = WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | ES_MULTILINE | ES_AUTOVSCROLL | ES_WANTRETURN
-    hwnd = CreateWindowExW(0, "EDIT", text, style, x, y, width, height, parent.handle, nid, void, void)
-    c = NativeControl(id, "TextArea", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
+    startText = _normalizeEditText(text)
+    hwnd = CreateWindowExW(0, "EDIT", startText, style, x, y, width, height, parent.handle, nid, void, void)
+    c = NativeControl(id, "TextArea", hwnd, nid, startText, x, y, width, height, true, true, startText, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     return Application.addControl(app, c)
   end function
 end struct
@@ -1263,6 +1314,7 @@ end struct
 struct Control
   static function setText(control, text)
     if control is void then return false end if
+    if control.kind == "TextArea" then text = _normalizeEditText(text) end if
     control.text = text
     control.lastText = text
     if control.handle is void then return false end if
@@ -1460,8 +1512,27 @@ struct Control
     return SendMessageW(control.handle, TVM_INSERTITEMW, 0, nativeBytesPtr(item))
   end function
 
+  static function getTreeViewSelectedText(control)
+    if control is void then return "" end if
+    if control.handle is void then return "" end if
+    if control.kind != "TreeView" then return "" end if
+    hItem = SendMessageW(control.handle, TVM_GETNEXTITEM, TVGN_CARET, 0)
+    if hItem == 0 then return "" end if
+    textBuf = bytes(512, 0)
+    item = bytes(64, 0)
+    _writeU32LE(item, 0, TVIF_TEXT)
+    _writePtrLE(item, 8, hItem)
+    _writePtrLE(item, 24, nativeBytesPtr(textBuf))
+    _writeU32LE(item, 32, 255)
+    SendMessageW(control.handle, TVM_GETITEMW, 0, nativeBytesPtr(item))
+    text = decode16Z(textBuf)
+    if typeof(text) == "string" then return text end if
+    return ""
+  end function
+
   static function setItems(control, items)
     if Control.clearItems(control) == false then return false end if
+    control.text = _joinText(items, "\n")
     if len(items) > 0 then
       for i = 0 to len(items) - 1
         Control.addItem(control, items[i])
@@ -1931,7 +2002,9 @@ struct Events
           newTreeValue = oldTreeValue + 1
           if newTreeValue < 0 then newTreeValue = 0 end if
           c.lastSelection = newTreeValue
-          Events.dispatch(b, b.eventType, oldTreeValue, newTreeValue)
+          selectedTreeText = Control.getTreeViewSelectedText(c)
+          if selectedTreeText == "" then selectedTreeText = newTreeValue end if
+          Events.dispatch(b, b.eventType, oldTreeValue, selectedTreeText)
           return true
         end if
       end if
@@ -2016,7 +2089,7 @@ struct Events
     return false
   end function
 
-  static function dispatchSelectionClickedByHandle(app, hwndControl)
+  static function dispatchSelectionClickedByHandle(app, hwndControl, x, y)
     if app is void then return false end if
     if len(app.selectionBindings) == 0 then return false end if
     for s = 0 to len(app.selectionBindings) - 1
@@ -2026,18 +2099,28 @@ struct Events
         if (c.kind == "TreeView" or c.kind == "ListView") and c.handle == hwndControl then
           oldValue = c.lastSelection
           newValue = Control.getSelectedIndex(c)
+          eventValue = newValue
           if c.kind == "TreeView" then
-            if newValue < 0 then newValue = oldValue + 1 end if
+            clickedIndex = _asInt(y / 18)
+            countTree = _itemCount(c.text)
+            if clickedIndex < 0 then clickedIndex = 0 end if
+            if countTree > 0 and clickedIndex >= countTree then clickedIndex = countTree - 1 end if
+            newValue = clickedIndex
             if newValue < 0 then newValue = 0 end if
+            selectedClickText = _itemTextAt(c.text, newValue)
+            if selectedClickText == "" then selectedClickText = Control.getTreeViewSelectedText(c) end if
+            eventValue = newValue
+            if selectedClickText != "" then eventValue = selectedClickText end if
           else
-            newValue = oldValue + 1
+            newValue = _asInt((y - 20) / 16)
             if newValue < 0 then newValue = 0 end if
             countList = SendMessageW(c.handle, LVM_GETITEMCOUNT, 0, 0)
             if countList > 0 and newValue >= countList then newValue = 0 end if
+            eventValue = newValue
           end if
           c.lastSelection = newValue
           if oldValue != newValue or c.kind == "TreeView" or c.kind == "ListView" then
-            Events.dispatch(b, b.eventType, oldValue, newValue)
+            Events.dispatch(b, b.eventType, oldValue, eventValue)
             return true
           end if
         end if
