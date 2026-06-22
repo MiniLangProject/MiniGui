@@ -45,6 +45,7 @@ extern function GetWindowTextW(hwnd as ptr, text as bytes, maxCount as int) from
 extern function GetWindowTextLengthW(hwnd as ptr) from "user32.dll" returns int
 extern function GetClientRect(hwnd as ptr, rect as bytes) from "user32.dll" returns bool
 extern function MoveWindow(hwnd as ptr, x as int, y as int, width as int, height as int, repaint as bool) from "user32.dll" returns bool
+extern function RedrawWindow(hwnd as ptr, rect as ptr, region as ptr, flags as u32) from "user32.dll" returns bool
 extern function SetTimer(hwnd as ptr, timerId as u32, elapsedMs as u32, timerProc as ptr) from "user32.dll" returns ptr
 extern function SetWindowLongPtrW(hwnd as ptr, index as int, newLong as ptr) from "user32.dll" returns ptr
 extern function GetWindowLongPtrW(hwnd as ptr, index as int) from "user32.dll" returns ptr
@@ -118,6 +119,7 @@ const IDC_ARROW = 32512
 const WS_OVERLAPPEDWINDOW = 13565952
 const WS_VISIBLE = 268435456
 const WS_CHILD = 1073741824
+const WS_CLIPCHILDREN = 33554432
 const WS_BORDER = 8388608
 const WS_VSCROLL = 2097152
 const WS_HSCROLL = 1048576
@@ -153,6 +155,11 @@ const TBS_AUTOTICKS = 1
 const TBS_VERT = 2
 const DTS_SHORTDATEFORMAT = 0
 const SW_SHOW = 5
+const COLOR_BTNFACE = 15
+const RDW_INVALIDATE = 1
+const RDW_ERASE = 4
+const RDW_ALLCHILDREN = 128
+const RDW_UPDATENOW = 256
 const MB_OK = 0
 const MB_OKCANCEL = 1
 const MB_ICONERROR = 16
@@ -332,7 +339,7 @@ function _registerWindowClass()
   _writePtrLE(cls, 24, GetModuleHandleW(void))
   _writePtrLE(cls, 32, 0)
   _writePtrLE(cls, 40, LoadCursorW(void, IDC_ARROW))
-  _writePtrLE(cls, 48, 0)
+  _writePtrLE(cls, 48, COLOR_BTNFACE + 1)
   _writePtrLE(cls, 56, 0)
   _writePtrLE(cls, 64, namePtr)
 
@@ -422,6 +429,9 @@ struct NativeControl
   baseHeight,
   baseClientWidth,
   baseClientHeight,
+  parent,
+  baseParentWidth,
+  baseParentHeight,
 end struct
 
 struct ApplicationState
@@ -484,10 +494,20 @@ struct Application
       for i = 0 to len(app.controls) - 1
         c = app.controls[i]
         if c is void == false then
-          nx = c.baseX * clientWidth / window.baseClientWidth
-          ny = c.baseY * clientHeight / window.baseClientHeight
-          nw = c.baseWidth * clientWidth / window.baseClientWidth
-          nh = c.baseHeight * clientHeight / window.baseClientHeight
+          parentWidth = clientWidth
+          parentHeight = clientHeight
+          if c.parent is void == false then
+            parentWidth = c.parent.width
+            parentHeight = c.parent.height
+          end if
+          baseParentWidth = c.baseParentWidth
+          baseParentHeight = c.baseParentHeight
+          if baseParentWidth <= 0 then baseParentWidth = window.baseClientWidth end if
+          if baseParentHeight <= 0 then baseParentHeight = window.baseClientHeight end if
+          nx = c.baseX * parentWidth / baseParentWidth
+          ny = c.baseY * parentHeight / baseParentHeight
+          nw = c.baseWidth * parentWidth / baseParentWidth
+          nh = c.baseHeight * parentHeight / baseParentHeight
           if nw < 1 then nw = 1 end if
           if nh < 1 then nh = 1 end if
           Control.moveCurrent(c, nx, ny, nw, nh)
@@ -495,6 +515,7 @@ struct Application
       end for
     end if
     Events.dispatchResize(app, window, oldSize, [clientWidth, clientHeight])
+    RedrawWindow(window.handle, void, void, RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN | RDW_UPDATENOW)
     return true
   end function
 
@@ -556,14 +577,14 @@ struct Window
     useRegistered = _registerWindowClass()
     className = "MiniGuiWindow"
     if useRegistered == false then className = "#32770" end if
-    hwnd = CreateWindowExW(0, className, title, WS_OVERLAPPEDWINDOW, 100, 100, width, height, void, void, void, void)
+    hwnd = CreateWindowExW(0, className, title, WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, 100, 100, width, height, void, void, void, void)
     if hwnd == 0 and useRegistered then
-      hwnd = CreateWindowExW(0, "#32770", title, WS_OVERLAPPEDWINDOW, 100, 100, width, height, void, void, void, void)
+      hwnd = CreateWindowExW(0, "#32770", title, WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, 100, 100, width, height, void, void, void, void)
       useRegistered = false
     end if
     if hwnd != 0 then SetWindowLongPtrW(hwnd, GWLP_USERDATA, nativeRawValue(app)) end if
     if hwnd != 0 then _installWindowProc(hwnd) end if
-    win = NativeControl(id, "Window", hwnd, 0, title, 100, 100, width, height, true, true, title, -1, 0, 100, 0, 1, 10, 100, 100, width, height, width - 40, height - 80)
+    win = NativeControl(id, "Window", hwnd, 0, title, 100, 100, width, height, true, true, title, -1, 0, 100, 0, 1, 10, 100, 100, width, height, width - 40, height - 80, void, width - 40, height - 80)
     Application.addWindow(app, win)
     return win
   end function
@@ -602,6 +623,22 @@ struct Window
 
   static function setTitle(window, title)
     return Control.setText(window, title)
+  end function
+
+  static function getClientWidth(window)
+    if window is void then return 0 end if
+    if window.handle is void then return 0 end if
+    rect = bytes(16, 0)
+    if GetClientRect(window.handle, rect) == false then return window.width end if
+    return _readI32LE(rect, 8) - _readI32LE(rect, 0)
+  end function
+
+  static function getClientHeight(window)
+    if window is void then return 0 end if
+    if window.handle is void then return 0 end if
+    rect = bytes(16, 0)
+    if GetClientRect(window.handle, rect) == false then return window.height end if
+    return _readI32LE(rect, 12) - _readI32LE(rect, 4)
   end function
 end struct
 
@@ -648,7 +685,7 @@ end struct
 struct Label
   static function create(app, parent, id, text, x, y, width, height)
     hwnd = CreateWindowExW(0, "STATIC", text, WS_CHILD | WS_VISIBLE | SS_LEFT, x, y, width, height, parent.handle, void, void, void)
-    c = NativeControl(id, "Label", hwnd, 0, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0)
+    c = NativeControl(id, "Label", hwnd, 0, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     return Application.addControl(app, c)
   end function
 end struct
@@ -658,7 +695,7 @@ struct Button
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
     hwnd = CreateWindowExW(0, "BUTTON", text, WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, x, y, width, height, parent.handle, nid, void, void)
-    c = NativeControl(id, "Button", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0)
+    c = NativeControl(id, "Button", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     return Application.addControl(app, c)
   end function
 end struct
@@ -669,7 +706,7 @@ struct TextBox
     app.nextNativeId = app.nextNativeId + 1
     style = WS_CHILD | WS_VISIBLE | WS_BORDER | ES_AUTOHSCROLL
     hwnd = CreateWindowExW(0, "EDIT", text, style, x, y, width, height, parent.handle, nid, void, void)
-    c = NativeControl(id, "TextBox", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0)
+    c = NativeControl(id, "TextBox", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     return Application.addControl(app, c)
   end function
 end struct
@@ -680,7 +717,7 @@ struct TextArea
     app.nextNativeId = app.nextNativeId + 1
     style = WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | ES_MULTILINE | ES_AUTOVSCROLL | ES_WANTRETURN
     hwnd = CreateWindowExW(0, "EDIT", text, style, x, y, width, height, parent.handle, nid, void, void)
-    c = NativeControl(id, "TextArea", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0)
+    c = NativeControl(id, "TextArea", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     return Application.addControl(app, c)
   end function
 end struct
@@ -691,7 +728,7 @@ struct PasswordBox
     app.nextNativeId = app.nextNativeId + 1
     style = WS_CHILD | WS_VISIBLE | WS_BORDER | ES_AUTOHSCROLL | ES_PASSWORD
     hwnd = CreateWindowExW(0, "EDIT", text, style, x, y, width, height, parent.handle, nid, void, void)
-    c = NativeControl(id, "PasswordBox", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0)
+    c = NativeControl(id, "PasswordBox", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     return Application.addControl(app, c)
   end function
 end struct
@@ -704,7 +741,7 @@ struct NumberBox
     startText = text
     if startText == "" then startText = "" + value end if
     hwnd = CreateWindowExW(0, "EDIT", startText, style, x, y, width, height, parent.handle, nid, void, void)
-    c = NativeControl(id, "NumberBox", hwnd, nid, startText, x, y, width, height, true, true, startText, -1, minimum, maximum, value, step, step, x, y, width, height, 0, 0)
+    c = NativeControl(id, "NumberBox", hwnd, nid, startText, x, y, width, height, true, true, startText, -1, minimum, maximum, value, step, step, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     return Application.addControl(app, c)
   end function
 end struct
@@ -715,7 +752,7 @@ struct CheckBox
     app.nextNativeId = app.nextNativeId + 1
     hwnd = CreateWindowExW(0, "BUTTON", text, WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX, x, y, width, height, parent.handle, nid, void, void)
     if checked then SendMessageW(hwnd, BM_SETCHECK, BST_CHECKED, 0) end if
-    c = NativeControl(id, "CheckBox", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0)
+    c = NativeControl(id, "CheckBox", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     return Application.addControl(app, c)
   end function
 end struct
@@ -726,7 +763,7 @@ struct RadioButton
     app.nextNativeId = app.nextNativeId + 1
     hwnd = CreateWindowExW(0, "BUTTON", text, WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON, x, y, width, height, parent.handle, nid, void, void)
     if checked then SendMessageW(hwnd, BM_SETCHECK, BST_CHECKED, 0) end if
-    c = NativeControl(id, "RadioButton", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0)
+    c = NativeControl(id, "RadioButton", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     return Application.addControl(app, c)
   end function
 end struct
@@ -742,7 +779,7 @@ struct Image
       bmp = LoadImageW(void, source, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE)
       if bmp != 0 then SendMessageW(hwnd, STM_SETIMAGE, IMAGE_BITMAP, bmp) end if
     end if
-    c = NativeControl(id, "Image", hwnd, nid, label, x, y, width, height, true, true, label, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0)
+    c = NativeControl(id, "Image", hwnd, nid, label, x, y, width, height, true, true, label, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     return Application.addControl(app, c)
   end function
 end struct
@@ -752,7 +789,7 @@ struct Separator
     style = WS_CHILD | WS_VISIBLE | SS_ETCHEDHORZ
     if orientation == "vertical" then style = WS_CHILD | WS_VISIBLE | SS_ETCHEDVERT end if
     hwnd = CreateWindowExW(0, "STATIC", text, style, x, y, width, height, parent.handle, void, void, void)
-    c = NativeControl(id, "Separator", hwnd, 0, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0)
+    c = NativeControl(id, "Separator", hwnd, 0, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     return Application.addControl(app, c)
   end function
 end struct
@@ -764,7 +801,7 @@ struct LinkLabel
     label = text
     if label == "" then label = url end if
     hwnd = CreateWindowExW(0, "STATIC", label, WS_CHILD | WS_VISIBLE | SS_LEFT | SS_NOTIFY, x, y, width, height, parent.handle, nid, void, void)
-    c = NativeControl(id, "LinkLabel", hwnd, nid, label, x, y, width, height, true, true, label, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0)
+    c = NativeControl(id, "LinkLabel", hwnd, nid, label, x, y, width, height, true, true, label, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     return Application.addControl(app, c)
   end function
 end struct
@@ -774,7 +811,7 @@ struct Panel
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
     hwnd = CreateWindowExW(0, "STATIC", text, WS_CHILD | WS_VISIBLE, x, y, width, height, parent.handle, nid, void, void)
-    c = NativeControl(id, "Panel", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0)
+    c = NativeControl(id, "Panel", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     return Application.addControl(app, c)
   end function
 end struct
@@ -787,7 +824,7 @@ struct ScrollViewer
     if horizontalScroll then style = style | WS_HSCROLL end if
     if verticalScroll then style = style | WS_VSCROLL end if
     hwnd = CreateWindowExW(0, "STATIC", text, style, x, y, width, height, parent.handle, nid, void, void)
-    c = NativeControl(id, "ScrollViewer", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0)
+    c = NativeControl(id, "ScrollViewer", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     return Application.addControl(app, c)
   end function
 end struct
@@ -797,7 +834,7 @@ struct GroupBox
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
     hwnd = CreateWindowExW(0, "BUTTON", text, WS_CHILD | WS_VISIBLE | BS_GROUPBOX, x, y, width, height, parent.handle, nid, void, void)
-    c = NativeControl(id, "GroupBox", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0)
+    c = NativeControl(id, "GroupBox", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     return Application.addControl(app, c)
   end function
 end struct
@@ -809,7 +846,7 @@ struct ScrollBar
     style = WS_CHILD | WS_VISIBLE | SBS_VERT
     if orientation == "horizontal" then style = WS_CHILD | WS_VISIBLE | SBS_HORZ end if
     hwnd = CreateWindowExW(0, "SCROLLBAR", text, style, x, y, width, height, parent.handle, nid, void, void)
-    c = NativeControl(id, "ScrollBar", hwnd, nid, text, x, y, width, height, true, true, text, -1, minimum, maximum, value, smallStep, largeStep, x, y, width, height, 0, 0)
+    c = NativeControl(id, "ScrollBar", hwnd, nid, text, x, y, width, height, true, true, text, -1, minimum, maximum, value, smallStep, largeStep, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     Control.setScrollRange(c, minimum, maximum)
     Control.setScrollValue(c, value)
     return Application.addControl(app, c)
@@ -824,7 +861,7 @@ struct Slider
     style = WS_CHILD | WS_VISIBLE | TBS_AUTOTICKS
     if orientation == "vertical" then style = WS_CHILD | WS_VISIBLE | TBS_AUTOTICKS | TBS_VERT end if
     hwnd = CreateWindowExW(0, "msctls_trackbar32", text, style, x, y, width, height, parent.handle, nid, void, void)
-    c = NativeControl(id, "Slider", hwnd, nid, text, x, y, width, height, true, true, text, -1, minimum, maximum, value, smallStep, largeStep, x, y, width, height, 0, 0)
+    c = NativeControl(id, "Slider", hwnd, nid, text, x, y, width, height, true, true, text, -1, minimum, maximum, value, smallStep, largeStep, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     Control.setScrollRange(c, minimum, maximum)
     Control.setScrollSteps(c, smallStep, largeStep)
     Control.setScrollValue(c, value)
@@ -838,7 +875,7 @@ struct ProgressBar
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
     hwnd = CreateWindowExW(0, "msctls_progress32", text, WS_CHILD | WS_VISIBLE, x, y, width, height, parent.handle, nid, void, void)
-    c = NativeControl(id, "ProgressBar", hwnd, nid, text, x, y, width, height, true, true, text, -1, minimum, maximum, value, 1, 10, x, y, width, height, 0, 0)
+    c = NativeControl(id, "ProgressBar", hwnd, nid, text, x, y, width, height, true, true, text, -1, minimum, maximum, value, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     Control.setValueRange(c, minimum, maximum)
     Control.setValue(c, value)
     return Application.addControl(app, c)
@@ -851,7 +888,7 @@ struct TabControl
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
     hwnd = CreateWindowExW(0, "SysTabControl32", text, WS_CHILD | WS_VISIBLE, x, y, width, height, parent.handle, nid, void, void)
-    c = NativeControl(id, "TabControl", hwnd, nid, text, x, y, width, height, true, true, text, selectedIndex, 0, 100, 0, 1, 10, x, y, width, height, 0, 0)
+    c = NativeControl(id, "TabControl", hwnd, nid, text, x, y, width, height, true, true, text, selectedIndex, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     if len(items) > 0 then
       for i = 0 to len(items) - 1
         TabControl.addTab(c, i, items[i])
@@ -880,7 +917,7 @@ struct MenuBar
     label = text
     if label == "" and len(items) > 0 then label = "  " + _joinText(items, "    ") end if
     hwnd = CreateWindowExW(0, "STATIC", label, WS_CHILD | WS_VISIBLE | SS_LEFT | SS_NOTIFY, x, y, width, height, parent.handle, nid, void, void)
-    c = NativeControl(id, "MenuBar", hwnd, nid, label, x, y, width, height, true, true, label, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0)
+    c = NativeControl(id, "MenuBar", hwnd, nid, label, x, y, width, height, true, true, label, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     return Application.addControl(app, c)
   end function
 end struct
@@ -891,7 +928,7 @@ struct StatusBar
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
     hwnd = CreateWindowExW(0, "msctls_statusbar32", text, WS_CHILD | WS_VISIBLE, x, y, width, height, parent.handle, nid, void, void)
-    c = NativeControl(id, "StatusBar", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0)
+    c = NativeControl(id, "StatusBar", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     return Application.addControl(app, c)
   end function
 end struct
@@ -903,7 +940,7 @@ struct ToolBar
     label = text
     if label == "" and len(items) > 0 then label = "  " + _joinText(items, "  |  ") end if
     hwnd = CreateWindowExW(0, "STATIC", label, WS_CHILD | WS_VISIBLE | SS_LEFT | SS_NOTIFY, x, y, width, height, parent.handle, nid, void, void)
-    c = NativeControl(id, "ToolBar", hwnd, nid, label, x, y, width, height, true, true, label, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0)
+    c = NativeControl(id, "ToolBar", hwnd, nid, label, x, y, width, height, true, true, label, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     return Application.addControl(app, c)
   end function
 end struct
@@ -914,7 +951,7 @@ struct TreeView
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
     hwnd = CreateWindowExW(0, "SysTreeView32", text, WS_CHILD | WS_VISIBLE | WS_BORDER | TVS_HASLINES | TVS_LINESATROOT | TVS_HASBUTTONS, x, y, width, height, parent.handle, nid, void, void)
-    c = NativeControl(id, "TreeView", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0)
+    c = NativeControl(id, "TreeView", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     return Application.addControl(app, c)
   end function
 end struct
@@ -925,7 +962,7 @@ struct ListView
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
     hwnd = CreateWindowExW(0, "SysListView32", text, WS_CHILD | WS_VISIBLE | WS_BORDER | LVS_REPORT | LVS_SINGLESEL, x, y, width, height, parent.handle, nid, void, void)
-    c = NativeControl(id, "ListView", hwnd, nid, text, x, y, width, height, true, true, text, selectedIndex, 0, 100, 0, 1, 10, x, y, width, height, 0, 0)
+    c = NativeControl(id, "ListView", hwnd, nid, text, x, y, width, height, true, true, text, selectedIndex, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     return Application.addControl(app, c)
   end function
 end struct
@@ -936,7 +973,7 @@ struct DatePicker
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
     hwnd = CreateWindowExW(0, "SysDateTimePick32", text, WS_CHILD | WS_VISIBLE | DTS_SHORTDATEFORMAT, x, y, width, height, parent.handle, nid, void, void)
-    c = NativeControl(id, "DatePicker", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0)
+    c = NativeControl(id, "DatePicker", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     return Application.addControl(app, c)
   end function
 end struct
@@ -947,7 +984,7 @@ struct ComboBox
     app.nextNativeId = app.nextNativeId + 1
     style = WS_CHILD | WS_VISIBLE | WS_VSCROLL | CBS_DROPDOWNLIST | CBS_HASSTRINGS
     hwnd = CreateWindowExW(0, "COMBOBOX", text, style, x, y, width, height, parent.handle, nid, void, void)
-    c = NativeControl(id, "ComboBox", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0)
+    c = NativeControl(id, "ComboBox", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     Control.setItems(c, items)
     if selectedIndex >= 0 then Control.setSelectedIndex(c, selectedIndex) end if
     c.lastSelection = Control.getSelectedIndex(c)
@@ -961,7 +998,7 @@ struct ListBox
     app.nextNativeId = app.nextNativeId + 1
     style = WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | LBS_NOTIFY
     hwnd = CreateWindowExW(0, "LISTBOX", text, style, x, y, width, height, parent.handle, nid, void, void)
-    c = NativeControl(id, "ListBox", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0)
+    c = NativeControl(id, "ListBox", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     Control.setItems(c, items)
     if selectedIndex >= 0 then Control.setSelectedIndex(c, selectedIndex) end if
     c.lastSelection = Control.getSelectedIndex(c)
