@@ -52,6 +52,15 @@
             "events": { "click": "onActionClicked" }
           },
           {
+            "id": "actionLabel",
+            "type": "Label",
+            "properties": {
+              "text": "Menu and toolbar actions appear here.",
+              "height": 24,
+              "width": "fill"
+            }
+          },
+          {
             "id": "titleLabel",
             "type": "Label",
             "properties": {

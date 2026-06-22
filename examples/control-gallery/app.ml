@@ -25,8 +25,14 @@ function onMainWindowResized(ui, event)
 end function
 
 function onActionClicked(ui, event)
-  MiniGui.Control.setText(ui.resultLabel, "Action from " + event.sender.id)
-  MiniGui.Control.setText(ui.statusLabel, "Dialog action: " + event.sender.id)
+  action = "" + event.newValue
+  if action == "" or action == "true" then action = event.sender.id end if
+  source = "Toolbar"
+  if event.sender.kind == "MenuBar" then source = "Menu" end if
+  message = source + ": " + action
+  MiniGui.Control.setText(ui.actionLabel, message)
+  MiniGui.Control.setText(ui.resultLabel, message)
+  MiniGui.Control.setText(ui.statusLabel, "Action: " + action)
   return 0
 end function
 

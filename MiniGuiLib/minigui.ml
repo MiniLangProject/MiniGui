@@ -382,7 +382,8 @@ function _miniGuiWndProc(hwnd, msg, wParam, lParam)
         if Events.dispatchSelectionClickedByHandle(appClick, hwnd, selectionClickX2, selectionClickY2) then return 0 end if
         return 0
       end if
-      if Events.dispatchClickByHandle(appClick, hwnd) then
+      clickX = lParam & 65535
+      if Events.dispatchClickByHandle(appClick, hwnd, clickX) then
         return 0
       end if
     end if
@@ -1215,6 +1216,7 @@ struct MenuBar
     hwnd = CreateWindowExW(0, "STATIC", label, WS_CHILD | WS_VISIBLE | SS_LEFT | SS_NOTIFY, x, y, width, height, parent.handle, nid, void, void)
     if hwnd != 0 then _installWindowProc(hwnd) end if
     c = NativeControl(id, "MenuBar", hwnd, nid, label, x, y, width, height, true, true, label, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
+    c.lastText = _joinText(items, "\n")
     return Application.addControl(app, c)
   end function
 end struct
@@ -1239,6 +1241,7 @@ struct ToolBar
     hwnd = CreateWindowExW(0, "STATIC", label, WS_CHILD | WS_VISIBLE | SS_LEFT | SS_NOTIFY, x, y, width, height, parent.handle, nid, void, void)
     if hwnd != 0 then _installWindowProc(hwnd) end if
     c = NativeControl(id, "ToolBar", hwnd, nid, label, x, y, width, height, true, true, label, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
+    c.lastText = _joinText(items, "\n")
     return Application.addControl(app, c)
   end function
 end struct
@@ -1510,6 +1513,22 @@ struct Control
     _writePtrLE(item, 40, nativeBytesPtr(textBytes))
     _writeU32LE(item, 48, len(text))
     return SendMessageW(control.handle, TVM_INSERTITEMW, 0, nativeBytesPtr(item))
+  end function
+
+  static function getItemTextAtClick(control, x)
+    if control is void then return "" end if
+    itemsText = control.lastText
+    if itemsText == "" then return "" end if
+    count = _itemCount(itemsText)
+    if count <= 0 then return "" end if
+    cursor = 8
+    for i = 0 to count - 1
+      item = _itemTextAt(itemsText, i)
+      itemWidth = len(item) * 8 + 28
+      if x <= cursor + itemWidth then return item end if
+      cursor = cursor + itemWidth
+    end for
+    return ""
   end function
 
   static function getTreeViewSelectedText(control)
@@ -2012,14 +2031,19 @@ struct Events
     return false
   end function
 
-  static function dispatchClickByHandle(app, hwndControl)
+  static function dispatchClickByHandle(app, hwndControl, x)
     if app is void then return false end if
     for i = 0 to len(app.clickBindings) - 1
       b = app.clickBindings[i]
       c = b.control
       if c is void == false then
         if c.handle == hwndControl then
-          Events.dispatch(b, "click", false, true)
+          clickValue = true
+          if c.kind == "MenuBar" or c.kind == "ToolBar" then
+            itemText = Control.getItemTextAtClick(c, x)
+            if itemText != "" then clickValue = itemText end if
+          end if
+          Events.dispatch(b, b.eventType, false, clickValue)
           return true
         end if
       end if

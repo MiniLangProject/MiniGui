@@ -227,14 +227,14 @@ function Assert-ControlGalleryInteractions {
     [MiniGuiTestWin32]::SendMessageW($toolBar.Handle, 514, [IntPtr]::Zero, [IntPtr]::Zero) | Out-Null
     Start-Sleep -Milliseconds 300
     $afterToolBar = Get-StaticTextSnapshot $process.MainWindowHandle
-    if ($afterToolBar -notmatch "Action from mainToolBar") {
+    if ($afterToolBar -notmatch "Toolbar: New") {
       throw "control-gallery ToolBar click did not update result text: $afterToolBar"
     }
 
     [MiniGuiTestWin32]::SendMessageW($menuBar.Handle, 514, [IntPtr]::Zero, [IntPtr]::Zero) | Out-Null
     Start-Sleep -Milliseconds 300
     $afterMenuBar = Get-StaticTextSnapshot $process.MainWindowHandle
-    if ($afterMenuBar -notmatch "Action from mainMenu") {
+    if ($afterMenuBar -notmatch "Menu: File") {
       throw "control-gallery MenuBar click did not update result text: $afterMenuBar"
     }
 

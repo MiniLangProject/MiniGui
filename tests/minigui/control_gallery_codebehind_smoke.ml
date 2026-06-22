@@ -6,6 +6,7 @@ struct GalleryUi
   mainWindow,
   mainMenu,
   mainToolBar,
+  actionLabel,
   titleLabel,
   galleryTabs,
   inputPanel,
@@ -41,6 +42,7 @@ function main(args)
   win = MiniGui.Window.create(app, "mainWindow", "Gallery Smoke", 880, 760)
   menu = MiniGui.MenuBar.create(app, win, "mainMenu", "", 0, 0, 400, 24, ["File", "Help"])
   toolbar = MiniGui.ToolBar.create(app, win, "mainToolBar", "", 0, 28, 400, 30, ["Save", "Refresh"])
+  actionLabel = MiniGui.Label.create(app, win, "actionLabel", "", 0, 58, 400, 24)
   title = MiniGui.Label.create(app, win, "titleLabel", "Gallery", 0, 64, 300, 24)
   tabs = MiniGui.TabControl.create(app, win, "galleryTabs", "", 0, 96, 760, 500, ["Inputs", "Selection", "Layout", "Feedback", "Data"], 0)
   inputPanel = MiniGui.Panel.create(app, tabs, "inputPanel", "", 8, 36, 420, 120)
@@ -71,7 +73,7 @@ function main(args)
   dataStatus = MiniGui.Label.create(app, dataPanel, "dataStatusLabel", "", 8, 136, 260, 24)
   statusLabel = MiniGui.StatusBar.create(app, win, "statusLabel", "", 0, 610, 500, 24)
   resultLabel = MiniGui.Label.create(app, win, "resultLabel", "", 0, 640, 500, 24)
-  ui = GalleryUi(app, win, menu, toolbar, title, tabs, inputPanel, nameLabel, nameBox, datePicker, notes, group, consent, radioEmail, radioPhone, selectionPanel, country, city, layoutPanel, primary, disabled, hidden, feedbackPanel, volumeLabel, slider, progress, dataPanel, tree, table, dataStatus, statusLabel, resultLabel)
+  ui = GalleryUi(app, win, menu, toolbar, actionLabel, title, tabs, inputPanel, nameLabel, nameBox, datePicker, notes, group, consent, radioEmail, radioPhone, selectionPanel, country, city, layoutPanel, primary, disabled, hidden, feedbackPanel, volumeLabel, slider, progress, dataPanel, tree, table, dataStatus, statusLabel, resultLabel)
 
   Gallery.onMainWindowLoad(ui, MiniGui.Event(win, "load", void, void, false))
   if MiniGui.Control.getText(statusLabel) != "Gallery ready" then return 1 end if
@@ -80,8 +82,9 @@ function main(args)
   Gallery.onMainWindowResized(ui, MiniGui.Event(win, "resized", [880, 760], [900, 780], false))
   if MiniGui.Control.getText(statusLabel) != "Window resized" then return 3 end if
 
-  Gallery.onActionClicked(ui, MiniGui.Event(toolbar, "click", false, true, false))
-  if MiniGui.Control.getText(resultLabel) != "Action from mainToolBar" then return 4 end if
+  Gallery.onActionClicked(ui, MiniGui.Event(toolbar, "click", false, "Save", false))
+  if MiniGui.Control.getText(resultLabel) != "Toolbar: Save" then return 4 end if
+  if MiniGui.Control.getText(actionLabel) != "Toolbar: Save" then return 36 end if
 
   Gallery.onTabSelected(ui, MiniGui.Event(tabs, "selected", 0, 1, false))
   if MiniGui.Control.getText(statusLabel) != "Tab selected: 1" then return 5 end if
