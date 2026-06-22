@@ -224,6 +224,21 @@ function Assert-ControlGalleryInteractions {
       }
     }
 
+    $nameEdit = $children | Where-Object { $_.Visible -and $_.Class -eq "Edit" -and $_.Text -eq "Ada" } | Select-Object -First 1
+    if (-not $nameEdit) { throw "control-gallery interaction test did not find name TextBox." }
+    [MiniGuiTestWin32]::SendMessageW($nameEdit.Handle, 7, [IntPtr]::Zero, [IntPtr]::Zero) | Out-Null
+    Start-Sleep -Milliseconds 200
+    $afterNameFocus = Get-StaticTextSnapshot $process.MainWindowHandle
+    if ($afterNameFocus -notmatch "Name focused") {
+      throw "control-gallery focus event did not update result text: $afterNameFocus"
+    }
+    [MiniGuiTestWin32]::SendMessageW($nameEdit.Handle, 8, [IntPtr]::Zero, [IntPtr]::Zero) | Out-Null
+    Start-Sleep -Milliseconds 200
+    $afterNameBlur = Get-StaticTextSnapshot $process.MainWindowHandle
+    if ($afterNameBlur -notmatch "Name blurred") {
+      throw "control-gallery blur event did not update result text: $afterNameBlur"
+    }
+
     [MiniGuiTestWin32]::SendMessageW($toolBar.Handle, 514, [IntPtr]::Zero, [IntPtr]::Zero) | Out-Null
     Start-Sleep -Milliseconds 300
     $afterToolBar = Get-StaticTextSnapshot $process.MainWindowHandle
@@ -331,12 +346,28 @@ function Assert-ControlGalleryInteractions {
     }
 
     $beforeWidth = $slider.Rect.Right - $slider.Rect.Left
+    $beforeTableWidth = $table.Rect.Right - $table.Rect.Left
+    $beforeScrollHostWidth = $scrollContent.Parent
+    $beforeScrollHost = Get-ChildWindows $process.MainWindowHandle | Where-Object { $_.Handle -eq $beforeScrollHostWidth } | Select-Object -First 1
+    $beforeScrollWidth = $beforeScrollHost.Rect.Right - $beforeScrollHost.Rect.Left
     [MiniGuiTestWin32]::MoveWindow($process.MainWindowHandle, 80, 80, 980, 860, $true) | Out-Null
     Start-Sleep -Milliseconds 800
     $resizedSlider = Get-ChildWindows $process.MainWindowHandle | Where-Object { $_.Class -eq "msctls_trackbar32" } | Select-Object -First 1
     $afterWidth = $resizedSlider.Rect.Right - $resizedSlider.Rect.Left
     if ($afterWidth -le $beforeWidth) {
       throw "control-gallery resize did not grow Slider width. Before $beforeWidth, after $afterWidth."
+    }
+    $afterResizeChildren = Get-ChildWindows $process.MainWindowHandle
+    $resizedTable = $afterResizeChildren | Where-Object { $_.Visible -and $_.Class -eq "SysListView32" } | Select-Object -First 1
+    $afterTableWidth = $resizedTable.Rect.Right - $resizedTable.Rect.Left
+    if ($afterTableWidth -le $beforeTableWidth) {
+      throw "control-gallery resize did not grow Table width. Before $beforeTableWidth, after $afterTableWidth."
+    }
+    $resizedScrollContent = $afterResizeChildren | Where-Object { $_.Visible -and $_.Class -eq "Edit" -and $_.Text -match "Longer content" } | Select-Object -First 1
+    $resizedScrollHost = $afterResizeChildren | Where-Object { $_.Handle -eq $resizedScrollContent.Parent } | Select-Object -First 1
+    $afterScrollWidth = $resizedScrollHost.Rect.Right - $resizedScrollHost.Rect.Left
+    if ($afterScrollWidth -le $beforeScrollWidth) {
+      throw "control-gallery resize did not grow ScrollViewer width. Before $beforeScrollWidth, after $afterScrollWidth."
     }
 
     Write-Host "OK: control-gallery interactions"
@@ -409,8 +440,9 @@ Assert-FileContains $galleryGen1 "generated Table/ListView constructor" "MiniGui
 Assert-FileContains $galleryGen1 "generated DatePicker constructor" "MiniGui\.DatePicker\.create"
 Assert-FileContains $galleryGen1 "generated click binding" "MiniGui\.Events\.bindClick"
 Assert-FileContains $galleryGen1 "generated change binding" "MiniGui\.Events\.bindChange"
-Assert-FileContains $galleryGen1 "generated selection binding" "MiniGui\.Events\.bindSelectionChanged"
+Assert-FileContains $galleryGen1 "generated selected binding" "MiniGui\.Events\.bindSelected"
 Assert-FileContains $galleryGen1 "generated scroll binding" "MiniGui\.Events\.bindScrollChanged"
+Assert-FileContains $galleryGen1 "generated value binding" "MiniGui\.Events\.bindValueChanged"
 Assert-FileContains $galleryGen1 "generated resize binding" "MiniGui\.Events\.bindResized"
 Assert-FileContains $galleryGen1 "generated enabled mutation" "MiniGui\.Control\.setEnabled"
 Assert-FileContains $galleryGen1 "generated visible mutation" "MiniGui\.Control\.setVisible"
@@ -451,7 +483,7 @@ Write-Utf8NoBom $checkControlsMson @'
         "children": [
           { "id": "optInCheckBox", "type": "CheckBox", "properties": { "text": "Opt in", "checked": true }, "events": { "click": "onToggle" } },
           { "id": "choiceRadioButton", "type": "RadioButton", "properties": { "text": "Choice A", "checked": false }, "events": { "click": "onToggle" } },
-          { "id": "passwordBox", "type": "PasswordBox", "properties": { "maxLength": 20 }, "events": { "change": "onToggle" } },
+          { "id": "passwordBox", "type": "PasswordBox", "properties": { "maxLength": 20 }, "events": { "change": "onToggle", "focus": "onToggle", "blur": "onToggle" } },
           { "id": "numberBox", "type": "NumberBox", "properties": { "minimum": 0, "maximum": 10, "value": 2, "step": 1 }, "events": { "valueChanged": "onToggle" } },
           { "id": "image", "type": "Image", "properties": { "text": "Image", "source": "", "height": 40 }, "events": { "click": "onToggle" } },
           { "id": "separator", "type": "Separator", "properties": { "height": 8, "orientation": "horizontal" } },
@@ -503,6 +535,11 @@ Assert-FileContains $checkControlsGenerated "generated TreeView constructor" "Mi
 Assert-FileContains $checkControlsGenerated "generated Table constructor" "MiniGui\.ListView\.create"
 Assert-FileContains $checkControlsGenerated "generated DatePicker constructor" "MiniGui\.DatePicker\.create"
 Assert-FileContains $checkControlsGenerated "generated StatusBar constructor" "MiniGui\.StatusBar\.create"
+Assert-FileContains $checkControlsGenerated "generated clicked binding" "MiniGui\.Events\.bindClicked"
+Assert-FileContains $checkControlsGenerated "generated selected binding" "MiniGui\.Events\.bindSelected"
+Assert-FileContains $checkControlsGenerated "generated valueChanged binding" "MiniGui\.Events\.bindValueChanged"
+Assert-FileContains $checkControlsGenerated "generated focus binding" "MiniGui\.Events\.bindFocus"
+Assert-FileContains $checkControlsGenerated "generated blur binding" "MiniGui\.Events\.bindBlur"
 Assert-Ok (Invoke-Capture $Tool @("build", $checkControlsMson, "--output", $checkControlsBuiltExe, "--compiler", $Compiler, "--library-dir", $Root)) "build check controls MSON"
 
 $smokeExe = Join-Path $Tmp "runtime-smoke.exe"

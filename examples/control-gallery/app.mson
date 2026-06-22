@@ -111,7 +111,7 @@
                         "id": "nameTextBox",
                         "type": "TextBox",
                         "properties": { "text": "Ada", "width": "fill", "minWidth": 220, "enabled": true, "tooltip": "Editable name field", "tabIndex": 2 },
-                        "events": { "changed": "onNameChanged" }
+                        "events": { "changed": "onNameChanged", "focus": "onNameFocus", "blur": "onNameBlur" }
                       },
                       {
                         "id": "birthDatePicker",

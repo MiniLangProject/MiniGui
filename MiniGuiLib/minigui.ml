@@ -67,6 +67,8 @@ extern function InitCommonControls() from "comctl32.dll" returns void
 const GWLP_WNDPROC = -4
 const GWLP_USERDATA = -21
 const ERROR_CLASS_ALREADY_EXISTS = 1410
+const WM_SETFOCUS = 7
+const WM_KILLFOCUS = 8
 const WM_SIZE = 5
 const WM_TIMER = 275
 const WM_DESTROY = 2
@@ -358,6 +360,17 @@ end function
 
 function _miniGuiWndProc(hwnd, msg, wParam, lParam)
   global _activeApp
+  if msg == WM_SETFOCUS or msg == WM_KILLFOCUS then
+    appFocus = _activeApp
+    if appFocus is void then appFocus = _appForWindow(hwnd) end if
+    if appFocus is void == false then
+      if Events.dispatchFocusByHandle(appFocus, hwnd, msg == WM_SETFOCUS) then
+        return _defaultWndProc(hwnd, msg, wParam, lParam)
+      end if
+    end if
+    return _defaultWndProc(hwnd, msg, wParam, lParam)
+  end if
+
   if msg == WM_LBUTTONUP then
     appClick = _activeApp
     if appClick is void then appClick = _appForWindow(hwnd) end if
@@ -630,6 +643,8 @@ struct ApplicationState
   loadBindings,
   closeBindings,
   resizeBindings,
+  focusBindings,
+  blurBindings,
   startupWindow,
   nextNativeId,
   running,
@@ -637,7 +652,7 @@ end struct
 
 struct Application
   static function create()
-    return ApplicationState([], [], [], [], [], [], [], [], [], void, 1000, false)
+    return ApplicationState([], [], [], [], [], [], [], [], [], [], [], void, 1000, false)
   end function
 
   static function addWindow(app, window)
@@ -985,6 +1000,7 @@ struct Button
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
     hwnd = CreateWindowExW(0, "BUTTON", text, WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, x, y, width, height, parent.handle, nid, void, void)
+    if hwnd != 0 then _installWindowProc(hwnd) end if
     c = NativeControl(id, "Button", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     return Application.addControl(app, c)
   end function
@@ -996,6 +1012,7 @@ struct TextBox
     app.nextNativeId = app.nextNativeId + 1
     style = WS_CHILD | WS_VISIBLE | WS_BORDER | ES_AUTOHSCROLL
     hwnd = CreateWindowExW(0, "EDIT", text, style, x, y, width, height, parent.handle, nid, void, void)
+    if hwnd != 0 then _installWindowProc(hwnd) end if
     c = NativeControl(id, "TextBox", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     return Application.addControl(app, c)
   end function
@@ -1008,6 +1025,7 @@ struct TextArea
     style = WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | ES_MULTILINE | ES_AUTOVSCROLL | ES_WANTRETURN
     startText = _normalizeEditText(text)
     hwnd = CreateWindowExW(0, "EDIT", startText, style, x, y, width, height, parent.handle, nid, void, void)
+    if hwnd != 0 then _installWindowProc(hwnd) end if
     c = NativeControl(id, "TextArea", hwnd, nid, startText, x, y, width, height, true, true, startText, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     return Application.addControl(app, c)
   end function
@@ -1019,6 +1037,7 @@ struct PasswordBox
     app.nextNativeId = app.nextNativeId + 1
     style = WS_CHILD | WS_VISIBLE | WS_BORDER | ES_AUTOHSCROLL | ES_PASSWORD
     hwnd = CreateWindowExW(0, "EDIT", text, style, x, y, width, height, parent.handle, nid, void, void)
+    if hwnd != 0 then _installWindowProc(hwnd) end if
     c = NativeControl(id, "PasswordBox", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     return Application.addControl(app, c)
   end function
@@ -1032,6 +1051,7 @@ struct NumberBox
     startText = text
     if startText == "" then startText = "" + value end if
     hwnd = CreateWindowExW(0, "EDIT", startText, style, x, y, width, height, parent.handle, nid, void, void)
+    if hwnd != 0 then _installWindowProc(hwnd) end if
     c = NativeControl(id, "NumberBox", hwnd, nid, startText, x, y, width, height, true, true, startText, -1, minimum, maximum, value, step, step, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     return Application.addControl(app, c)
   end function
@@ -1042,6 +1062,7 @@ struct CheckBox
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
     hwnd = CreateWindowExW(0, "BUTTON", text, WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX, x, y, width, height, parent.handle, nid, void, void)
+    if hwnd != 0 then _installWindowProc(hwnd) end if
     if checked then SendMessageW(hwnd, BM_SETCHECK, BST_CHECKED, 0) end if
     c = NativeControl(id, "CheckBox", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     return Application.addControl(app, c)
@@ -1053,6 +1074,7 @@ struct RadioButton
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
     hwnd = CreateWindowExW(0, "BUTTON", text, WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON, x, y, width, height, parent.handle, nid, void, void)
+    if hwnd != 0 then _installWindowProc(hwnd) end if
     if checked then SendMessageW(hwnd, BM_SETCHECK, BST_CHECKED, 0) end if
     c = NativeControl(id, "RadioButton", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     return Application.addControl(app, c)
@@ -1162,6 +1184,7 @@ struct ScrollBar
     style = WS_CHILD | WS_VISIBLE | SBS_VERT
     if orientation == "horizontal" then style = WS_CHILD | WS_VISIBLE | SBS_HORZ end if
     hwnd = CreateWindowExW(0, "SCROLLBAR", text, style, x, y, width, height, parent.handle, nid, void, void)
+    if hwnd != 0 then _installWindowProc(hwnd) end if
     c = NativeControl(id, "ScrollBar", hwnd, nid, text, x, y, width, height, true, true, text, -1, minimum, maximum, value, smallStep, largeStep, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     Control.setScrollRange(c, minimum, maximum)
     Control.setScrollValue(c, value)
@@ -1177,6 +1200,7 @@ struct Slider
     style = WS_CHILD | WS_VISIBLE | TBS_AUTOTICKS
     if orientation == "vertical" then style = WS_CHILD | WS_VISIBLE | TBS_AUTOTICKS | TBS_VERT end if
     hwnd = CreateWindowExW(0, "msctls_trackbar32", text, style, x, y, width, height, parent.handle, nid, void, void)
+    if hwnd != 0 then _installWindowProc(hwnd) end if
     c = NativeControl(id, "Slider", hwnd, nid, text, x, y, width, height, true, true, text, -1, minimum, maximum, value, smallStep, largeStep, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     Control.setScrollRange(c, minimum, maximum)
     Control.setScrollSteps(c, smallStep, largeStep)
@@ -1191,6 +1215,7 @@ struct ProgressBar
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
     hwnd = CreateWindowExW(0, "msctls_progress32", text, WS_CHILD | WS_VISIBLE, x, y, width, height, parent.handle, nid, void, void)
+    if hwnd != 0 then _installWindowProc(hwnd) end if
     c = NativeControl(id, "ProgressBar", hwnd, nid, text, x, y, width, height, true, true, text, -1, minimum, maximum, value, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     Control.setValueRange(c, minimum, maximum)
     Control.setValue(c, value)
@@ -1247,6 +1272,7 @@ struct StatusBar
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
     hwnd = CreateWindowExW(0, "msctls_statusbar32", text, WS_CHILD | WS_VISIBLE, x, y, width, height, parent.handle, nid, void, void)
+    if hwnd != 0 then _installWindowProc(hwnd) end if
     c = NativeControl(id, "StatusBar", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     return Application.addControl(app, c)
   end function
@@ -1301,6 +1327,7 @@ struct DatePicker
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
     hwnd = CreateWindowExW(0, "SysDateTimePick32", text, WS_CHILD | WS_VISIBLE | DTS_SHORTDATEFORMAT, x, y, width, height, parent.handle, nid, void, void)
+    if hwnd != 0 then _installWindowProc(hwnd) end if
     c = NativeControl(id, "DatePicker", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     return Application.addControl(app, c)
   end function
@@ -1312,6 +1339,7 @@ struct ComboBox
     app.nextNativeId = app.nextNativeId + 1
     style = WS_CHILD | WS_VISIBLE | WS_VSCROLL | CBS_DROPDOWNLIST | CBS_HASSTRINGS
     hwnd = CreateWindowExW(0, "COMBOBOX", text, style, x, y, width, height, parent.handle, nid, void, void)
+    if hwnd != 0 then _installWindowProc(hwnd) end if
     c = NativeControl(id, "ComboBox", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     Control.setItems(c, items)
     if selectedIndex >= 0 then Control.setSelectedIndex(c, selectedIndex) end if
@@ -1326,6 +1354,7 @@ struct ListBox
     app.nextNativeId = app.nextNativeId + 1
     style = WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | LBS_NOTIFY
     hwnd = CreateWindowExW(0, "LISTBOX", text, style, x, y, width, height, parent.handle, nid, void, void)
+    if hwnd != 0 then _installWindowProc(hwnd) end if
     c = NativeControl(id, "ListBox", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     Control.setItems(c, items)
     if selectedIndex >= 0 then Control.setSelectedIndex(c, selectedIndex) end if
@@ -1936,55 +1965,94 @@ struct Events
   end function
 
   static function bindClicked(app, control, callback, context)
-    return Events.bindClick(app, control, callback, context)
+    app.clickBindings = app.clickBindings + [Binding(control, callback, context, "clicked")]
+    return control
   end function
 
-  static function bindTextChanged(app, control, callback, context)
-    app.textBindings = app.textBindings + [Binding(control, callback, context, "textChanged")]
+  static function bindTextEvent(app, control, callback, context, eventType)
+    app.textBindings = app.textBindings + [Binding(control, callback, context, eventType)]
     if control is void == false then
       control.lastText = Control.getText(control)
     end if
     return control
   end function
 
-  static function bindSelectionChanged(app, control, callback, context)
-    app.selectionBindings = app.selectionBindings + [Binding(control, callback, context, "selectionChanged")]
+  static function bindTextChanged(app, control, callback, context)
+    return Events.bindTextEvent(app, control, callback, context, "textChanged")
+  end function
+
+  static function bindSelectionEvent(app, control, callback, context, eventType)
+    app.selectionBindings = app.selectionBindings + [Binding(control, callback, context, eventType)]
     if control is void == false then
       control.lastSelection = Control.getSelectedIndex(control)
     end if
     return control
   end function
 
-  static function bindSelected(app, control, callback, context)
-    return Events.bindSelectionChanged(app, control, callback, context)
+  static function bindSelectionChanged(app, control, callback, context)
+    return Events.bindSelectionEvent(app, control, callback, context, "selectionChanged")
   end function
 
-  static function bindScrollChanged(app, control, callback, context)
-    app.scrollBindings = app.scrollBindings + [Binding(control, callback, context, "scrollChanged")]
+  static function bindSelected(app, control, callback, context)
+    return Events.bindSelectionEvent(app, control, callback, context, "selected")
+  end function
+
+  static function bindScrollEvent(app, control, callback, context, eventType)
+    app.scrollBindings = app.scrollBindings + [Binding(control, callback, context, eventType)]
     if control is void == false then
       control.scrollValue = Control.getScrollValue(control)
     end if
     return control
   end function
 
+  static function bindScrollChanged(app, control, callback, context)
+    return Events.bindScrollEvent(app, control, callback, context, "scrollChanged")
+  end function
+
   static function bindValueChanged(app, control, callback, context)
-    return Events.bindScrollChanged(app, control, callback, context)
+    if control is void == false then
+      if control.kind == "ComboBox" or control.kind == "ListBox" or control.kind == "TabControl" or control.kind == "TreeView" or control.kind == "ListView" then
+        return Events.bindSelectionEvent(app, control, callback, context, "valueChanged")
+      end if
+      if control.kind == "ScrollBar" or control.kind == "Slider" or control.kind == "ProgressBar" or control.kind == "ScrollViewer" then
+        return Events.bindScrollEvent(app, control, callback, context, "valueChanged")
+      end if
+    end if
+    return Events.bindTextEvent(app, control, callback, context, "valueChanged")
   end function
 
   static function bindChanged(app, control, callback, context)
-    return Events.bindChange(app, control, callback, context)
+    if control is void == false then
+      if control.kind == "ComboBox" or control.kind == "ListBox" or control.kind == "TabControl" or control.kind == "TreeView" or control.kind == "ListView" then
+        return Events.bindSelectionEvent(app, control, callback, context, "changed")
+      end if
+      if control.kind == "ScrollBar" or control.kind == "Slider" or control.kind == "ProgressBar" or control.kind == "ScrollViewer" then
+        return Events.bindScrollEvent(app, control, callback, context, "changed")
+      end if
+    end if
+    return Events.bindTextEvent(app, control, callback, context, "changed")
   end function
 
   static function bindChange(app, control, callback, context)
     if control is void == false then
-      if control.kind == "ComboBox" or control.kind == "ListBox" then
-        return Events.bindSelectionChanged(app, control, callback, context)
+      if control.kind == "ComboBox" or control.kind == "ListBox" or control.kind == "TabControl" or control.kind == "TreeView" or control.kind == "ListView" then
+        return Events.bindSelectionEvent(app, control, callback, context, "change")
       end if
-      if control.kind == "ScrollBar" or control.kind == "Slider" then
-        return Events.bindScrollChanged(app, control, callback, context)
+      if control.kind == "ScrollBar" or control.kind == "Slider" or control.kind == "ProgressBar" or control.kind == "ScrollViewer" then
+        return Events.bindScrollEvent(app, control, callback, context, "change")
       end if
     end if
-    return Events.bindTextChanged(app, control, callback, context)
+    return Events.bindTextEvent(app, control, callback, context, "change")
+  end function
+
+  static function bindFocus(app, control, callback, context)
+    app.focusBindings = app.focusBindings + [Binding(control, callback, context, "focus")]
+    return control
+  end function
+
+  static function bindBlur(app, control, callback, context)
+    app.blurBindings = app.blurBindings + [Binding(control, callback, context, "blur")]
+    return control
   end function
 
   static function dispatch(binding, eventType, oldValue, newValue)
@@ -2039,6 +2107,30 @@ struct Events
       end if
     end for
     return false
+  end function
+
+  static function dispatchFocusByHandle(app, hwndControl, focused)
+    if app is void then return false end if
+    bindings = app.blurBindings
+    eventType = "blur"
+    if focused then
+      bindings = app.focusBindings
+      eventType = "focus"
+    end if
+    handled = false
+    if len(bindings) > 0 then
+      for i = 0 to len(bindings) - 1
+        b = bindings[i]
+        c = b.control
+        if c is void == false then
+          if c.handle == hwndControl then
+            Events.dispatch(b, eventType, false, true)
+            handled = true
+          end if
+        end if
+      end for
+    end if
+    return handled
   end function
 
   static function dispatchNotify(app, hwndControl, nativeId, code)
@@ -2273,7 +2365,7 @@ struct Events
         c = b.control
         if c is void == false then
           if c.nativeId == nativeId or c.handle == hwndControl then
-            Events.dispatch(b, "click", false, true)
+            Events.dispatch(b, b.eventType, false, true)
             return true
           end if
         end if

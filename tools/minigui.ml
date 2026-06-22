@@ -823,12 +823,13 @@ function testPropertyNames(result, path, obj, allowed, context)
 end function
 
 function allowedControlEvents(typ)
-  if contains(["Button", "CheckBox", "RadioButton", "ToolBar", "MenuBar", "LinkLabel", "Image"], typ) then return ["click", "clicked"] end if
-  if contains(["TextBox", "TextArea", "PasswordBox", "DatePicker"], typ) then return ["textChanged", "changed", "change", "submit", "validating", "validated"] end if
-  if typ == "NumberBox" then return ["textChanged", "valueChanged", "changed", "change", "submit", "validating", "validated"] end if
-  if contains(["ComboBox", "ListBox", "TabControl", "TreeView", "ListView", "Table"], typ) then return ["selectionChanged", "selected", "changed", "change"] end if
-  if contains(["ScrollBar", "Slider", "ProgressBar", "ScrollViewer"], typ) then return ["scrollChanged", "valueChanged", "changed", "change"] end if
-  return []
+  commonEvents = ["focus", "blur"]
+  if contains(["Button", "CheckBox", "RadioButton", "ToolBar", "MenuBar", "LinkLabel", "Image"], typ) then return ["click", "clicked"] + commonEvents end if
+  if contains(["TextBox", "TextArea", "PasswordBox", "DatePicker"], typ) then return ["textChanged", "changed", "change", "submit", "validating", "validated"] + commonEvents end if
+  if typ == "NumberBox" then return ["textChanged", "valueChanged", "changed", "change", "submit", "validating", "validated"] + commonEvents end if
+  if contains(["ComboBox", "ListBox", "TabControl", "TreeView", "ListView", "Table"], typ) then return ["selectionChanged", "selected", "valueChanged", "changed", "change"] + commonEvents end if
+  if contains(["ScrollBar", "Slider", "ProgressBar", "ScrollViewer"], typ) then return ["scrollChanged", "valueChanged", "changed", "change"] + commonEvents end if
+  return commonEvents
 end function
 
 function commonControlProps()
@@ -1456,14 +1457,16 @@ function generateCode(result, outputPath)
     if ev.eventName == "load" then body = body + ["MiniGui.Events.bindLoad(app, " + cid + ", " + wrapper + ", ui)"]
     else if ev.eventName == "close" then body = body + ["MiniGui.Events.bindClose(app, " + cid + ", " + wrapper + ", ui)"]
     else if ev.eventName == "resized" then body = body + ["MiniGui.Events.bindResized(app, " + cid + ", " + wrapper + ", ui)"]
-    else if ev.eventName == "click" or ev.eventName == "clicked" then body = body + ["MiniGui.Events.bindClick(app, " + cid + ", " + wrapper + ", ui)"]
-    else if ev.eventName == "selectionChanged" or ev.eventName == "selected" then body = body + ["MiniGui.Events.bindSelectionChanged(app, " + cid + ", " + wrapper + ", ui)"]
+    else if ev.eventName == "click" then body = body + ["MiniGui.Events.bindClick(app, " + cid + ", " + wrapper + ", ui)"]
+    else if ev.eventName == "clicked" then body = body + ["MiniGui.Events.bindClicked(app, " + cid + ", " + wrapper + ", ui)"]
+    else if ev.eventName == "focus" then body = body + ["MiniGui.Events.bindFocus(app, " + cid + ", " + wrapper + ", ui)"]
+    else if ev.eventName == "blur" then body = body + ["MiniGui.Events.bindBlur(app, " + cid + ", " + wrapper + ", ui)"]
+    else if ev.eventName == "selectionChanged" then body = body + ["MiniGui.Events.bindSelectionChanged(app, " + cid + ", " + wrapper + ", ui)"]
+    else if ev.eventName == "selected" then body = body + ["MiniGui.Events.bindSelected(app, " + cid + ", " + wrapper + ", ui)"]
     else if ev.eventName == "scrollChanged" then body = body + ["MiniGui.Events.bindScrollChanged(app, " + cid + ", " + wrapper + ", ui)"]
-    else if ev.eventName == "valueChanged" then
-      if ev.controlType == "NumberBox" then body = body + ["MiniGui.Events.bindChange(app, " + cid + ", " + wrapper + ", ui)"]
-      else body = body + ["MiniGui.Events.bindScrollChanged(app, " + cid + ", " + wrapper + ", ui)"]
-      end if
-    else if ev.eventName == "change" or ev.eventName == "changed" or ev.eventName == "submit" or ev.eventName == "validating" or ev.eventName == "validated" then body = body + ["MiniGui.Events.bindChange(app, " + cid + ", " + wrapper + ", ui)"]
+    else if ev.eventName == "valueChanged" then body = body + ["MiniGui.Events.bindValueChanged(app, " + cid + ", " + wrapper + ", ui)"]
+    else if ev.eventName == "changed" then body = body + ["MiniGui.Events.bindChanged(app, " + cid + ", " + wrapper + ", ui)"]
+    else if ev.eventName == "change" or ev.eventName == "submit" or ev.eventName == "validating" or ev.eventName == "validated" then body = body + ["MiniGui.Events.bindChange(app, " + cid + ", " + wrapper + ", ui)"]
     else body = body + ["MiniGui.Events.bindTextChanged(app, " + cid + ", " + wrapper + ", ui)"]
     end if
   end for

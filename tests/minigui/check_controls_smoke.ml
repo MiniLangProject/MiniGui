@@ -15,6 +15,11 @@ function onScroll(ui, event)
   return 0
 end function
 
+function onEventName(ui, event)
+  MiniGui.Control.setText(ui.resultLabel, event.sender.kind + ":" + event.eventType + ":" + event.newValue)
+  return 0
+end function
+
 struct CheckControlsUi
   app,
   mainWindow,
@@ -27,6 +32,7 @@ struct CheckControlsUi
   cityListBox,
   volumeScrollBar,
   volumeSlider,
+  valueSlider,
   progressBar,
   tabs,
   menu,
@@ -50,6 +56,7 @@ function main(args)
   list = MiniGui.ListBox.create(app, win, "cityListBox", "", 220, 180, 180, 90, ["Berlin", "Bonn", "Hamburg"], 0)
   scroll = MiniGui.ScrollBar.create(app, win, "volumeScrollBar", "", 430, 180, 18, 100, "vertical", 0, 100, 20, 5, 25)
   slider = MiniGui.Slider.create(app, win, "volumeSlider", "", 16, 280, 220, 32, "horizontal", 0, 100, 30, 5, 25)
+  valueSlider = MiniGui.Slider.create(app, win, "valueSlider", "", 16, 314, 220, 32, "horizontal", 0, 100, 10, 5, 25)
   progress = MiniGui.ProgressBar.create(app, win, "progressBar", "", 250, 280, 180, 24, 0, 100, 40)
   tabs = MiniGui.TabControl.create(app, win, "tabs", "", 16, 326, 220, 80, ["Inputs", "Data"], 0)
   menu = MiniGui.MenuBar.create(app, win, "menu", "", 250, 326, 180, 24, ["File", "Help"])
@@ -59,7 +66,7 @@ function main(args)
   datePicker = MiniGui.DatePicker.create(app, win, "datePicker", "", 385, 420, 140, 26)
   statusBar = MiniGui.StatusBar.create(app, win, "statusBar", "Ready", 16, 520, 420, 24)
   label = MiniGui.Label.create(app, win, "resultLabel", "", 16, 550, 420, 24)
-  ui = CheckControlsUi(app, win, optIn, choice, panel, notes, group, combo, list, scroll, slider, progress, tabs, menu, toolbar, tree, table, datePicker, statusBar, label)
+  ui = CheckControlsUi(app, win, optIn, choice, panel, notes, group, combo, list, scroll, slider, valueSlider, progress, tabs, menu, toolbar, tree, table, datePicker, statusBar, label)
 
   if MiniGui.Control.isChecked(optIn) == false then return 1 end if
   if MiniGui.Control.isChecked(choice) then return 2 end if
@@ -117,6 +124,9 @@ function main(args)
   MiniGui.Events.bindSelectionChanged(app, list, onSelection, ui)
   MiniGui.Events.bindScrollChanged(app, scroll, onScroll, ui)
   MiniGui.Events.bindScrollChanged(app, slider, onScroll, ui)
+  MiniGui.Events.bindValueChanged(app, valueSlider, onEventName, ui)
+  MiniGui.Events.bindFocus(app, optIn, onEventName, ui)
+  MiniGui.Events.bindBlur(app, optIn, onEventName, ui)
   if MiniGui.Events.dispatchCommand(app, 0, optIn.nativeId, optIn.handle) == false then return 7 end if
   if MiniGui.Control.getText(label) != "CheckBox:click" then return 8 end if
   if MiniGui.Events.dispatchCommand(app, 0, choice.nativeId, choice.handle) == false then return 9 end if
@@ -133,5 +143,11 @@ function main(args)
   if MiniGui.Control.getText(label) != "ScrollBar:25" then return 38 end if
   if MiniGui.Events.dispatchScroll(app, 1, 0, slider.handle) == false then return 45 end if
   if MiniGui.Control.getText(label) != "Slider:35" then return 46 end if
+  if MiniGui.Events.dispatchScroll(app, 1, 0, valueSlider.handle) == false then return 62 end if
+  if MiniGui.Control.getText(label) != "Slider:valueChanged:15" then return 63 end if
+  if MiniGui.Events.dispatchFocusByHandle(app, optIn.handle, true) == false then return 64 end if
+  if MiniGui.Control.getText(label) != "CheckBox:focus:true" then return 65 end if
+  if MiniGui.Events.dispatchFocusByHandle(app, optIn.handle, false) == false then return 66 end if
+  if MiniGui.Control.getText(label) != "CheckBox:blur:true" then return 67 end if
   return 0
 end function

@@ -46,6 +46,16 @@ function onNameChanged(ui, event)
   return 0
 end function
 
+function onNameFocus(ui, event)
+  MiniGui.Control.setText(ui.resultLabel, "Name focused")
+  return 0
+end function
+
+function onNameBlur(ui, event)
+  MiniGui.Control.setText(ui.resultLabel, "Name blurred")
+  return 0
+end function
+
 function onDateChanged(ui, event)
   MiniGui.Control.setText(ui.statusLabel, "Date changed")
   return 0

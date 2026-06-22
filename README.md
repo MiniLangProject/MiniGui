@@ -344,6 +344,9 @@ Example:
 
 MiniGui currently supports these controls:
 
+All controls can also use `focus` and `blur` events. The table lists the
+control-specific events in addition to those common focus events.
+
 | Control | Purpose | Important properties | Events |
 | --- | --- | --- | --- |
 | `Label` | Display text | `text` | - |
@@ -639,6 +642,15 @@ Window events:
 - `close`
 - `resized`
 
+Common control events:
+
+- `focus`: the control received keyboard focus.
+- `blur`: the control lost keyboard focus.
+
+Selection and value aliases preserve their event name in `event.eventType`.
+For example, a MSON `valueChanged` handler receives `event.eventType ==
+"valueChanged"`, not the lower-level Win32 event family used internally.
+
 Close-event example:
 
 ```json
@@ -700,6 +712,22 @@ value = MiniGui.Control.getValue(control)
 `setValue` and `getValue` are useful for `Slider`, `ScrollBar`, and
 `ProgressBar`, and `NumberBox`. For `ComboBox` and `ListBox`, use the selection
 functions.
+
+The most useful functions from `MiniGui.Events`:
+
+```minilang
+MiniGui.Events.bindClick(app, button, onClick, ui)
+MiniGui.Events.bindClicked(app, button, onClick, ui)
+MiniGui.Events.bindTextChanged(app, textBox, onText, ui)
+MiniGui.Events.bindChange(app, control, onChange, ui)
+MiniGui.Events.bindChanged(app, control, onChanged, ui)
+MiniGui.Events.bindSelectionChanged(app, list, onSelection, ui)
+MiniGui.Events.bindSelected(app, list, onSelected, ui)
+MiniGui.Events.bindScrollChanged(app, slider, onScroll, ui)
+MiniGui.Events.bindValueChanged(app, slider, onValue, ui)
+MiniGui.Events.bindFocus(app, control, onFocus, ui)
+MiniGui.Events.bindBlur(app, control, onBlur, ui)
+```
 
 ## Dialog API
 
