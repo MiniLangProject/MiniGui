@@ -377,6 +377,40 @@ control-specific events in addition to those common focus events.
 | `Table` | Table-like list, currently backed by `ListView` | `items`, `selectedIndex` | `selectionChanged`, `selected`, `changed`, `change` |
 | `DatePicker` | Date input | `text` | `textChanged`, `changed`, `change` |
 
+## Control Screenshot Gallery
+
+These screenshots are cropped from the MiniGui Control Gallery example.
+
+| Control | Screenshot |
+| --- | --- |
+| `Label` | [![Label](docs/images/controls/label.png)](docs/images/controls/label.png) |
+| `Button` | [![Button](docs/images/controls/button.png)](docs/images/controls/button.png) |
+| `TextBox` | [![TextBox](docs/images/controls/textbox.png)](docs/images/controls/textbox.png) |
+| `TextArea` | [![TextArea](docs/images/controls/textarea.png)](docs/images/controls/textarea.png) |
+| `PasswordBox` | [![PasswordBox](docs/images/controls/passwordbox.png)](docs/images/controls/passwordbox.png) |
+| `NumberBox` | [![NumberBox](docs/images/controls/numberbox.png)](docs/images/controls/numberbox.png) |
+| `CheckBox` | [![CheckBox](docs/images/controls/checkbox.png)](docs/images/controls/checkbox.png) |
+| `RadioButton` | [![RadioButton](docs/images/controls/radiobutton.png)](docs/images/controls/radiobutton.png) |
+| `Image` | [![Image](docs/images/controls/image.png)](docs/images/controls/image.png) |
+| `Separator` | [![Separator](docs/images/controls/separator.png)](docs/images/controls/separator.png) |
+| `LinkLabel` | [![LinkLabel](docs/images/controls/linklabel.png)](docs/images/controls/linklabel.png) |
+| `Panel` | [![Panel](docs/images/controls/panel.png)](docs/images/controls/panel.png) |
+| `ScrollViewer` | [![ScrollViewer](docs/images/controls/scrollviewer.png)](docs/images/controls/scrollviewer.png) |
+| `GroupBox` | [![GroupBox](docs/images/controls/groupbox.png)](docs/images/controls/groupbox.png) |
+| `ComboBox` | [![ComboBox](docs/images/controls/combobox.png)](docs/images/controls/combobox.png) |
+| `ListBox` | [![ListBox](docs/images/controls/listbox.png)](docs/images/controls/listbox.png) |
+| `ScrollBar` | [![ScrollBar](docs/images/controls/scrollbar.png)](docs/images/controls/scrollbar.png) |
+| `Slider` | [![Slider](docs/images/controls/slider.png)](docs/images/controls/slider.png) |
+| `ProgressBar` | [![ProgressBar](docs/images/controls/progressbar.png)](docs/images/controls/progressbar.png) |
+| `TabControl` | [![TabControl](docs/images/controls/tabcontrol.png)](docs/images/controls/tabcontrol.png) |
+| `MenuBar` | [![MenuBar](docs/images/controls/menubar.png)](docs/images/controls/menubar.png) |
+| `ToolBar` | [![ToolBar](docs/images/controls/toolbar.png)](docs/images/controls/toolbar.png) |
+| `StatusBar` | [![StatusBar](docs/images/controls/statusbar.png)](docs/images/controls/statusbar.png) |
+| `TreeView` | [![TreeView](docs/images/controls/treeview.png)](docs/images/controls/treeview.png) |
+| `ListView` | [![ListView](docs/images/controls/listview.png)](docs/images/controls/listview.png) |
+| `Table` | [![Table](docs/images/controls/table.png)](docs/images/controls/table.png) |
+| `DatePicker` | [![DatePicker](docs/images/controls/datepicker.png)](docs/images/controls/datepicker.png) |
+
 ## Control Examples
 
 ### Button

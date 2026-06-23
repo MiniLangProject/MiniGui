@@ -391,6 +391,21 @@
                       "width": "fill"
                     },
                     "events": { "valueChanged": "onProgressChanged" }
+                  },
+                  {
+                    "id": "nativeScrollBar",
+                    "type": "ScrollBar",
+                    "properties": {
+                      "orientation": "horizontal",
+                      "minimum": 0,
+                      "maximum": 100,
+                      "value": 45,
+                      "smallStep": 5,
+                      "largeStep": 20,
+                      "height": 18,
+                      "width": "fill"
+                    },
+                    "events": { "valueChanged": "onVolumeScrolled" }
                   }
                 ]
               }
@@ -421,7 +436,7 @@
                         "properties": {
                           "items": ["Customers", "Orders", "Reports"],
                           "height": 120,
-                          "width": 380
+                          "width": 250
                         },
                         "events": { "selected": "onTreeSelected" }
                       },
@@ -432,7 +447,18 @@
                           "items": ["Ada Lovelace", "Grace Hopper", "Margaret Hamilton"],
                           "selectedIndex": -1,
                           "height": 120,
-                          "width": 380
+                          "width": 250
+                        },
+                        "events": { "selected": "onTableSelected" }
+                      },
+                      {
+                        "id": "customerListView",
+                        "type": "ListView",
+                        "properties": {
+                          "items": ["Active", "Pending", "Archived"],
+                          "selectedIndex": 0,
+                          "height": 120,
+                          "width": 240
                         },
                         "events": { "selected": "onTableSelected" }
                       }
