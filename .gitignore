@@ -1,6 +1,7 @@
 examples/*/build/
 tests/tmp/
 build/
+dist/
 tools/tmp/
 *.exe
 *.mlo
