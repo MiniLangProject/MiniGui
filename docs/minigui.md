@@ -5,12 +5,12 @@ application logic in normal `.ml` files.
 
 ## CLI
 
-MiniGui is expected to live next to the MiniLang compiler checkout. By default
-the CLI looks for `..\MiniLangCompilerML\build\mlc_win64.exe`; use
+MiniGui is expected to live next to a MiniLang compiler checkout. The examples
+use the faster Python compiler at `..\MiniLangCompilerPy\mlc_win64.py`; use
 `--compiler <path>` to override that.
 
 ```powershell
-..\MiniLangCompilerML\build\mlc_win64.exe .\tools\minigui.ml .\tools\minigui.exe -I . -I ..\MiniLangCompilerML
+py -3.14 ..\MiniLangCompilerPy\mlc_win64.py .\tools\minigui.ml .\tools\minigui.exe -I . -I ..\MiniLangCompilerPy
 .\tools\minigui.exe validate .\examples\hello-gui\app.mson
 .\tools\minigui.exe generate .\examples\hello-gui\app.mson --output .\examples\hello-gui\build\app.gui.ml
 .\tools\minigui.exe build .\examples\hello-gui\app.mson --output .\examples\hello-gui\build\hello-gui.exe
@@ -60,20 +60,37 @@ MSON is valid JSON with file extension `.mson`.
 }
 ```
 
-Supported controls in the vertical prototype:
+Supported controls:
 
 - `Window`
 - `Label`
 - `Button`
 - `TextBox`
 - `TextArea`
+- `PasswordBox`
+- `NumberBox`
 - `CheckBox`
 - `RadioButton`
+- `Image`
+- `Separator`
+- `LinkLabel`
 - `Panel`
+- `ScrollViewer`
 - `GroupBox`
 - `ComboBox`
 - `ListBox`
 - `ScrollBar`
+- `Slider`
+- `ProgressBar`
+- `TabControl`
+- `MenuBar`
+- `ContextMenu`
+- `StatusBar`
+- `ToolBar`
+- `TreeView`
+- `ListView`
+- `Table`
+- `DatePicker`
 - Component names declared in `components`
 
 Supported layouts:

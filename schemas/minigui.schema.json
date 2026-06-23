@@ -90,6 +90,7 @@
             "ProgressBar",
             "TabControl",
             "MenuBar",
+            "ContextMenu",
             "StatusBar",
             "ToolBar",
             "TreeView",

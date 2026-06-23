@@ -824,7 +824,7 @@ end function
 
 function allowedControlEvents(typ)
   commonEvents = ["focus", "blur"]
-  if contains(["Button", "CheckBox", "RadioButton", "ToolBar", "MenuBar", "LinkLabel", "Image"], typ) then return ["click", "clicked"] + commonEvents end if
+  if contains(["Button", "CheckBox", "RadioButton", "ToolBar", "MenuBar", "ContextMenu", "LinkLabel", "Image"], typ) then return ["click", "clicked"] + commonEvents end if
   if contains(["TextBox", "TextArea", "PasswordBox", "DatePicker"], typ) then return ["textChanged", "changed", "change", "submit", "validating", "validated"] + commonEvents end if
   if typ == "NumberBox" then return ["textChanged", "valueChanged", "changed", "change", "submit", "validating", "validated"] + commonEvents end if
   if contains(["ComboBox", "ListBox", "TabControl", "TreeView", "ListView", "Table"], typ) then return ["selectionChanged", "selected", "valueChanged", "changed", "change"] + commonEvents end if
@@ -840,10 +840,11 @@ function allowedControlProps(typ)
   if contains(["TextBox", "TextArea", "PasswordBox"], typ) then return commonControlProps() + ["placeholder", "readOnly", "maxLength", "inputType", "validationMessage"] end if
   if typ == "NumberBox" then return commonControlProps() + ["placeholder", "readOnly", "maxLength", "minimum", "maximum", "value", "step", "decimals", "validationMessage"] end if
   if contains(["CheckBox", "RadioButton"], typ) then return commonControlProps() + ["checked"] end if
-  if contains(["ComboBox", "ListBox", "TabControl", "TreeView", "ListView", "Table"], typ) then return commonControlProps() + ["items", "selectedIndex"] end if
+  if contains(["ComboBox", "ListBox", "TabControl", "TreeView"], typ) then return commonControlProps() + ["items", "selectedIndex"] end if
+  if contains(["ListView", "Table"], typ) then return commonControlProps() + ["items", "selectedIndex", "columns"] end if
   if contains(["ScrollBar", "Slider"], typ) then return commonControlProps() + ["orientation", "minimum", "maximum", "value", "smallStep", "largeStep"] end if
   if typ == "ProgressBar" then return commonControlProps() + ["minimum", "maximum", "value"] end if
-  if contains(["MenuBar", "ToolBar"], typ) then return commonControlProps() + ["items"] end if
+  if contains(["MenuBar", "ToolBar", "ContextMenu"], typ) then return commonControlProps() + ["items"] end if
   if typ == "Image" then return commonControlProps() + ["source", "stretch"] end if
   if typ == "Separator" then return commonControlProps() + ["orientation"] end if
   if typ == "LinkLabel" then return commonControlProps() + ["url", "visited"] end if
@@ -853,7 +854,7 @@ function allowedControlProps(typ)
 end function
 
 function isControl(typ)
-  return contains(["Label", "Button", "TextBox", "TextArea", "PasswordBox", "NumberBox", "CheckBox", "RadioButton", "Image", "Separator", "LinkLabel", "Panel", "ScrollViewer", "GroupBox", "ComboBox", "ListBox", "ScrollBar", "Slider", "ProgressBar", "TabControl", "MenuBar", "StatusBar", "ToolBar", "TreeView", "ListView", "Table", "DatePicker"], typ)
+  return contains(["Label", "Button", "TextBox", "TextArea", "PasswordBox", "NumberBox", "CheckBox", "RadioButton", "Image", "Separator", "LinkLabel", "Panel", "ScrollViewer", "GroupBox", "ComboBox", "ListBox", "ScrollBar", "Slider", "ProgressBar", "TabControl", "MenuBar", "ContextMenu", "StatusBar", "ToolBar", "TreeView", "ListView", "Table", "DatePicker"], typ)
 end function
 
 function isContainerControl(typ)
@@ -885,7 +886,28 @@ function testControlProperties(result, path, typ, properties)
       if v.kind != "array" then addError(result, path, "Property '" + name + "' on " + typ + " must be an array of strings.")
       else if len(v.items) > 0 then
         for itemIndex = 0 to len(v.items) - 1
-          if v.items[itemIndex].kind != "string" then addError(result, path, "Property '" + name + "' on " + typ + " must be an array of strings.") end if
+          if typ == "TreeView" then
+            if v.items[itemIndex].kind != "string" and v.items[itemIndex].kind != "object" then addError(result, path, "Property '" + name + "' on " + typ + " must contain strings or tree item objects.") end if
+          else if typ == "ListView" or typ == "Table" then
+            if v.items[itemIndex].kind == "array" then
+              rowItems = v.items[itemIndex].items
+              if len(rowItems) > 0 then
+                for rowItemIndex = 0 to len(rowItems) - 1
+                  if rowItems[rowItemIndex].kind != "string" then addError(result, path, "Property '" + name + "' on " + typ + " must contain strings or arrays of strings.") end if
+                end for
+              end if
+            else if v.items[itemIndex].kind != "string" then addError(result, path, "Property '" + name + "' on " + typ + " must contain strings or arrays of strings.") end if
+          else
+            if v.items[itemIndex].kind != "string" then addError(result, path, "Property '" + name + "' on " + typ + " must be an array of strings.") end if
+          end if
+        end for
+      end if
+    end if
+    if name == "columns" then
+      if v.kind != "array" then addError(result, path, "Property '" + name + "' on " + typ + " must be an array of strings.")
+      else if len(v.items) > 0 then
+        for columnIndex = 0 to len(v.items) - 1
+          if v.items[columnIndex].kind != "string" then addError(result, path, "Property '" + name + "' on " + typ + " must be an array of strings.") end if
         end for
       end if
     end if
@@ -1034,6 +1056,7 @@ end function
 
 function controlDefaultHeight(typ)
   if typ == "MenuBar" then return 24 end if
+  if typ == "ContextMenu" then return 1 end if
   if typ == "ToolBar" then return 30 end if
   if typ == "StatusBar" then return 24 end if
   if typ == "Button" then return 30 end if
@@ -1127,6 +1150,65 @@ function stringArrayLiteral(result, path, node, name)
   return "[" + str.join(parts, ", ") + "]"
 end function
 
+function collectTreeItemLiterals(result, path, parts, item, level)
+  prefix = ""
+  if level > 0 then
+    for i = 0 to level - 1
+      prefix = prefix + "  "
+    end for
+  end if
+  if item.kind == "string" then
+    parts = parts + [mlString(prefix + item.text)]
+    return parts
+  end if
+  if item.kind != "object" then return parts end if
+  label = asString(resourceValue(result, path, prop(item, "text")), "")
+  if label == "" then label = asString(resourceValue(result, path, prop(item, "label")), "") end if
+  if label == "" then return parts end if
+  parts = parts + [mlString(prefix + label)]
+  children = arrItems(resourceValue(result, path, prop(item, "children")))
+  if len(children) > 0 then
+    for c = 0 to len(children) - 1
+      parts = collectTreeItemLiterals(result, path, parts, children[c], level + 1)
+    end for
+  end if
+  return parts
+end function
+
+function treeArrayLiteral(result, path, node, name)
+  v = resourceValue(result, path, prop(prop(node, "properties"), name))
+  if v.kind != "array" then return "[]" end if
+  parts = []
+  if len(v.items) > 0 then
+    for i = 0 to len(v.items) - 1
+      parts = collectTreeItemLiterals(result, path, parts, v.items[i], 0)
+    end for
+  end if
+  return "[" + str.join(parts, ", ") + "]"
+end function
+
+function tableArrayLiteral(result, path, node, name)
+  v = resourceValue(result, path, prop(prop(node, "properties"), name))
+  if v.kind != "array" then return "[]" end if
+  if len(v.items) == 0 then return "[]" end if
+  parts = []
+  for i = 0 to len(v.items) - 1
+    item = resourceValue(result, path, v.items[i])
+    if item.kind == "array" then
+      row = []
+      if len(item.items) > 0 then
+        for c = 0 to len(item.items) - 1
+          row = row + [asString(resourceValue(result, path, item.items[c]), "")]
+        end for
+      end if
+      parts = parts + [mlString(str.join(row, "\t"))]
+    else
+      parts = parts + [mlString(asString(item, ""))]
+    end if
+  end for
+  return "[" + str.join(parts, ", ") + "]"
+end function
+
 function createCallFor(typ)
   if typ == "Label" then return "MiniGui.Label.create" end if
   if typ == "Button" then return "MiniGui.Button.create" end if
@@ -1148,6 +1230,7 @@ function createCallFor(typ)
   if typ == "ProgressBar" then return "MiniGui.ProgressBar.create" end if
   if typ == "TabControl" then return "MiniGui.TabControl.create" end if
   if typ == "MenuBar" then return "MiniGui.MenuBar.create" end if
+  if typ == "ContextMenu" then return "MiniGui.ContextMenu.create" end if
   if typ == "StatusBar" then return "MiniGui.StatusBar.create" end if
   if typ == "ToolBar" then return "MiniGui.ToolBar.create" end if
   if typ == "TreeView" then return "MiniGui.TreeView.create" end if
@@ -1214,15 +1297,27 @@ function addGeneratedNode(lines, fields, result, path, node, parentVar, parentTy
       if boolProp(result, path, node, "horizontalScroll", false) then hscroll = "true" end if
       if boolProp(result, path, node, "verticalScroll", true) == false then vscroll = "false" end if
       lines = lines + [var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + hscroll + ", " + vscroll + ")"]
-    else if typ == "ComboBox" or typ == "ListBox" or typ == "ListView" or typ == "Table" then
+    else if typ == "ComboBox" or typ == "ListBox" then
       items = stringArrayLiteral(result, path, node, "items")
       selectedIndex = intProp(result, path, node, "selectedIndex", -1)
       lines = lines + [var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + items + ", " + selectedIndex + ")"]
+    else if typ == "ListView" or typ == "Table" then
+      items = tableArrayLiteral(result, path, node, "items")
+      columns = stringArrayLiteral(result, path, node, "columns")
+      selectedIndex = intProp(result, path, node, "selectedIndex", -1)
+      if columns == "[]" then
+        lines = lines + [var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + items + ", " + selectedIndex + ")"]
+      else
+        lines = lines + [var + " = MiniGui.ListView.createColumns(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + columns + ", " + items + ", " + selectedIndex + ")"]
+      end if
     else if typ == "TabControl" then
       itemsTab = stringArrayLiteral(result, path, node, "items")
       selectedTab = intProp(result, path, node, "selectedIndex", 0)
       lines = lines + [var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + itemsTab + ", " + selectedTab + ")"]
-    else if typ == "MenuBar" or typ == "ToolBar" or typ == "TreeView" then
+    else if typ == "TreeView" then
+      itemsText = treeArrayLiteral(result, path, node, "items")
+      lines = lines + [var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + itemsText + ")"]
+    else if typ == "MenuBar" or typ == "ToolBar" or typ == "ContextMenu" then
       itemsText = stringArrayLiteral(result, path, node, "items")
       lines = lines + [var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + itemsText + ")"]
     else if typ == "ScrollBar" or typ == "Slider" then
@@ -1245,10 +1340,26 @@ function addGeneratedNode(lines, fields, result, path, node, parentVar, parentTy
     end if
     if boolProp(result, path, node, "enabled", true) == false then lines = lines + ["MiniGui.Control.setEnabled(" + var + ", false)"] end if
     if boolProp(result, path, node, "visible", true) == false then lines = lines + ["MiniGui.Control.setVisible(" + var + ", false)"] end if
+    tooltip = stringProp(result, path, node, "tooltip", "")
+    if tooltip != "" then lines = lines + ["MiniGui.Control.setTooltip(" + var + ", " + mlString(tooltip) + ")"] end if
+    tabIndex = intProp(result, path, node, "tabIndex", -1)
+    if tabIndex >= 0 then lines = lines + ["MiniGui.Control.setTabIndex(" + var + ", " + tabIndex + ")"] end if
+    foreground = stringProp(result, path, node, "foreground", "")
+    if foreground != "" then lines = lines + ["MiniGui.Control.setForeground(" + var + ", " + mlString(foreground) + ")"] end if
+    background = stringProp(result, path, node, "background", "")
+    if background != "" then lines = lines + ["MiniGui.Control.setBackground(" + var + ", " + mlString(background) + ")"] end if
+    borderColor = stringProp(result, path, node, "borderColor", "")
+    borderWidth = intProp(result, path, node, "borderWidth", -1)
+    if borderColor != "" or borderWidth >= 0 then lines = lines + ["MiniGui.Control.setBorder(" + var + ", " + mlString(borderColor) + ", " + borderWidth + ")"] end if
+    fontFamily = stringProp(result, path, node, "fontFamily", "")
+    fontSize = intProp(result, path, node, "fontSize", -1)
+    fontWeight = stringProp(result, path, node, "fontWeight", "")
+    if fontFamily != "" or fontSize >= 0 or fontWeight != "" then lines = lines + ["MiniGui.Control.setFont(" + var + ", " + mlString(fontFamily) + ", " + fontSize + ", " + mlString(fontWeight) + ")"] end if
     if boolProp(result, path, node, "readOnly", false) then lines = lines + ["MiniGui.Control.setReadOnly(" + var + ", true)"] end if
     maxLength = intProp(result, path, node, "maxLength", -1)
     if maxLength >= 0 then lines = lines + ["MiniGui.Control.setMaxLength(" + var + ", " + maxLength + ")"] end if
     if contains(fields, var) == false then fields = fields + [var] end if
+    if typ == "ContextMenu" then return [lines, fields, 0] end if
     if isContainerControl(typ) then
       childPadding = intProp(result, path, node, "padding", 8)
       childSpacing = intProp(result, path, node, "spacing", 6)

@@ -42,6 +42,14 @@
             "events": { "clicked": "onActionClicked" }
           },
           {
+            "id": "mainContextMenu",
+            "type": "ContextMenu",
+            "properties": {
+              "items": ["Copy", "Paste", "Refresh"]
+            },
+            "events": { "clicked": "onActionClicked" }
+          },
+          {
             "id": "mainToolBar",
             "type": "ToolBar",
             "properties": {
@@ -66,7 +74,14 @@
             "properties": {
               "text": { "$resource": "heading" },
               "height": 24,
-              "width": "fill"
+              "width": "fill",
+              "foreground": "#202020",
+              "background": "#F3F3F3",
+              "fontFamily": "Segoe UI",
+              "fontSize": 10,
+              "fontWeight": "bold",
+              "borderColor": "#D0D0D0",
+              "borderWidth": 1
             }
           },
           {
@@ -434,7 +449,11 @@
                         "id": "navigationTree",
                         "type": "TreeView",
                         "properties": {
-                          "items": ["Customers", "Orders", "Reports"],
+                          "items": [
+                            { "text": "Customers", "children": ["Active", "Archived"] },
+                            { "text": "Orders", "children": ["Open", "Shipped"] },
+                            { "text": "Reports", "children": ["Revenue", "Inventory"] }
+                          ],
                           "height": 120,
                           "width": 250
                         },
@@ -444,7 +463,12 @@
                         "id": "customerTable",
                         "type": "Table",
                         "properties": {
-                          "items": ["Ada Lovelace", "Grace Hopper", "Margaret Hamilton"],
+                          "columns": ["Name", "Role", "Status"],
+                          "items": [
+                            ["Ada Lovelace", "Analyst", "Active"],
+                            ["Grace Hopper", "Compiler", "Active"],
+                            ["Margaret Hamilton", "Apollo", "Active"]
+                          ],
                           "selectedIndex": -1,
                           "height": 120,
                           "width": 250
@@ -455,7 +479,12 @@
                         "id": "customerListView",
                         "type": "ListView",
                         "properties": {
-                          "items": ["Active", "Pending", "Archived"],
+                          "columns": ["Status", "Count"],
+                          "items": [
+                            ["Active", "12"],
+                            ["Pending", "4"],
+                            ["Archived", "31"]
+                          ],
                           "selectedIndex": 0,
                           "height": 120,
                           "width": 240

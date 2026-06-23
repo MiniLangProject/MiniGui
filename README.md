@@ -319,8 +319,8 @@ These properties can be used on controls:
 - `tooltip`: tooltip text.
 - `tabIndex`: keyboard navigation order.
 - `row`, `column`, `rowSpan`, `columnSpan`: reserved for richer grid placement.
-- `fontFamily`, `fontSize`, `fontWeight`: accepted styling metadata.
-- `foreground`, `background`, `borderColor`, `borderWidth`: accepted styling metadata.
+- `foreground`, `background`: native text/background styling for standard Win32 controls.
+- `borderColor`, `borderWidth`, `fontFamily`, `fontSize`, `fontWeight`: generated styling hooks reserved for richer native rendering.
 
 Example:
 
@@ -370,11 +370,12 @@ control-specific events in addition to those common focus events.
 | `ProgressBar` | Display progress | `minimum`, `maximum`, `value` | `scrollChanged`, `valueChanged`, `changed`, `change` |
 | `TabControl` | Tabbed interface | `items`, `selectedIndex`, `children` | `selectionChanged`, `selected`, `changed`, `change` |
 | `MenuBar` | Application menu bar | `items` | `click`, `clicked` |
+| `ContextMenu` | Native right-click popup menu on its parent | `items` | `click`, `clicked` |
 | `ToolBar` | Toolbar | `items` | `click`, `clicked` |
 | `StatusBar` | Status line | `text` | - |
 | `TreeView` | Tree navigation | `items` | `selectionChanged`, `selected`, `changed`, `change` |
-| `ListView` | List/report view | `items`, `selectedIndex` | `selectionChanged`, `selected`, `changed`, `change` |
-| `Table` | Table-like list, currently backed by `ListView` | `items`, `selectedIndex` | `selectionChanged`, `selected`, `changed`, `change` |
+| `ListView` | List/report view | `columns`, `items`, `selectedIndex` | `selectionChanged`, `selected`, `changed`, `change` |
+| `Table` | Table-like list backed by `ListView` | `columns`, `items`, `selectedIndex` | `selectionChanged`, `selected`, `changed`, `change` |
 | `DatePicker` | Date input | `text` | `textChanged`, `changed`, `change` |
 
 ## Control Screenshot Gallery
@@ -592,7 +593,7 @@ end function
 }
 ```
 
-### ToolBar, MenuBar, and StatusBar
+### ToolBar, MenuBar, ContextMenu, and StatusBar
 
 ```json
 {
@@ -604,6 +605,30 @@ end function
     "width": "fill"
   },
   "events": { "click": "onToolbarClick" }
+}
+```
+
+```json
+{
+  "id": "mainMenu",
+  "type": "MenuBar",
+  "properties": {
+    "items": ["File", "Edit", "View", "Help"],
+    "height": 24,
+    "width": "fill"
+  },
+  "events": { "clicked": "onMenuClick" }
+}
+```
+
+```json
+{
+  "id": "rowContextMenu",
+  "type": "ContextMenu",
+  "properties": {
+    "items": ["Open", "Rename", "Delete"]
+  },
+  "events": { "clicked": "onContextMenuClick" }
 }
 ```
 
@@ -625,14 +650,26 @@ end function
     {
       "id": "navigationTree",
       "type": "TreeView",
-      "properties": { "items": ["Customers", "Orders", "Reports"], "height": 120 },
+      "properties": {
+        "items": [
+          { "text": "Customers", "children": ["Active", "Archived"] },
+          { "text": "Orders", "children": ["Open", "Shipped"] },
+          { "text": "Reports", "children": ["Revenue", "Inventory"] }
+        ],
+        "height": 120
+      },
       "events": { "selected": "onTreeSelected" }
     },
     {
       "id": "customerTable",
       "type": "Table",
       "properties": {
-        "items": ["Ada Lovelace", "Grace Hopper", "Margaret Hamilton"],
+        "columns": ["Name", "Role", "Status"],
+        "items": [
+          ["Ada Lovelace", "Analyst", "Active"],
+          ["Grace Hopper", "Compiler", "Active"],
+          ["Margaret Hamilton", "Apollo", "Active"]
+        ],
         "selectedIndex": 0,
         "height": 120
       },
@@ -777,10 +814,28 @@ if MiniGui.Dialog.confirm(ui.app, "Close", "Close without saving?") then
 end if
 ```
 
-Stable API hooks also exist for `pickOpenFile`, `pickSaveFile`, `pickFolder`,
-and `pickColor`. The native picker implementations are intentionally isolated
-behind `MiniGui.Dialog` so application code does not need to change when those
-backends are expanded.
+Native picker helpers are also available:
+
+```minilang
+path = MiniGui.Dialog.pickOpenFile(ui.app, "Open file", "Text files (*.txt)|*.txt|All files (*.*)|*.*")
+target = MiniGui.Dialog.pickSaveFile(ui.app, "Save file", "Text files (*.txt)|*.txt|All files (*.*)|*.*")
+folder = MiniGui.Dialog.pickFolder(ui.app, "Choose folder")
+color = MiniGui.Dialog.pickColor(ui.app, "Choose color", "#336699")
+```
+
+The picker helpers return an empty string when the user cancels. `pickColor`
+returns the fallback color when cancelled.
+
+## Release Package
+
+Build a distributable ZIP with the MiniGui CLI, runtime library, schema,
+documentation, and examples:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\package-release.ps1 -Version 0.1.0 -Compiler ..\MiniLangCompilerPy\mlc_win64.py
+```
+
+The script writes `dist/MiniGui-<version>.zip` and a matching `.sha256` file.
 
 ## Resources
 

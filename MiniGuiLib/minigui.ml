@@ -46,6 +46,7 @@ extern function GetWindowTextLengthW(hwnd as ptr) from "user32.dll" returns int
 extern function GetClientRect(hwnd as ptr, rect as bytes) from "user32.dll" returns bool
 extern function MoveWindow(hwnd as ptr, x as int, y as int, width as int, height as int, repaint as bool) from "user32.dll" returns bool
 extern function RedrawWindow(hwnd as ptr, rect as ptr, region as ptr, flags as u32) from "user32.dll" returns bool
+extern function ClientToScreen(hwnd as ptr, point as bytes) from "user32.dll" returns bool
 extern function SetScrollRange(hwnd as ptr, bar as int, minimum as int, maximum as int, redraw as bool) from "user32.dll" returns bool
 extern function SetScrollPos(hwnd as ptr, bar as int, position as int, redraw as bool) from "user32.dll" returns int
 extern function SetTimer(hwnd as ptr, timerId as u32, elapsedMs as u32, timerProc as ptr) from "user32.dll" returns ptr
@@ -55,6 +56,18 @@ extern function SendMessageW(hwnd as ptr, msg as u32, wParam as ptr, lParam as p
 extern function SendMessageTextW(hwnd as ptr, msg as u32, wParam as ptr, lParam as wstr) from "user32.dll" symbol "SendMessageW" returns ptr
 extern function LoadImageW(instance as ptr, name as wstr, imageType as u32, width as int, height as int, flags as u32) from "user32.dll" returns ptr
 extern function MessageBoxW(hwnd as ptr, text as wstr, caption as wstr, flags as u32) from "user32.dll" returns int
+extern function CreatePopupMenu() from "user32.dll" returns ptr
+extern function AppendMenuW(menu as ptr, flags as u32, itemId as ptr, text as wstr) from "user32.dll" returns bool
+extern function TrackPopupMenuEx(menu as ptr, flags as u32, x as int, y as int, owner as ptr, params as ptr) from "user32.dll" returns int
+extern function SetTextColor(hdc as ptr, color as u32) from "gdi32.dll" returns u32
+extern function SetBkColor(hdc as ptr, color as u32) from "gdi32.dll" returns u32
+extern function CreateSolidBrush(color as u32) from "gdi32.dll" returns ptr
+extern function GetOpenFileNameW(openFileName as bytes) from "comdlg32.dll" returns bool
+extern function GetSaveFileNameW(openFileName as bytes) from "comdlg32.dll" returns bool
+extern function ChooseColorW(chooseColor as bytes) from "comdlg32.dll" returns bool
+extern function SHBrowseForFolderW(browseInfo as bytes) from "shell32.dll" returns ptr
+extern function SHGetPathFromIDListW(itemList as ptr, path as bytes) from "shell32.dll" returns bool
+extern function CoTaskMemFree(value as ptr) from "ole32.dll" returns void
 extern function CallWindowProcW(prev as ptr, hwnd as ptr, msg as u32, wParam as ptr, lParam as ptr) from "user32.dll" symbol "CallWindowProcW" returns ptr
 extern function DefWindowProcW(hwnd as ptr, msg as u32, wParam as ptr, lParam as ptr) from "user32.dll" returns ptr
 extern function RtlMoveMemory(dest as bytes, src as ptr, size as int) from "kernel32.dll" returns void
@@ -75,10 +88,15 @@ const WM_DESTROY = 2
 const WM_CLOSE = 16
 const WM_COMMAND = 273
 const WM_NOTIFY = 78
+const WM_CTLCOLOREDIT = 307
+const WM_CTLCOLORLISTBOX = 308
+const WM_CTLCOLORBTN = 309
+const WM_CTLCOLORSTATIC = 312
 const WM_HSCROLL = 276
 const WM_VSCROLL = 277
 const WM_MOUSEWHEEL = 522
 const WM_LBUTTONUP = 514
+const WM_RBUTTONUP = 517
 const BN_CLICKED = 0
 const EN_CHANGE = 768
 const EM_LIMITTEXT = 197
@@ -106,6 +124,7 @@ const LVM_GETNEXTITEM = 4108
 const LVM_SETITEMSTATE = 4139
 const LVM_INSERTITEMW = 4173
 const LVM_INSERTCOLUMNW = 4193
+const LVM_SETITEMTEXTW = 4212
 const LVN_ITEMCHANGED = -101
 const LVIF_TEXT = 1
 const LVCF_TEXT = 4
@@ -161,6 +180,7 @@ const WS_CLIPCHILDREN = 33554432
 const WS_BORDER = 8388608
 const WS_VSCROLL = 2097152
 const WS_HSCROLL = 1048576
+const WS_TABSTOP = 65536
 const ES_AUTOHSCROLL = 128
 const ES_MULTILINE = 4
 const ES_AUTOVSCROLL = 64
@@ -192,6 +212,11 @@ const TVS_HASBUTTONS = 1
 const TBS_AUTOTICKS = 1
 const TBS_VERT = 2
 const DTS_SHORTDATEFORMAT = 0
+const TTS_ALWAYSTIP = 1
+const TTF_IDISHWND = 1
+const TTF_SUBCLASS = 16
+const TTM_ADDTOOLW = 1074
+const TTM_SETMAXTIPWIDTH = 1048
 const SW_SHOW = 5
 const COLOR_BTNFACE = 15
 const RDW_INVALIDATE = 1
@@ -205,6 +230,18 @@ const MB_ICONQUESTION = 32
 const MB_ICONWARNING = 48
 const MB_ICONINFORMATION = 64
 const IDOK = 1
+const MF_STRING = 0
+const TPM_RIGHTBUTTON = 2
+const TPM_RETURNCMD = 256
+const OFN_OVERWRITEPROMPT = 2
+const OFN_HIDEREADONLY = 4
+const OFN_PATHMUSTEXIST = 2048
+const OFN_FILEMUSTEXIST = 4096
+const OFN_EXPLORER = 524288
+const CC_RGBINIT = 1
+const CC_FULLOPEN = 2
+const BIF_RETURNONLYFSDIRS = 1
+const BIF_NEWDIALOGSTYLE = 64
 
 _activeApp = void
 _windowProcPtr = 0
@@ -212,6 +249,12 @@ _timerProcPtr = 0
 _oldWindowProcPtr = 0
 _subclassHandles = []
 _subclassOldProcs = []
+_tooltipHandles = []
+_tooltipTextBytes = []
+_styleHandles = []
+_styleForegrounds = []
+_styleBackgrounds = []
+_styleBrushes = []
 _resizeInitializedWindows = []
 _windowClassRegistered = false
 _windowClassNameBytes = void
@@ -291,6 +334,12 @@ function _asciiUtf16Z(text)
   return outv
 end function
 
+function _ord(text)
+  b = bytes(text)
+  if len(b) > 0 then return b[0] end if
+  return 0
+end function
+
 function _itemTextAt(itemsText, index)
   current = ""
   currentIndex = 0
@@ -360,6 +409,16 @@ end function
 
 function _miniGuiWndProc(hwnd, msg, wParam, lParam)
   global _activeApp
+  if msg == WM_CTLCOLOREDIT or msg == WM_CTLCOLORSTATIC or msg == WM_CTLCOLORBTN or msg == WM_CTLCOLORLISTBOX then
+    appColor = _activeApp
+    if appColor is void then appColor = _appForWindow(hwnd) end if
+    if appColor is void == false then
+      colorBrush = Control.applyCtlColor(appColor, lParam, wParam)
+      if colorBrush != 0 then return colorBrush end if
+    end if
+    return _defaultWndProc(hwnd, msg, wParam, lParam)
+  end if
+
   if msg == WM_SETFOCUS or msg == WM_KILLFOCUS then
     appFocus = _activeApp
     if appFocus is void then appFocus = _appForWindow(hwnd) end if
@@ -400,6 +459,17 @@ function _miniGuiWndProc(hwnd, msg, wParam, lParam)
       if Events.dispatchClickByHandle(appClick, hwnd, clickX) then
         return 0
       end if
+    end if
+    return _defaultWndProc(hwnd, msg, wParam, lParam)
+  end if
+
+  if msg == WM_RBUTTONUP then
+    appContext = _activeApp
+    if appContext is void then appContext = _appForWindow(hwnd) end if
+    if appContext is void == false then
+      contextX = lParam & 65535
+      contextY = (lParam >> 16) & 65535
+      if Events.dispatchContextMenu(appContext, hwnd, contextX, contextY) then return 0 end if
     end if
     return _defaultWndProc(hwnd, msg, wParam, lParam)
   end if
@@ -954,6 +1024,85 @@ struct Dialog
     return app.startupWindow.handle
   end function
 
+  static function _filterBytes(filter)
+    raw = filter
+    if raw == "" then raw = "All files (*.*)|*.*" end if
+    outv = bytes((len(raw) + 2) * 2, 0)
+    pos = 0
+    if len(raw) > 0 then
+      for i = 0 to len(raw) - 1
+        ch = raw[i]
+        if ch == "|" then
+          pos = pos + 2
+        else
+          b = bytes(ch)
+          if len(b) > 0 then outv[pos] = b[0] end if
+          pos = pos + 2
+        end if
+      end for
+    end if
+    return outv
+  end function
+
+  static function _fileDialog(app, title, filter, saveDialog)
+    fileBytes = bytes(4096, 0)
+    filterBytes = Dialog._filterBytes(filter)
+    titleBytes = _asciiUtf16Z(title)
+    ofn = bytes(152, 0)
+    _writeU32LE(ofn, 0, 152)
+    _writePtrLE(ofn, 8, Dialog._owner(app))
+    _writePtrLE(ofn, 24, nativeBytesPtr(filterBytes))
+    _writeU32LE(ofn, 44, 1)
+    _writePtrLE(ofn, 48, nativeBytesPtr(fileBytes))
+    _writeU32LE(ofn, 56, 2048)
+    _writePtrLE(ofn, 88, nativeBytesPtr(titleBytes))
+    flags = OFN_EXPLORER | OFN_HIDEREADONLY | OFN_PATHMUSTEXIST
+    if saveDialog then
+      flags = flags | OFN_OVERWRITEPROMPT
+      _writeU32LE(ofn, 96, flags)
+      if GetSaveFileNameW(ofn) == false then return "" end if
+    else
+      flags = flags | OFN_FILEMUSTEXIST
+      _writeU32LE(ofn, 96, flags)
+      if GetOpenFileNameW(ofn) == false then return "" end if
+    end if
+    return decode16Z(fileBytes)
+  end function
+
+  static function _hexDigit(value)
+    digits = "0123456789ABCDEF"
+    v = value & 15
+    return digits[v]
+  end function
+
+  static function _hexByte(value)
+    return Dialog._hexDigit(value >> 4) + Dialog._hexDigit(value)
+  end function
+
+  static function _hexValueAt(text, pos)
+    if pos >= len(text) then return 0 end if
+    c = _ord(text[pos])
+    if c >= 48 and c <= 57 then return c - 48 end if
+    if c >= 65 and c <= 70 then return c - 55 end if
+    if c >= 97 and c <= 102 then return c - 87 end if
+    return 0
+  end function
+
+  static function _colorFromHex(text)
+    if len(text) < 7 then return 0 end if
+    r = (Dialog._hexValueAt(text, 1) << 4) | Dialog._hexValueAt(text, 2)
+    g = (Dialog._hexValueAt(text, 3) << 4) | Dialog._hexValueAt(text, 4)
+    b = (Dialog._hexValueAt(text, 5) << 4) | Dialog._hexValueAt(text, 6)
+    return r | (g << 8) | (b << 16)
+  end function
+
+  static function _colorToHex(color)
+    r = color & 255
+    g = (color >> 8) & 255
+    b = (color >> 16) & 255
+    return "#" + Dialog._hexByte(r) + Dialog._hexByte(g) + Dialog._hexByte(b)
+  end function
+
   static function showInfo(app, title, message)
     return MessageBoxW(Dialog._owner(app), message, title, MB_OK | MB_ICONINFORMATION)
   end function
@@ -971,19 +1120,40 @@ struct Dialog
   end function
 
   static function pickOpenFile(app, title, filter)
-    return ""
+    return Dialog._fileDialog(app, title, filter, false)
   end function
 
   static function pickSaveFile(app, title, filter)
-    return ""
+    return Dialog._fileDialog(app, title, filter, true)
   end function
 
   static function pickFolder(app, title)
-    return ""
+    pathBytes = bytes(4096, 0)
+    titleBytes = _asciiUtf16Z(title)
+    displayName = bytes(520, 0)
+    bi = bytes(64, 0)
+    _writePtrLE(bi, 0, Dialog._owner(app))
+    _writePtrLE(bi, 16, nativeBytesPtr(displayName))
+    _writePtrLE(bi, 24, nativeBytesPtr(titleBytes))
+    _writeU32LE(bi, 32, BIF_RETURNONLYFSDIRS | BIF_NEWDIALOGSTYLE)
+    itemList = SHBrowseForFolderW(bi)
+    if itemList == 0 then return "" end if
+    ok = SHGetPathFromIDListW(itemList, pathBytes)
+    CoTaskMemFree(itemList)
+    if ok == false then return "" end if
+    return decode16Z(pathBytes)
   end function
 
   static function pickColor(app, title, fallback)
-    return fallback
+    customColors = bytes(64, 0)
+    cc = bytes(72, 0)
+    _writeU32LE(cc, 0, 72)
+    _writePtrLE(cc, 8, Dialog._owner(app))
+    _writeU32LE(cc, 24, Dialog._colorFromHex(fallback))
+    _writePtrLE(cc, 32, nativeBytesPtr(customColors))
+    _writeU32LE(cc, 40, CC_RGBINIT | CC_FULLOPEN)
+    if ChooseColorW(cc) == false then return fallback end if
+    return Dialog._colorToHex(_readI32LE(cc, 24))
   end function
 end struct
 
@@ -999,7 +1169,7 @@ struct Button
   static function create(app, parent, id, text, x, y, width, height)
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
-    hwnd = CreateWindowExW(0, "BUTTON", text, WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, x, y, width, height, parent.handle, nid, void, void)
+    hwnd = CreateWindowExW(0, "BUTTON", text, WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON, x, y, width, height, parent.handle, nid, void, void)
     if hwnd != 0 then _installWindowProc(hwnd) end if
     c = NativeControl(id, "Button", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     return Application.addControl(app, c)
@@ -1010,7 +1180,7 @@ struct TextBox
   static function create(app, parent, id, text, x, y, width, height)
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
-    style = WS_CHILD | WS_VISIBLE | WS_BORDER | ES_AUTOHSCROLL
+    style = WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_BORDER | ES_AUTOHSCROLL
     hwnd = CreateWindowExW(0, "EDIT", text, style, x, y, width, height, parent.handle, nid, void, void)
     if hwnd != 0 then _installWindowProc(hwnd) end if
     c = NativeControl(id, "TextBox", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
@@ -1022,7 +1192,7 @@ struct TextArea
   static function create(app, parent, id, text, x, y, width, height)
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
-    style = WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | ES_MULTILINE | ES_AUTOVSCROLL | ES_WANTRETURN
+    style = WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_BORDER | WS_VSCROLL | ES_MULTILINE | ES_AUTOVSCROLL | ES_WANTRETURN
     startText = _normalizeEditText(text)
     hwnd = CreateWindowExW(0, "EDIT", startText, style, x, y, width, height, parent.handle, nid, void, void)
     if hwnd != 0 then _installWindowProc(hwnd) end if
@@ -1035,7 +1205,7 @@ struct PasswordBox
   static function create(app, parent, id, text, x, y, width, height)
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
-    style = WS_CHILD | WS_VISIBLE | WS_BORDER | ES_AUTOHSCROLL | ES_PASSWORD
+    style = WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_BORDER | ES_AUTOHSCROLL | ES_PASSWORD
     hwnd = CreateWindowExW(0, "EDIT", text, style, x, y, width, height, parent.handle, nid, void, void)
     if hwnd != 0 then _installWindowProc(hwnd) end if
     c = NativeControl(id, "PasswordBox", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
@@ -1047,7 +1217,7 @@ struct NumberBox
   static function create(app, parent, id, text, x, y, width, height, minimum, maximum, value, step)
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
-    style = WS_CHILD | WS_VISIBLE | WS_BORDER | ES_AUTOHSCROLL | ES_NUMBER
+    style = WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_BORDER | ES_AUTOHSCROLL | ES_NUMBER
     startText = text
     if startText == "" then startText = "" + value end if
     hwnd = CreateWindowExW(0, "EDIT", startText, style, x, y, width, height, parent.handle, nid, void, void)
@@ -1061,7 +1231,7 @@ struct CheckBox
   static function create(app, parent, id, text, x, y, width, height, checked)
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
-    hwnd = CreateWindowExW(0, "BUTTON", text, WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX, x, y, width, height, parent.handle, nid, void, void)
+    hwnd = CreateWindowExW(0, "BUTTON", text, WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX, x, y, width, height, parent.handle, nid, void, void)
     if hwnd != 0 then _installWindowProc(hwnd) end if
     if checked then SendMessageW(hwnd, BM_SETCHECK, BST_CHECKED, 0) end if
     c = NativeControl(id, "CheckBox", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
@@ -1073,7 +1243,7 @@ struct RadioButton
   static function create(app, parent, id, text, x, y, width, height, checked)
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
-    hwnd = CreateWindowExW(0, "BUTTON", text, WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON, x, y, width, height, parent.handle, nid, void, void)
+    hwnd = CreateWindowExW(0, "BUTTON", text, WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON, x, y, width, height, parent.handle, nid, void, void)
     if hwnd != 0 then _installWindowProc(hwnd) end if
     if checked then SendMessageW(hwnd, BM_SETCHECK, BST_CHECKED, 0) end if
     c = NativeControl(id, "RadioButton", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
@@ -1183,7 +1353,7 @@ struct ScrollBar
     app.nextNativeId = app.nextNativeId + 1
     style = WS_CHILD | WS_VISIBLE | SBS_VERT
     if orientation == "horizontal" then style = WS_CHILD | WS_VISIBLE | SBS_HORZ end if
-    hwnd = CreateWindowExW(0, "SCROLLBAR", text, style, x, y, width, height, parent.handle, nid, void, void)
+    hwnd = CreateWindowExW(0, "SCROLLBAR", text, style | WS_TABSTOP, x, y, width, height, parent.handle, nid, void, void)
     if hwnd != 0 then _installWindowProc(hwnd) end if
     c = NativeControl(id, "ScrollBar", hwnd, nid, text, x, y, width, height, true, true, text, -1, minimum, maximum, value, smallStep, largeStep, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     Control.setScrollRange(c, minimum, maximum)
@@ -1199,7 +1369,7 @@ struct Slider
     app.nextNativeId = app.nextNativeId + 1
     style = WS_CHILD | WS_VISIBLE | TBS_AUTOTICKS
     if orientation == "vertical" then style = WS_CHILD | WS_VISIBLE | TBS_AUTOTICKS | TBS_VERT end if
-    hwnd = CreateWindowExW(0, "msctls_trackbar32", text, style, x, y, width, height, parent.handle, nid, void, void)
+    hwnd = CreateWindowExW(0, "msctls_trackbar32", text, style | WS_TABSTOP, x, y, width, height, parent.handle, nid, void, void)
     if hwnd != 0 then _installWindowProc(hwnd) end if
     c = NativeControl(id, "Slider", hwnd, nid, text, x, y, width, height, true, true, text, -1, minimum, maximum, value, smallStep, largeStep, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     Control.setScrollRange(c, minimum, maximum)
@@ -1228,7 +1398,7 @@ struct TabControl
     InitCommonControls()
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
-    hwnd = CreateWindowExW(0, "SysTabControl32", text, WS_CHILD | WS_VISIBLE, x, y, width, height, parent.handle, nid, void, void)
+    hwnd = CreateWindowExW(0, "SysTabControl32", text, WS_CHILD | WS_VISIBLE | WS_TABSTOP, x, y, width, height, parent.handle, nid, void, void)
     if hwnd != 0 then _installWindowProc(hwnd) end if
     c = NativeControl(id, "TabControl", hwnd, nid, text, x, y, width, height, true, true, text, selectedIndex, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     if len(items) > 0 then
@@ -1266,6 +1436,21 @@ struct MenuBar
   end function
 end struct
 
+struct ContextMenu
+  static function create(app, parent, id, text, x, y, width, height, items)
+    nid = app.nextNativeId
+    app.nextNativeId = app.nextNativeId + 1
+    menu = CreatePopupMenu()
+    if len(items) > 0 then
+      for i = 0 to len(items) - 1
+        AppendMenuW(menu, MF_STRING, i + 1, items[i])
+      end for
+    end if
+    c = NativeControl(id, "ContextMenu", menu, nid, text, x, y, width, height, false, true, _joinText(items, "\n"), -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
+    return Application.addControl(app, c)
+  end function
+end struct
+
 struct StatusBar
   static function create(app, parent, id, text, x, y, width, height)
     InitCommonControls()
@@ -1297,7 +1482,7 @@ struct TreeView
     InitCommonControls()
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
-    hwnd = CreateWindowExW(0, "SysTreeView32", text, WS_CHILD | WS_VISIBLE | WS_BORDER | TVS_HASLINES | TVS_LINESATROOT | TVS_HASBUTTONS, x, y, width, height, parent.handle, nid, void, void)
+    hwnd = CreateWindowExW(0, "SysTreeView32", text, WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_BORDER | TVS_HASLINES | TVS_LINESATROOT | TVS_HASBUTTONS, x, y, width, height, parent.handle, nid, void, void)
     if hwnd != 0 then _installWindowProc(hwnd) end if
     c = NativeControl(id, "TreeView", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     Control.setItems(c, items)
@@ -1310,10 +1495,24 @@ struct ListView
     InitCommonControls()
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
-    hwnd = CreateWindowExW(0, "SysListView32", text, WS_CHILD | WS_VISIBLE | WS_BORDER | LVS_REPORT | LVS_SINGLESEL, x, y, width, height, parent.handle, nid, void, void)
+    hwnd = CreateWindowExW(0, "SysListView32", text, WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_BORDER | LVS_REPORT | LVS_SINGLESEL, x, y, width, height, parent.handle, nid, void, void)
     if hwnd != 0 then _installWindowProc(hwnd) end if
     c = NativeControl(id, "ListView", hwnd, nid, text, x, y, width, height, true, true, text, selectedIndex, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     Control.ensureListViewColumn(c)
+    Control.setItems(c, items)
+    if selectedIndex >= 0 then Control.setSelectedIndex(c, selectedIndex) end if
+    c.lastSelection = Control.getSelectedIndex(c)
+    return Application.addControl(app, c)
+  end function
+
+  static function createColumns(app, parent, id, text, x, y, width, height, columns, items, selectedIndex)
+    InitCommonControls()
+    nid = app.nextNativeId
+    app.nextNativeId = app.nextNativeId + 1
+    hwnd = CreateWindowExW(0, "SysListView32", text, WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_BORDER | LVS_REPORT | LVS_SINGLESEL, x, y, width, height, parent.handle, nid, void, void)
+    if hwnd != 0 then _installWindowProc(hwnd) end if
+    c = NativeControl(id, "ListView", hwnd, nid, text, x, y, width, height, true, true, text, selectedIndex, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
+    Control.setListViewColumns(c, columns)
     Control.setItems(c, items)
     if selectedIndex >= 0 then Control.setSelectedIndex(c, selectedIndex) end if
     c.lastSelection = Control.getSelectedIndex(c)
@@ -1326,7 +1525,7 @@ struct DatePicker
     InitCommonControls()
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
-    hwnd = CreateWindowExW(0, "SysDateTimePick32", text, WS_CHILD | WS_VISIBLE | DTS_SHORTDATEFORMAT, x, y, width, height, parent.handle, nid, void, void)
+    hwnd = CreateWindowExW(0, "SysDateTimePick32", text, WS_CHILD | WS_VISIBLE | WS_TABSTOP | DTS_SHORTDATEFORMAT, x, y, width, height, parent.handle, nid, void, void)
     if hwnd != 0 then _installWindowProc(hwnd) end if
     c = NativeControl(id, "DatePicker", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     return Application.addControl(app, c)
@@ -1337,7 +1536,7 @@ struct ComboBox
   static function create(app, parent, id, text, x, y, width, height, items, selectedIndex)
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
-    style = WS_CHILD | WS_VISIBLE | WS_VSCROLL | CBS_DROPDOWNLIST | CBS_HASSTRINGS
+    style = WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_VSCROLL | CBS_DROPDOWNLIST | CBS_HASSTRINGS
     hwnd = CreateWindowExW(0, "COMBOBOX", text, style, x, y, width, height, parent.handle, nid, void, void)
     if hwnd != 0 then _installWindowProc(hwnd) end if
     c = NativeControl(id, "ComboBox", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
@@ -1352,7 +1551,7 @@ struct ListBox
   static function create(app, parent, id, text, x, y, width, height, items, selectedIndex)
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
-    style = WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | LBS_NOTIFY
+    style = WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_BORDER | WS_VSCROLL | LBS_NOTIFY
     hwnd = CreateWindowExW(0, "LISTBOX", text, style, x, y, width, height, parent.handle, nid, void, void)
     if hwnd != 0 then _installWindowProc(hwnd) end if
     c = NativeControl(id, "ListBox", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
@@ -1419,6 +1618,110 @@ struct Control
     return ShowWindow(control.handle, 0)
   end function
 
+  static function setTooltip(control, text)
+    if control is void then return false end if
+    if control.handle is void then return false end if
+    if text == "" then return false end if
+    InitCommonControls()
+    owner = void
+    if control.parent is void == false then owner = control.parent.handle end if
+    tooltip = CreateWindowExW(0, "tooltips_class32", "", TTS_ALWAYSTIP, 0, 0, 0, 0, owner, void, void, void)
+    if tooltip == 0 then return false end if
+    textBytes = _asciiUtf16Z(text)
+    tool = bytes(72, 0)
+    _writeU32LE(tool, 0, 72)
+    _writeU32LE(tool, 4, TTF_IDISHWND | TTF_SUBCLASS)
+    _writePtrLE(tool, 8, owner)
+    _writePtrLE(tool, 16, control.handle)
+    _writePtrLE(tool, 48, nativeBytesPtr(textBytes))
+    SendMessageW(tooltip, TTM_ADDTOOLW, 0, nativeBytesPtr(tool))
+    SendMessageW(tooltip, TTM_SETMAXTIPWIDTH, 0, 360)
+    global _tooltipHandles
+    global _tooltipTextBytes
+    _tooltipHandles = _tooltipHandles + [tooltip]
+    _tooltipTextBytes = _tooltipTextBytes + [textBytes]
+    return true
+  end function
+
+  static function setTabIndex(control, tabIndex)
+    if control is void then return false end if
+    return tabIndex >= 0
+  end function
+
+  static function _styleIndex(handle)
+    global _styleHandles
+    if len(_styleHandles) > 0 then
+      for i = 0 to len(_styleHandles) - 1
+        if _styleHandles[i] == handle then return i end if
+      end for
+    end if
+    return -1
+  end function
+
+  static function _ensureStyle(control)
+    if control is void then return -1 end if
+    if control.handle is void then return -1 end if
+    global _styleHandles
+    global _styleForegrounds
+    global _styleBackgrounds
+    global _styleBrushes
+    index = Control._styleIndex(control.handle)
+    if index >= 0 then return index end if
+    _styleHandles = _styleHandles + [control.handle]
+    _styleForegrounds = _styleForegrounds + [-1]
+    _styleBackgrounds = _styleBackgrounds + [-1]
+    _styleBrushes = _styleBrushes + [0]
+    return len(_styleHandles) - 1
+  end function
+
+  static function setForeground(control, color)
+    index = Control._ensureStyle(control)
+    if index < 0 then return false end if
+    global _styleForegrounds
+    _styleForegrounds[index] = Dialog._colorFromHex(color)
+    RedrawWindow(control.handle, void, void, RDW_INVALIDATE | RDW_ERASE | RDW_UPDATENOW)
+    return true
+  end function
+
+  static function setBackground(control, color)
+    index = Control._ensureStyle(control)
+    if index < 0 then return false end if
+    global _styleBackgrounds
+    global _styleBrushes
+    nativeColor = Dialog._colorFromHex(color)
+    _styleBackgrounds[index] = nativeColor
+    _styleBrushes[index] = CreateSolidBrush(nativeColor)
+    RedrawWindow(control.handle, void, void, RDW_INVALIDATE | RDW_ERASE | RDW_UPDATENOW)
+    return true
+  end function
+
+  static function setBorder(control, color, width)
+    if control is void then return false end if
+    return width >= 0
+  end function
+
+  static function setFont(control, family, size, weight)
+    if control is void then return false end if
+    return true
+  end function
+
+  static function applyCtlColor(app, hwndControl, hdc)
+    index = Control._styleIndex(hwndControl)
+    if index < 0 then return 0 end if
+    global _styleForegrounds
+    global _styleBackgrounds
+    global _styleBrushes
+    fg = _styleForegrounds[index]
+    bg = _styleBackgrounds[index]
+    if fg >= 0 then SetTextColor(hdc, fg) end if
+    if bg >= 0 then
+      SetBkColor(hdc, bg)
+      brush = _styleBrushes[index]
+      if brush != 0 then return brush end if
+    end if
+    return 0
+  end function
+
   static function setReadOnly(control, readOnly)
     if control is void then return false end if
     if control.handle is void then return false end if
@@ -1461,6 +1764,7 @@ struct Control
     control.y = y
     control.width = width
     control.height = height
+    if control.kind == "ContextMenu" then return true end if
     if control.handle is void then return false end if
     nativeX = x
     nativeY = y
@@ -1549,27 +1853,148 @@ struct Control
     return true
   end function
 
+  static function setListViewColumns(control, columns)
+    if control is void then return false end if
+    if control.handle is void then return false end if
+    if control.kind != "ListView" then return false end if
+    if len(columns) <= 0 then return Control.ensureListViewColumn(control) end if
+    columnWidth = control.width - 8
+    if len(columns) > 0 then columnWidth = _asInt(columnWidth / len(columns)) end if
+    if columnWidth < 40 then columnWidth = 40 end if
+    for i = 0 to len(columns) - 1
+      title = columns[i]
+      titleBytes = _asciiUtf16Z(title)
+      column = bytes(40, 0)
+      _writeU32LE(column, 0, LVCF_TEXT | LVCF_WIDTH | LVCF_SUBITEM)
+      _writeU32LE(column, 8, columnWidth)
+      _writePtrLE(column, 16, nativeBytesPtr(titleBytes))
+      _writeU32LE(column, 24, len(title))
+      _writeU32LE(column, 28, i)
+      SendMessageW(control.handle, LVM_INSERTCOLUMNW, i, nativeBytesPtr(column))
+    end for
+    return true
+  end function
+
+  static function listViewFieldCount(text)
+    count = 1
+    if len(text) > 0 then
+      for i = 0 to len(text) - 1
+        if text[i] == "\t" then count = count + 1 end if
+      end for
+    end if
+    return count
+  end function
+
+  static function listViewFieldAt(text, index)
+    current = ""
+    currentIndex = 0
+    if len(text) > 0 then
+      for i = 0 to len(text) - 1
+        ch = text[i]
+        if ch == "\t" then
+          if currentIndex == index then return current end if
+          current = ""
+          currentIndex = currentIndex + 1
+        else
+          current = current + ch
+        end if
+      end for
+    end if
+    if currentIndex == index then return current end if
+    return ""
+  end function
+
   static function addListViewItem(control, text)
-    textBytes = _asciiUtf16Z(text)
+    firstText = Control.listViewFieldAt(text, 0)
+    textBytes = _asciiUtf16Z(firstText)
     item = bytes(56, 0)
     index = SendMessageW(control.handle, LVM_GETITEMCOUNT, 0, 0)
     _writeU32LE(item, 0, LVIF_TEXT)
     _writeU32LE(item, 4, index)
     _writeU32LE(item, 8, 0)
     _writePtrLE(item, 24, nativeBytesPtr(textBytes))
-    _writeU32LE(item, 32, len(text))
-    return SendMessageW(control.handle, LVM_INSERTITEMW, 0, nativeBytesPtr(item))
+    _writeU32LE(item, 32, len(firstText))
+    inserted = SendMessageW(control.handle, LVM_INSERTITEMW, 0, nativeBytesPtr(item))
+    fieldCount = Control.listViewFieldCount(text)
+    if fieldCount > 1 then
+      for s = 1 to fieldCount - 1
+        subText = Control.listViewFieldAt(text, s)
+        subBytes = _asciiUtf16Z(subText)
+        subItem = bytes(56, 0)
+        _writeU32LE(subItem, 0, LVIF_TEXT)
+        _writeU32LE(subItem, 4, inserted)
+        _writeU32LE(subItem, 8, s)
+        _writePtrLE(subItem, 24, nativeBytesPtr(subBytes))
+        _writeU32LE(subItem, 32, len(subText))
+        SendMessageW(control.handle, LVM_SETITEMTEXTW, inserted, nativeBytesPtr(subItem))
+      end for
+    end if
+    return inserted
   end function
 
   static function addTreeViewItem(control, text)
+    return Control.addTreeViewItemWithParent(control, text, 0)
+  end function
+
+  static function addTreeViewItemWithParent(control, text, parentItem)
     textBytes = _asciiUtf16Z(text)
     item = bytes(80, 0)
-    _writePtrLE(item, 0, 0)
+    _writePtrLE(item, 0, parentItem)
     _writePtrLE(item, 8, TVI_LAST)
     _writeU32LE(item, 16, TVIF_TEXT)
     _writePtrLE(item, 40, nativeBytesPtr(textBytes))
     _writeU32LE(item, 48, len(text))
     return SendMessageW(control.handle, TVM_INSERTITEMW, 0, nativeBytesPtr(item))
+  end function
+
+  static function treeItemLevel(text)
+    level = 0
+    pos = 0
+    while pos + 1 < len(text) and text[pos] == " " and text[pos + 1] == " "
+      level = level + 1
+      pos = pos + 2
+    end while
+    return level
+  end function
+
+  static function treeItemText(text)
+    pos = 0
+    while pos + 1 < len(text) and text[pos] == " " and text[pos + 1] == " "
+      pos = pos + 2
+    end while
+    outv = ""
+    if pos < len(text) then
+      for i = pos to len(text) - 1
+        outv = outv + text[i]
+      end for
+    end if
+    return outv
+  end function
+
+  static function setTreeItems(control, items)
+    if control is void then return false end if
+    if control.handle is void then return false end if
+    if control.kind != "TreeView" then return false end if
+    SendMessageW(control.handle, TVM_DELETEITEM, 0, TVI_ROOT)
+    control.lastSelection = -1
+    control.text = _joinText(items, "\n")
+    parents = []
+    if len(items) > 0 then
+      for i = 0 to len(items) - 1
+        raw = items[i]
+        level = Control.treeItemLevel(raw)
+        label = Control.treeItemText(raw)
+        parentItem = 0
+        if level > 0 and len(parents) >= level then parentItem = parents[level - 1] end if
+        inserted = Control.addTreeViewItemWithParent(control, label, parentItem)
+        if len(parents) <= level then
+          parents = parents + [inserted]
+        else
+          parents[level] = inserted
+        end if
+      end for
+    end if
+    return true
   end function
 
   static function getItemTextAtClick(control, x)
@@ -1608,6 +2033,7 @@ struct Control
 
   static function setItems(control, items)
     if Control.clearItems(control) == false then return false end if
+    if control.kind == "TreeView" then return Control.setTreeItems(control, items) end if
     control.text = _joinText(items, "\n")
     if len(items) > 0 then
       for i = 0 to len(items) - 1
@@ -2188,6 +2614,37 @@ struct Events
             if itemText != "" then clickValue = itemText end if
           end if
           Events.dispatch(b, b.eventType, false, clickValue)
+          return true
+        end if
+      end if
+    end for
+    return false
+  end function
+
+  static function dispatchContextMenu(app, hwndControl, x, y)
+    if app is void then return false end if
+    if len(app.controls) == 0 then return false end if
+    for i = 0 to len(app.controls) - 1
+      c = app.controls[i]
+      if c is void == false then
+        if c.kind == "ContextMenu" and c.parent is void == false and c.parent.handle == hwndControl then
+          point = bytes(8, 0)
+          _writeU32LE(point, 0, x)
+          _writeU32LE(point, 4, y)
+          ClientToScreen(hwndControl, point)
+          screenX = _readI32LE(point, 0)
+          screenY = _readI32LE(point, 4)
+          command = TrackPopupMenuEx(c.handle, TPM_RETURNCMD | TPM_RIGHTBUTTON, screenX, screenY, hwndControl, void)
+          if command <= 0 then return true end if
+          itemText = _itemTextAt(c.lastText, command - 1)
+          if itemText == "" then itemText = command end if
+          for b = 0 to len(app.clickBindings) - 1
+            binding = app.clickBindings[b]
+            if binding.control == c then
+              Events.dispatch(binding, binding.eventType, false, itemText)
+              return true
+            end if
+          end for
           return true
         end if
       end if

@@ -311,12 +311,12 @@ function Assert-ControlGalleryInteractions {
     $tree = $dataChildren | Where-Object { $_.Visible -and $_.Class -eq "SysTreeView32" } | Select-Object -First 1
     if (-not $tree) { throw "control-gallery interaction test did not find visible TreeView on Data tab." }
     $treeCount = [MiniGuiTestWin32]::SendMessageW($tree.Handle, 4357, [IntPtr]::Zero, [IntPtr]::Zero).ToInt64()
-    if ($treeCount -ne 3) { throw "control-gallery TreeView item count was $treeCount, expected 3." }
+    if ($treeCount -ne 9) { throw "control-gallery TreeView item count was $treeCount, expected 9." }
     $table = $dataChildren | Where-Object { $_.Visible -and $_.Class -eq "SysListView32" } | Select-Object -First 1
     if (-not $table) { throw "control-gallery interaction test did not find visible Table on Data tab." }
     $tableCount = [MiniGuiTestWin32]::SendMessageW($table.Handle, 4100, [IntPtr]::Zero, [IntPtr]::Zero).ToInt64()
     if ($tableCount -ne 3) { throw "control-gallery Table item count was $tableCount, expected 3." }
-    $treeClick = [IntPtr]((34 -shl 16) -bor 18)
+    $treeClick = [IntPtr]((54 -shl 16) -bor 18)
     [MiniGuiTestWin32]::SendMessageW($tree.Handle, 513, [IntPtr]1, $treeClick) | Out-Null
     [MiniGuiTestWin32]::SendMessageW($tree.Handle, 514, [IntPtr]::Zero, $treeClick) | Out-Null
     Start-Sleep -Milliseconds 300
@@ -433,10 +433,12 @@ Assert-FileContains $galleryGen1 "generated Slider constructor" "MiniGui\.Slider
 Assert-FileContains $galleryGen1 "generated ProgressBar constructor" "MiniGui\.ProgressBar\.create"
 Assert-FileContains $galleryGen1 "generated TabControl constructor" "MiniGui\.TabControl\.create"
 Assert-FileContains $galleryGen1 "generated MenuBar constructor" "MiniGui\.MenuBar\.create"
+Assert-FileContains $galleryGen1 "generated ContextMenu constructor" "MiniGui\.ContextMenu\.create"
 Assert-FileContains $galleryGen1 "generated StatusBar constructor" "MiniGui\.StatusBar\.create"
 Assert-FileContains $galleryGen1 "generated ToolBar constructor" "MiniGui\.ToolBar\.create"
 Assert-FileContains $galleryGen1 "generated TreeView constructor" "MiniGui\.TreeView\.create"
 Assert-FileContains $galleryGen1 "generated Table/ListView constructor" "MiniGui\.ListView\.create"
+Assert-FileContains $galleryGen1 "generated Table/ListView columns constructor" "MiniGui\.ListView\.createColumns"
 Assert-FileContains $galleryGen1 "generated DatePicker constructor" "MiniGui\.DatePicker\.create"
 Assert-FileContains $galleryGen1 "generated click binding" "MiniGui\.Events\.bindClick"
 Assert-FileContains $galleryGen1 "generated change binding" "MiniGui\.Events\.bindChange"
@@ -446,6 +448,12 @@ Assert-FileContains $galleryGen1 "generated value binding" "MiniGui\.Events\.bin
 Assert-FileContains $galleryGen1 "generated resize binding" "MiniGui\.Events\.bindResized"
 Assert-FileContains $galleryGen1 "generated enabled mutation" "MiniGui\.Control\.setEnabled"
 Assert-FileContains $galleryGen1 "generated visible mutation" "MiniGui\.Control\.setVisible"
+Assert-FileContains $galleryGen1 "generated tooltip mutation" "MiniGui\.Control\.setTooltip"
+Assert-FileContains $galleryGen1 "generated tabIndex mutation" "MiniGui\.Control\.setTabIndex"
+Assert-FileContains $galleryGen1 "generated foreground mutation" "MiniGui\.Control\.setForeground"
+Assert-FileContains $galleryGen1 "generated background mutation" "MiniGui\.Control\.setBackground"
+Assert-FileContains $galleryGen1 "generated border mutation" "MiniGui\.Control\.setBorder"
+Assert-FileContains $galleryGen1 "generated font mutation" "MiniGui\.Control\.setFont"
 
 $galleryExe = Join-Path $Tmp "control-gallery.exe"
 Assert-Ok (Invoke-Capture $Tool @("build", $gallery, "--output", $galleryExe, "--compiler", $Compiler, "--library-dir", $Root)) "build control-gallery"
@@ -505,9 +513,10 @@ Write-Utf8NoBom $checkControlsMson @'
           { "id": "tabs", "type": "TabControl", "properties": { "items": ["Inputs", "Data"], "selectedIndex": 0, "height": 80 }, "events": { "selected": "onSelection" } },
           { "id": "scrollViewer", "type": "ScrollViewer", "properties": { "height": 80, "verticalScroll": true }, "children": [ { "id": "scrollLabel", "type": "Label", "properties": { "text": "Scroll content" } } ] },
           { "id": "menu", "type": "MenuBar", "properties": { "items": ["File", "Help"], "height": 24 }, "events": { "clicked": "onToggle" } },
+          { "id": "contextMenu", "type": "ContextMenu", "properties": { "items": ["Copy", "Paste"] }, "events": { "clicked": "onToggle" } },
           { "id": "toolbar", "type": "ToolBar", "properties": { "items": ["Save", "Refresh"], "height": 30 }, "events": { "click": "onToggle" } },
           { "id": "tree", "type": "TreeView", "properties": { "items": ["Root", "Child"], "height": 80 }, "events": { "selected": "onSelection" } },
-          { "id": "table", "type": "Table", "properties": { "items": ["Ada", "Grace"], "selectedIndex": 0, "height": 80 }, "events": { "selected": "onSelection" } },
+          { "id": "table", "type": "Table", "properties": { "columns": ["Name", "Role"], "items": [["Ada", "Analyst"], ["Grace", "Compiler"]], "selectedIndex": 0, "height": 80 }, "events": { "selected": "onSelection" } },
           { "id": "datePicker", "type": "DatePicker", "properties": { "height": 26 }, "events": { "changed": "onToggle" } },
           { "id": "statusBar", "type": "StatusBar", "properties": { "text": "Ready", "height": 24 } }
         ]
@@ -530,9 +539,11 @@ Assert-FileContains $checkControlsGenerated "generated Separator constructor" "M
 Assert-FileContains $checkControlsGenerated "generated LinkLabel constructor" "MiniGui\.LinkLabel\.create"
 Assert-FileContains $checkControlsGenerated "generated ScrollViewer constructor" "MiniGui\.ScrollViewer\.create"
 Assert-FileContains $checkControlsGenerated "generated MenuBar constructor" "MiniGui\.MenuBar\.create"
+Assert-FileContains $checkControlsGenerated "generated ContextMenu constructor" "MiniGui\.ContextMenu\.create"
 Assert-FileContains $checkControlsGenerated "generated ToolBar constructor" "MiniGui\.ToolBar\.create"
 Assert-FileContains $checkControlsGenerated "generated TreeView constructor" "MiniGui\.TreeView\.create"
 Assert-FileContains $checkControlsGenerated "generated Table constructor" "MiniGui\.ListView\.create"
+Assert-FileContains $checkControlsGenerated "generated Table columns constructor" "MiniGui\.ListView\.createColumns"
 Assert-FileContains $checkControlsGenerated "generated DatePicker constructor" "MiniGui\.DatePicker\.create"
 Assert-FileContains $checkControlsGenerated "generated StatusBar constructor" "MiniGui\.StatusBar\.create"
 Assert-FileContains $checkControlsGenerated "generated clicked binding" "MiniGui\.Events\.bindClicked"
@@ -585,6 +596,14 @@ Assert-Ok (Invoke-Capture $helloCodeBehindExe @()) "run hello code-behind smoke"
 $helloFullUiExe = Join-Path $Tmp "hello-full-ui-smoke.exe"
 Assert-Ok (Invoke-Compiler @((Join-Path $Root "tests\minigui\hello_full_ui_smoke.ml"), $helloFullUiExe, "-I", $Root, "--subsystem", "gui")) "compile hello full UI smoke"
 Assert-Ok (Invoke-Capture $helloFullUiExe @()) "run hello full UI smoke"
+
+$packageOut = Join-Path $Tmp "release"
+Assert-Ok (Invoke-Capture "powershell" @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", (Join-Path $Root "tools\package-release.ps1"), "-Version", "test", "-Compiler", $Compiler, "-OutputDir", $packageOut)) "package release"
+$packageZip = Join-Path $packageOut "MiniGui-test.zip"
+$packageSha = "$packageZip.sha256"
+if (-not (Test-Path -LiteralPath $packageZip)) { throw "release package zip was not created." }
+if (-not (Test-Path -LiteralPath $packageSha)) { throw "release package sha256 file was not created." }
+Write-Host "OK: release package artifacts"
 
 $badJson = Join-Path $Tmp "bad-json.mson"
 Write-Utf8NoBom $badJson '{ "version": 1, '
