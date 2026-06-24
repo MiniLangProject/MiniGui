@@ -111,19 +111,28 @@ Supported layouts:
 - `HorizontalStack`
 - `Grid`
 - `Canvas`
+- `DockPanel`
+- `WrapPanel`
 
 Supported window events:
 
 - `load`
 - `close`
+- `resized`
 
 Supported control events:
 
 - `click`
+- `clicked`
 - `textChanged`
 - `selectionChanged`
+- `selected`
 - `scrollChanged`
-- `change` as an alias for `textChanged`, `selectionChanged` or `scrollChanged`
+- `valueChanged`
+- `changed`
+- `change`
+- `focus`
+- `blur`
 
 Handlers receive `(ui, event)`. `ui` is the generated context struct. `event`
 contains `sender`, `eventType`, `oldValue`, `newValue` and `cancel`. A `close`
@@ -136,13 +145,27 @@ Common control properties in MSON:
 - `x`, `y` for `Canvas` placement
 - `visible`
 - `enabled`
+- `resizeMode`: `scale`, `none`, `anchor`, or `fill`
+- `anchor`: edge list such as `left,top`, `right,bottom`, or `left,top,right,bottom`
+- `minWidth`, `minHeight`, `maxWidth`, `maxHeight`
+- `tooltip`
+- `tabIndex`
+
+`resizeMode` controls runtime behavior when the parent window or container
+changes size. The default is `scale` for backwards compatibility. Use `anchor`
+for form-style layouts where controls should stay attached to one or more
+edges, and use `fill` when a content area should grow with its parent.
 
 Additional control properties:
 
-- `CheckBox`, `RadioButton`: `checked`
-- `Panel`, `GroupBox`: `children`, `padding`, `spacing`
-- `ComboBox`, `ListBox`: `items`, `selectedIndex`
-- `ScrollBar`: `orientation`, `minimum`, `maximum`, `value`, `smallStep`, `largeStep`
+- `CheckBox`, `RadioButton`, `ToggleSwitch`: `checked`
+- `Panel`, `GroupBox`, `ScrollViewer`: `children`, `padding`, `spacing`
+- `ComboBox`, `EditableComboBox`, `ListBox`, `TabControl`, `TreeView`: `items`, `selectedIndex`
+- `ListView`, `Table`, `DataGrid`: `columns`, `columnWidths`, `items`, `selectedIndex`
+- `DataGrid`: `editable`
+- `ScrollBar`, `Slider`: `orientation`, `minimum`, `maximum`, `value`, `smallStep`, `largeStep`
+- `ProgressBar`: `minimum`, `maximum`, `value`
+- `FilePicker`, `FolderPicker`, `ColorPicker`: dialog `title`; `FilePicker` also has `filter`
 
 `Panel` and `GroupBox` can contain child controls or layout nodes. Child
 positions are relative to the container.
@@ -155,6 +178,7 @@ Runtime control APIs:
 - `MiniGui.Control.setBounds(control, x, y, width, height)`
 - `MiniGui.Control.setPosition(control, x, y)`
 - `MiniGui.Control.setSize(control, width, height)`
+- `MiniGui.Control.setLayout(control, resizeMode, anchor, minWidth, minHeight, maxWidth, maxHeight)`
 - `MiniGui.Control.isChecked(control)` / `setChecked(control, value)`
 - `MiniGui.Control.addItem(control, text)`
 - `MiniGui.Control.setItems(control, items)`
@@ -164,6 +188,13 @@ Runtime control APIs:
 - `MiniGui.Control.getScrollValue(control)` / `setScrollValue(control, value)`
 - `MiniGui.Control.setScrollRange(control, minimum, maximum)`
 - `MiniGui.Control.setScrollSteps(control, smallStep, largeStep)`
+- `MiniGui.Control.getValue(control)` / `setValue(control, value)`
+- `MiniGui.Control.setValueRange(control, minimum, maximum)`
+- `MiniGui.Control.setColumnWidths(control, widths)`
+- `MiniGui.Control.setEditable(dataGrid, value)` / `isEditable(dataGrid)`
+- `MiniGui.Control.setCellText(dataGrid, row, column, text)` / `getCellText(dataGrid, row, column)`
+
+For unset size constraints in `setLayout`, pass `-1`.
 
 ## Test applications
 

@@ -315,6 +315,10 @@ These properties can be used on controls:
 - `alignment`: shorthand for horizontal alignment.
 - `dock`: especially useful with `"fill"`.
 - `fill`: `true` sets the width to the available space.
+- `resizeMode`: runtime resize behavior. Supported values are `"scale"`,
+  `"none"`, `"anchor"`, and `"fill"`.
+- `anchor`: edge anchors for `resizeMode: "anchor"`, for example
+  `"left,top"`, `"right,bottom"`, or `"left,top,right,bottom"`.
 - `minWidth`, `minHeight`, `maxWidth`, `maxHeight`: size constraints.
 - `tooltip`: tooltip text.
 - `tabIndex`: keyboard navigation order.
@@ -336,6 +340,38 @@ Example:
     "visible": true,
     "tooltip": "Enter a name",
     "tabIndex": 1
+  }
+}
+```
+
+### Resize Behavior
+
+MiniGui keeps older generated applications compatible by using
+`resizeMode: "scale"` when no explicit mode is set. That scales a control's
+position and size proportionally to its parent. For form-like interfaces, set a
+more explicit mode:
+
+- `none`: keep the generated position and size.
+- `anchor`: keep the control attached to selected parent edges. Anchoring left
+  and right stretches the width; anchoring only right moves the control with the
+  right edge.
+- `fill`: grow width and height with the parent.
+
+Size constraints are applied again during runtime resize, so `minWidth`,
+`minHeight`, `maxWidth`, and `maxHeight` are not just generation hints.
+
+```json
+{
+  "id": "contentTabs",
+  "type": "TabControl",
+  "properties": {
+    "items": ["Input", "Data"],
+    "width": "fill",
+    "height": 420,
+    "resizeMode": "anchor",
+    "anchor": "left,top,right,bottom",
+    "minWidth": 520,
+    "minHeight": 240
   }
 }
 ```
@@ -795,6 +831,7 @@ MiniGui.Control.setMaxLength(control, 32)
 MiniGui.Control.setBounds(control, 20, 20, 200, 30)
 MiniGui.Control.setPosition(control, 20, 20)
 MiniGui.Control.setSize(control, 200, 30)
+MiniGui.Control.setLayout(control, "anchor", "left,top,right", 160, -1, -1, -1)
 
 checked = MiniGui.Control.isChecked(control)
 MiniGui.Control.setChecked(control, true)
@@ -820,6 +857,9 @@ MiniGui.Control.setEditable(dataGrid, true)
 MiniGui.Control.setCellText(dataGrid, 0, 1, "Updated")
 cell = MiniGui.Control.getCellText(dataGrid, 0, 1)
 ```
+
+`setLayout(control, resizeMode, anchor, minWidth, minHeight, maxWidth,
+maxHeight)` uses `-1` for unset size constraints.
 
 `setValue` and `getValue` are useful for `Slider`, `ScrollBar`, and
 `ProgressBar`, `NumberBox`, and `SpinBox`. For `ComboBox` and `ListBox`, use

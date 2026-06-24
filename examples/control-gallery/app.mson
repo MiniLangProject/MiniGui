@@ -37,6 +37,8 @@
               "items": ["File", "Edit", "View", "Help"],
               "height": 24,
               "width": "fill",
+              "resizeMode": "anchor",
+              "anchor": "left,top,right",
               "tooltip": "Top level application menu"
             },
             "events": { "clicked": "onActionClicked" }
@@ -55,7 +57,9 @@
             "properties": {
               "items": ["New", "Open", "Save", "Refresh"],
               "height": 30,
-              "width": "fill"
+              "width": "fill",
+              "resizeMode": "anchor",
+              "anchor": "left,top,right"
             },
             "events": { "click": "onActionClicked" }
           },
@@ -65,7 +69,9 @@
             "properties": {
               "text": "Menu and toolbar actions appear here.",
               "height": 24,
-              "width": "fill"
+              "width": "fill",
+              "resizeMode": "anchor",
+              "anchor": "left,top,right"
             }
           },
           {
@@ -75,6 +81,8 @@
               "text": { "$resource": "heading" },
               "height": 24,
               "width": "fill",
+              "resizeMode": "anchor",
+              "anchor": "left,top,right",
               "foreground": "#202020",
               "background": "#F3F3F3",
               "fontFamily": "Segoe UI",
@@ -93,14 +101,16 @@
               "height": 600,
               "width": "fill",
               "minWidth": 520,
-              "alignment": "fill"
+              "alignment": "fill",
+              "resizeMode": "anchor",
+              "anchor": "left,top,right,bottom"
             },
             "events": { "selected": "onTabSelected" },
             "children": [
               {
                 "id": "inputsPage",
                 "type": "Panel",
-                "properties": { "height": 540, "width": "fill", "padding": 8, "spacing": 8 },
+                "properties": { "height": 540, "width": "fill", "padding": 8, "spacing": 8, "resizeMode": "anchor", "anchor": "left,top,right,bottom" },
                 "children": [
               {
                 "id": "inputPanel",
@@ -207,7 +217,7 @@
               {
                 "id": "selectionPage",
                 "type": "Panel",
-                "properties": { "height": 540, "width": "fill", "padding": 8, "spacing": 8 },
+                "properties": { "height": 540, "width": "fill", "padding": 8, "spacing": 8, "resizeMode": "anchor", "anchor": "left,top,right,bottom" },
                 "children": [
               {
                 "id": "optionsGroupBox",
@@ -308,7 +318,7 @@
               {
                 "id": "layoutPage",
                 "type": "Panel",
-                "properties": { "height": 540, "width": "fill", "padding": 8, "spacing": 8 },
+                "properties": { "height": 540, "width": "fill", "padding": 8, "spacing": 8, "resizeMode": "anchor", "anchor": "left,top,right,bottom" },
                 "children": [
               {
                 "id": "layoutPanel",
@@ -441,7 +451,7 @@
               {
                 "id": "feedbackPage",
                 "type": "Panel",
-                "properties": { "height": 540, "width": "fill", "padding": 8, "spacing": 8 },
+                "properties": { "height": 540, "width": "fill", "padding": 8, "spacing": 8, "resizeMode": "anchor", "anchor": "left,top,right,bottom" },
                 "children": [
               {
                 "id": "feedbackPanel",
@@ -514,7 +524,7 @@
               {
                 "id": "dataPage",
                 "type": "Panel",
-                "properties": { "height": 540, "width": "fill", "padding": 8, "spacing": 8 },
+                "properties": { "height": 540, "width": "fill", "padding": 8, "spacing": 8, "resizeMode": "anchor", "anchor": "left,top,right,bottom" },
                 "children": [
               {
                 "id": "dataPanel",

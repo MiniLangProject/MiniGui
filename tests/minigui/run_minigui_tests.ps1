@@ -469,6 +469,7 @@ Assert-FileContains $galleryGen1 "generated foreground mutation" "MiniGui\.Contr
 Assert-FileContains $galleryGen1 "generated background mutation" "MiniGui\.Control\.setBackground"
 Assert-FileContains $galleryGen1 "generated border mutation" "MiniGui\.Control\.setBorder"
 Assert-FileContains $galleryGen1 "generated font mutation" "MiniGui\.Control\.setFont"
+Assert-FileContains $galleryGen1 "generated layout metadata mutation" "MiniGui\.Control\.setLayout"
 
 $galleryExe = Join-Path $Tmp "control-gallery.exe"
 Assert-Ok (Invoke-Capture $Tool @("build", $gallery, "--output", $galleryExe, "--compiler", $Compiler, "--library-dir", $Root)) "build control-gallery"
@@ -533,7 +534,7 @@ Write-Utf8NoBom $checkControlsMson @'
           { "id": "editableComboBox", "type": "EditableComboBox", "properties": { "items": ["DE", "US", "FR"], "selectedIndex": 1 }, "events": { "selectionChanged": "onSelection" } },
           { "id": "cityListBox", "type": "ListBox", "properties": { "items": ["Berlin", "Bonn"], "selectedIndex": 0, "height": 72 }, "events": { "change": "onSelection" } },
           { "id": "volumeScrollBar", "type": "ScrollBar", "properties": { "orientation": "horizontal", "minimum": 0, "maximum": 100, "value": 25, "smallStep": 5, "largeStep": 20, "height": 18 }, "events": { "scrollChanged": "onScroll" } },
-          { "id": "volumeSlider", "type": "Slider", "properties": { "orientation": "horizontal", "minimum": 0, "maximum": 100, "value": 30, "smallStep": 5, "largeStep": 20, "height": 32, "width": "fill", "minWidth": 220 }, "events": { "valueChanged": "onScroll" } },
+          { "id": "volumeSlider", "type": "Slider", "properties": { "orientation": "horizontal", "minimum": 0, "maximum": 100, "value": 30, "smallStep": 5, "largeStep": 20, "height": 32, "width": "fill", "minWidth": 220, "resizeMode": "fill", "anchor": "left,top,right" }, "events": { "valueChanged": "onScroll" } },
           { "id": "progressBar", "type": "ProgressBar", "properties": { "minimum": 0, "maximum": 100, "value": 40, "height": 24 }, "events": { "valueChanged": "onScroll" } },
           { "id": "tabs", "type": "TabControl", "properties": { "items": ["Inputs", "Data"], "selectedIndex": 0, "height": 80 }, "events": { "selected": "onSelection" } },
           { "id": "scrollViewer", "type": "ScrollViewer", "properties": { "height": 80, "verticalScroll": true }, "children": [ { "id": "scrollLabel", "type": "Label", "properties": { "text": "Scroll content" } } ] },
@@ -594,6 +595,7 @@ Assert-FileContains $checkControlsGenerated "generated selected binding" "MiniGu
 Assert-FileContains $checkControlsGenerated "generated valueChanged binding" "MiniGui\.Events\.bindValueChanged"
 Assert-FileContains $checkControlsGenerated "generated focus binding" "MiniGui\.Events\.bindFocus"
 Assert-FileContains $checkControlsGenerated "generated blur binding" "MiniGui\.Events\.bindBlur"
+Assert-FileContains $checkControlsGenerated "generated setLayout mutation" "MiniGui\.Control\.setLayout"
 Assert-Ok (Invoke-Capture $Tool @("build", $checkControlsMson, "--output", $checkControlsBuiltExe, "--compiler", $Compiler, "--library-dir", $Root)) "build check controls MSON"
 
 $smokeExe = Join-Path $Tmp "runtime-smoke.exe"

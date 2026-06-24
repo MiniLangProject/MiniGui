@@ -291,6 +291,15 @@ _styleHandles = []
 _styleForegrounds = []
 _styleBackgrounds = []
 _styleBrushes = []
+// Optional runtime layout metadata. Controls without entries keep the legacy
+// proportional resize behavior.
+_layoutHandles = []
+_layoutResizeModes = []
+_layoutAnchors = []
+_layoutMinWidths = []
+_layoutMinHeights = []
+_layoutMaxWidths = []
+_layoutMaxHeights = []
 _resizeInitializedWindows = []
 _dragSplitter = void
 _dragSplitterStartX = 0
@@ -412,6 +421,20 @@ function _itemCount(itemsText)
     if itemsText[i] == "\n" then count = count + 1 end if
   end for
   return count
+end function
+
+function _textContains(text, needle)
+  if needle == "" then return true end if
+  if len(text) < len(needle) then return false end if
+  limit = len(text) - len(needle)
+  for i = 0 to limit
+    found = true
+    for j = 0 to len(needle) - 1
+      if text[i + j] != needle[j] then found = false end if
+    end for
+    if found then return true end if
+  end for
+  return false
 end function
 
 function _normalizeEditText(text)
@@ -957,10 +980,11 @@ struct Application
           baseParentHeight = c.baseParentHeight
           if baseParentWidth <= 0 then baseParentWidth = window.baseClientWidth end if
           if baseParentHeight <= 0 then baseParentHeight = window.baseClientHeight end if
-          nx = c.baseX * parentWidth / baseParentWidth
-          ny = c.baseY * parentHeight / baseParentHeight
-          nw = c.baseWidth * parentWidth / baseParentWidth
-          nh = c.baseHeight * parentHeight / baseParentHeight
+          resized = Control.layoutBounds(c, parentWidth, parentHeight, baseParentWidth, baseParentHeight)
+          nx = resized[0]
+          ny = resized[1]
+          nw = resized[2]
+          nh = resized[3]
           if nw < 1 then nw = 1 end if
           if nh < 1 then nh = 1 end if
           Control.moveCurrent(c, nx, ny, nw, nh)
@@ -2190,6 +2214,124 @@ struct Control
       return true
     end if
     return false
+  end function
+
+  static function _layoutIndex(control)
+    if control is void then return -1 end if
+    if control.handle is void then return -1 end if
+    global _layoutHandles
+    if len(_layoutHandles) > 0 then
+      for i = 0 to len(_layoutHandles) - 1
+        if _layoutHandles[i] == control.handle then return i end if
+      end for
+    end if
+    return -1
+  end function
+
+  static function setLayout(control, resizeMode, anchor, minWidth, minHeight, maxWidth, maxHeight)
+    if control is void then return false end if
+    if control.handle is void then return false end if
+    if resizeMode == "" then resizeMode = "scale" end if
+    if resizeMode != "scale" and resizeMode != "none" and resizeMode != "anchor" and resizeMode != "fill" then resizeMode = "scale" end if
+    if anchor == "" then anchor = "left,top" end if
+    global _layoutHandles
+    global _layoutResizeModes
+    global _layoutAnchors
+    global _layoutMinWidths
+    global _layoutMinHeights
+    global _layoutMaxWidths
+    global _layoutMaxHeights
+    index = Control._layoutIndex(control)
+    if index < 0 then
+      _layoutHandles = _layoutHandles + [control.handle]
+      _layoutResizeModes = _layoutResizeModes + [resizeMode]
+      _layoutAnchors = _layoutAnchors + [anchor]
+      _layoutMinWidths = _layoutMinWidths + [minWidth]
+      _layoutMinHeights = _layoutMinHeights + [minHeight]
+      _layoutMaxWidths = _layoutMaxWidths + [maxWidth]
+      _layoutMaxHeights = _layoutMaxHeights + [maxHeight]
+    else
+      _layoutResizeModes[index] = resizeMode
+      _layoutAnchors[index] = anchor
+      _layoutMinWidths[index] = minWidth
+      _layoutMinHeights[index] = minHeight
+      _layoutMaxWidths[index] = maxWidth
+      _layoutMaxHeights[index] = maxHeight
+    end if
+    return true
+  end function
+
+  static function layoutValue(control, slot, fallback)
+    index = Control._layoutIndex(control)
+    if index < 0 then return fallback end if
+    global _layoutResizeModes
+    global _layoutAnchors
+    global _layoutMinWidths
+    global _layoutMinHeights
+    global _layoutMaxWidths
+    global _layoutMaxHeights
+    if slot == "mode" then return _layoutResizeModes[index] end if
+    if slot == "anchor" then return _layoutAnchors[index] end if
+    if slot == "minWidth" then return _layoutMinWidths[index] end if
+    if slot == "minHeight" then return _layoutMinHeights[index] end if
+    if slot == "maxWidth" then return _layoutMaxWidths[index] end if
+    if slot == "maxHeight" then return _layoutMaxHeights[index] end if
+    return fallback
+  end function
+
+  static function clampLayoutWidth(control, width)
+    minWidth = Control.layoutValue(control, "minWidth", -1)
+    maxWidth = Control.layoutValue(control, "maxWidth", -1)
+    if minWidth >= 0 and width < minWidth then width = minWidth end if
+    if maxWidth >= 0 and width > maxWidth then width = maxWidth end if
+    if width < 1 then width = 1 end if
+    return width
+  end function
+
+  static function clampLayoutHeight(control, height)
+    minHeight = Control.layoutValue(control, "minHeight", -1)
+    maxHeight = Control.layoutValue(control, "maxHeight", -1)
+    if minHeight >= 0 and height < minHeight then height = minHeight end if
+    if maxHeight >= 0 and height > maxHeight then height = maxHeight end if
+    if height < 1 then height = 1 end if
+    return height
+  end function
+
+  static function layoutBounds(control, parentWidth, parentHeight, baseParentWidth, baseParentHeight)
+    if control is void then return [0, 0, 1, 1] end if
+    if baseParentWidth <= 0 then baseParentWidth = parentWidth end if
+    if baseParentHeight <= 0 then baseParentHeight = parentHeight end if
+    deltaW = parentWidth - baseParentWidth
+    deltaH = parentHeight - baseParentHeight
+    mode = Control.layoutValue(control, "mode", "scale")
+    anchor = Control.layoutValue(control, "anchor", "left,top")
+    nx = control.baseX
+    ny = control.baseY
+    nw = control.baseWidth
+    nh = control.baseHeight
+    if mode == "scale" then
+      nx = control.baseX * parentWidth / baseParentWidth
+      ny = control.baseY * parentHeight / baseParentHeight
+      nw = control.baseWidth * parentWidth / baseParentWidth
+      nh = control.baseHeight * parentHeight / baseParentHeight
+    else if mode == "fill" then
+      nw = control.baseWidth + deltaW
+      nh = control.baseHeight + deltaH
+    else if mode == "anchor" then
+      left = _textContains(anchor, "left")
+      top = _textContains(anchor, "top")
+      right = _textContains(anchor, "right")
+      bottom = _textContains(anchor, "bottom")
+      if left and right then nw = control.baseWidth + deltaW
+      else if right then nx = control.baseX + deltaW
+      end if
+      if top and bottom then nh = control.baseHeight + deltaH
+      else if bottom then ny = control.baseY + deltaH
+      end if
+    end if
+    nw = Control.clampLayoutWidth(control, nw)
+    nh = Control.clampLayoutHeight(control, nh)
+    return [_asInt(nx), _asInt(ny), _asInt(nw), _asInt(nh)]
   end function
 
   static function setBounds(control, x, y, width, height)

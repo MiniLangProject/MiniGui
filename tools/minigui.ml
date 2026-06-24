@@ -834,7 +834,7 @@ function allowedControlEvents(typ)
 end function
 
 function commonControlProps()
-  return ["text", "width", "height", "x", "y", "visible", "enabled", "margin", "horizontalAlignment", "verticalAlignment", "alignment", "dock", "fill", "minWidth", "minHeight", "maxWidth", "maxHeight", "tooltip", "tabIndex", "row", "column", "rowSpan", "columnSpan", "fontFamily", "fontSize", "fontWeight", "foreground", "background", "borderColor", "borderWidth"]
+  return ["text", "width", "height", "x", "y", "visible", "enabled", "margin", "horizontalAlignment", "verticalAlignment", "alignment", "dock", "fill", "resizeMode", "anchor", "minWidth", "minHeight", "maxWidth", "maxHeight", "tooltip", "tabIndex", "row", "column", "rowSpan", "columnSpan", "fontFamily", "fontSize", "fontWeight", "foreground", "background", "borderColor", "borderWidth"]
 end function
 
 function allowedControlProps(typ)
@@ -885,9 +885,10 @@ function testControlProperties(result, path, typ, properties)
     if contains(["minimum", "maximum", "value", "smallStep", "largeStep", "step", "decimals", "padding", "spacing", "minWidth", "minHeight", "maxWidth", "maxHeight", "fontSize", "borderWidth", "scrollX", "scrollY"], name) and (typ != "ColorPicker" or name != "value") and v.kind != "number" then addError(result, path, "Property '" + name + "' on " + typ + " must be an integer.") end if
     if contains(["visible", "enabled", "fill", "readOnly", "visited", "horizontalScroll", "verticalScroll", "autoHide", "editable"], name) and v.kind != "bool" then addError(result, path, "Property '" + name + "' on " + typ + " must be a boolean.") end if
     if name == "checked" and v.kind != "bool" then addError(result, path, "Property '" + name + "' on " + typ + " must be a boolean.") end if
-    if contains(["text", "placeholder", "orientation", "horizontalAlignment", "verticalAlignment", "alignment", "dock", "tooltip", "fontFamily", "fontWeight", "foreground", "background", "borderColor", "inputType", "validationMessage", "source", "stretch", "url", "title", "filter", "targetBefore", "targetAfter"], name) and v.kind != "string" then addError(result, path, "Property '" + name + "' on " + typ + " must be a string.") end if
+    if contains(["text", "placeholder", "orientation", "horizontalAlignment", "verticalAlignment", "alignment", "dock", "resizeMode", "anchor", "tooltip", "fontFamily", "fontWeight", "foreground", "background", "borderColor", "inputType", "validationMessage", "source", "stretch", "url", "title", "filter", "targetBefore", "targetAfter"], name) and v.kind != "string" then addError(result, path, "Property '" + name + "' on " + typ + " must be a string.") end if
     if typ == "ColorPicker" and name == "value" and v.kind != "string" then addError(result, path, "Property '" + name + "' on " + typ + " must be a string.") end if
     if name == "orientation" and v.kind == "string" and v.text != "vertical" and v.text != "horizontal" then addError(result, path, "Property '" + name + "' on " + typ + " must be 'vertical' or 'horizontal'.") end if
+    if name == "resizeMode" and v.kind == "string" and v.text != "scale" and v.text != "none" and v.text != "anchor" and v.text != "fill" then addError(result, path, "Property '" + name + "' on " + typ + " must be 'scale', 'none', 'anchor' or 'fill'.") end if
     if name == "items" then
       if v.kind != "array" then addError(result, path, "Property '" + name + "' on " + typ + " must be an array of strings.")
       else if len(v.items) > 0 then
@@ -951,7 +952,7 @@ function testLayoutNode(result, path, node, ids)
     end if
   end if
   if isLayout(typ) then
-    testPropertyNames(result, path, prop(node, "properties"), ["spacing", "padding", "width", "height", "margin", "visible", "enabled", "columns", "orientation", "itemWidth", "itemHeight", "alignment", "dock", "fill", "minWidth", "minHeight", "maxWidth", "maxHeight"], typ + ".properties")
+    testPropertyNames(result, path, prop(node, "properties"), ["spacing", "padding", "width", "height", "margin", "visible", "enabled", "columns", "orientation", "itemWidth", "itemHeight", "alignment", "dock", "fill", "resizeMode", "anchor", "minWidth", "minHeight", "maxWidth", "maxHeight"], typ + ".properties")
   else if isControl(typ) then
     testControlProperties(result, path, typ, prop(node, "properties"))
     events = prop(node, "events")
@@ -1406,6 +1407,16 @@ function addGeneratedNode(lines, fields, result, path, node, parentVar, parentTy
       lines = lines + [var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + progressMin + ", " + progressMax + ", " + progressValue + ")"]
     else
       lines = lines + [var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ")"]
+    end if
+    nodeProps = prop(node, "properties")
+    if hasProp(nodeProps, "resizeMode") or hasProp(nodeProps, "anchor") or hasProp(nodeProps, "minWidth") or hasProp(nodeProps, "minHeight") or hasProp(nodeProps, "maxWidth") or hasProp(nodeProps, "maxHeight") then
+      resizeMode = stringProp(result, path, node, "resizeMode", "scale")
+      anchor = stringProp(result, path, node, "anchor", "left,top")
+      minWidth = intProp(result, path, node, "minWidth", -1)
+      minHeight = intProp(result, path, node, "minHeight", -1)
+      maxWidth = intProp(result, path, node, "maxWidth", -1)
+      maxHeight = intProp(result, path, node, "maxHeight", -1)
+      lines = lines + ["MiniGui.Control.setLayout(" + var + ", " + mlString(resizeMode) + ", " + mlString(anchor) + ", " + minWidth + ", " + minHeight + ", " + maxWidth + ", " + maxHeight + ")"]
     end if
     if boolProp(result, path, node, "enabled", true) == false then lines = lines + ["MiniGui.Control.setEnabled(" + var + ", false)"] end if
     if boolProp(result, path, node, "visible", true) == false then lines = lines + ["MiniGui.Control.setVisible(" + var + ", false)"] end if
