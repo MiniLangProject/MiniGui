@@ -847,7 +847,8 @@ function allowedControlProps(typ)
   if typ == "ProgressBar" then return commonControlProps() + ["minimum", "maximum", "value"] end if
   if contains(["MenuBar", "ToolBar", "ContextMenu"], typ) then return commonControlProps() + ["items"] end if
   if typ == "Image" then return commonControlProps() + ["source", "stretch"] end if
-  if typ == "Separator" or typ == "Splitter" then return commonControlProps() + ["orientation"] end if
+  if typ == "Separator" then return commonControlProps() + ["orientation"] end if
+  if typ == "Splitter" then return commonControlProps() + ["orientation", "targetBefore", "targetAfter"] end if
   if typ == "FilePicker" then return commonControlProps() + ["title", "filter"] end if
   if typ == "FolderPicker" then return commonControlProps() + ["title"] end if
   if typ == "ColorPicker" then return commonControlProps() + ["title", "value"] end if
@@ -884,7 +885,7 @@ function testControlProperties(result, path, typ, properties)
     if contains(["minimum", "maximum", "value", "smallStep", "largeStep", "step", "decimals", "padding", "spacing", "minWidth", "minHeight", "maxWidth", "maxHeight", "fontSize", "borderWidth", "scrollX", "scrollY"], name) and (typ != "ColorPicker" or name != "value") and v.kind != "number" then addError(result, path, "Property '" + name + "' on " + typ + " must be an integer.") end if
     if contains(["visible", "enabled", "fill", "readOnly", "visited", "horizontalScroll", "verticalScroll", "autoHide"], name) and v.kind != "bool" then addError(result, path, "Property '" + name + "' on " + typ + " must be a boolean.") end if
     if name == "checked" and v.kind != "bool" then addError(result, path, "Property '" + name + "' on " + typ + " must be a boolean.") end if
-    if contains(["text", "placeholder", "orientation", "horizontalAlignment", "verticalAlignment", "alignment", "dock", "tooltip", "fontFamily", "fontWeight", "foreground", "background", "borderColor", "inputType", "validationMessage", "source", "stretch", "url", "title", "filter"], name) and v.kind != "string" then addError(result, path, "Property '" + name + "' on " + typ + " must be a string.") end if
+    if contains(["text", "placeholder", "orientation", "horizontalAlignment", "verticalAlignment", "alignment", "dock", "tooltip", "fontFamily", "fontWeight", "foreground", "background", "borderColor", "inputType", "validationMessage", "source", "stretch", "url", "title", "filter", "targetBefore", "targetAfter"], name) and v.kind != "string" then addError(result, path, "Property '" + name + "' on " + typ + " must be a string.") end if
     if typ == "ColorPicker" and name == "value" and v.kind != "string" then addError(result, path, "Property '" + name + "' on " + typ + " must be a string.") end if
     if name == "orientation" and v.kind == "string" and v.text != "vertical" and v.text != "horizontal" then addError(result, path, "Property '" + name + "' on " + typ + " must be 'vertical' or 'horizontal'.") end if
     if name == "items" then
@@ -1343,7 +1344,17 @@ function addGeneratedNode(lines, fields, result, path, node, parentVar, parentTy
       lines = lines + [var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + mlString(source) + ", " + mlString(stretch) + ")"]
     else if typ == "Separator" or typ == "Splitter" then
       sepOrientation = stringProp(result, path, node, "orientation", "horizontal")
-      lines = lines + [var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + mlString(sepOrientation) + ")"]
+      if typ == "Splitter" then
+        targetBefore = stringProp(result, path, node, "targetBefore", "")
+        targetAfter = stringProp(result, path, node, "targetAfter", "")
+        if targetBefore != "" or targetAfter != "" then
+          lines = lines + [var + " = MiniGui.Splitter.createPane(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + mlString(sepOrientation) + ", " + mlString(targetBefore) + ", " + mlString(targetAfter) + ")"]
+        else
+          lines = lines + [var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + mlString(sepOrientation) + ")"]
+        end if
+      else
+        lines = lines + [var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + mlString(sepOrientation) + ")"]
+      end if
     else if typ == "LinkLabel" then
       url = stringProp(result, path, node, "url", "")
       lines = lines + [var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + mlString(url) + ")"]

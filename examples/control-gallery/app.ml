@@ -164,7 +164,13 @@ end function
 
 function onTableSelected(ui, event)
   MiniGui.Control.setText(ui.dataStatusLabel, "Table row selected")
-  MiniGui.Control.setText(ui.resultLabel, "Table selected: " + event.newValue)
+  if event.sender.id == "auditDataGrid" then
+    row = MiniGui.Control.getSelectedIndex(event.sender)
+    MiniGui.Control.setCellText(event.sender, row, 1, "Updated")
+    MiniGui.Control.setText(ui.resultLabel, "DataGrid cell: " + MiniGui.Control.getCellText(event.sender, row, 1))
+  else
+    MiniGui.Control.setText(ui.resultLabel, "Table selected: " + event.newValue)
+  end if
   return 0
 end function
 

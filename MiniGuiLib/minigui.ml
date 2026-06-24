@@ -1418,13 +1418,18 @@ end struct
 
 struct Splitter
   static function create(app, parent, id, text, x, y, width, height, orientation)
+    return Splitter.createPane(app, parent, id, text, x, y, width, height, orientation, "", "")
+  end function
+
+  static function createPane(app, parent, id, text, x, y, width, height, orientation, targetBefore, targetAfter)
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
     style = WS_CHILD | WS_VISIBLE | SS_ETCHEDHORZ
     if orientation == "vertical" then style = WS_CHILD | WS_VISIBLE | SS_ETCHEDVERT end if
     hwnd = CreateWindowExW(0, "STATIC", text, style | SS_NOTIFY, x, y, width, height, parent.handle, nid, void, void)
     if hwnd != 0 then _installWindowProc(hwnd) end if
-    c = NativeControl(id, "Splitter", hwnd, nid, text, x, y, width, height, true, true, orientation, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
+    meta = orientation + "\n" + targetBefore + "\n" + targetAfter
+    c = NativeControl(id, "Splitter", hwnd, nid, text, x, y, width, height, true, true, meta, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     return Application.addControl(app, c)
   end function
 end struct
@@ -2002,6 +2007,69 @@ struct Control
     return moved
   end function
 
+  static function findById(app, id)
+    if app is void then return void end if
+    if len(app.controls) > 0 then
+      for i = 0 to len(app.controls) - 1
+        c = app.controls[i]
+        if c is void == false then
+          if c.id == id then return c end if
+        end if
+      end for
+    end if
+    return void
+  end function
+
+  static function splitterOrientation(splitter)
+    if splitter is void then return "horizontal" end if
+    value = _itemTextAt(splitter.lastText, 0)
+    if value == "" then return "horizontal" end if
+    return value
+  end function
+
+  static function splitterTargetBeforeId(splitter)
+    if splitter is void then return "" end if
+    return _itemTextAt(splitter.lastText, 1)
+  end function
+
+  static function splitterTargetAfterId(splitter)
+    if splitter is void then return "" end if
+    return _itemTextAt(splitter.lastText, 2)
+  end function
+
+  static function resizeSplitterTargets(app, splitter, oldX, oldY, newX, newY)
+    if app is void then return false end if
+    if splitter is void then return false end if
+    if splitter.kind != "Splitter" then return false end if
+    beforeId = Control.splitterTargetBeforeId(splitter)
+    afterId = Control.splitterTargetAfterId(splitter)
+    if beforeId == "" or afterId == "" then return false end if
+    before = Control.findById(app, beforeId)
+    after = Control.findById(app, afterId)
+    if before is void or after is void then return false end if
+    orientation = Control.splitterOrientation(splitter)
+    if orientation == "vertical" then
+      deltaX = newX - oldX
+      beforeWidth = before.width + deltaX
+      afterX = after.x + deltaX
+      afterWidth = after.width - deltaX
+      if beforeWidth < 20 then return false end if
+      if afterWidth < 20 then return false end if
+      Control.setBounds(before, before.x, before.y, beforeWidth, before.height)
+      Control.setBounds(after, afterX, after.y, afterWidth, after.height)
+      return true
+    end if
+    deltaY = newY - oldY
+    beforeHeight = before.height + deltaY
+    afterY = after.y + deltaY
+    afterHeight = after.height - deltaY
+    if beforeHeight < 20 then return false end if
+    if afterHeight < 20 then return false end if
+    Control.setBounds(before, before.x, before.y, before.width, beforeHeight)
+    Control.setBounds(after, after.x, afterY, after.width, afterHeight)
+    return true
+  end function
+
   static function setPosition(control, x, y)
     if control is void then return false end if
     return Control.setBounds(control, x, y, control.width, control.height)
@@ -2163,6 +2231,67 @@ struct Control
     end if
     if currentIndex == index then return current end if
     return ""
+  end function
+
+  static function replaceListViewField(text, index, value)
+    fieldCount = Control.listViewFieldCount(text)
+    if index >= fieldCount then fieldCount = index + 1 end if
+    parts = []
+    for i = 0 to fieldCount - 1
+      if i == index then
+        parts = parts + [value]
+      else
+        parts = parts + [Control.listViewFieldAt(text, i)]
+      end if
+    end for
+    return _joinText(parts, "\t")
+  end function
+
+  static function replaceListViewRowText(text, row, rowText)
+    rowCount = _itemCount(text)
+    if row >= rowCount then rowCount = row + 1 end if
+    rows = []
+    for i = 0 to rowCount - 1
+      if i == row then
+        rows = rows + [rowText]
+      else
+        rows = rows + [_itemTextAt(text, i)]
+      end if
+    end for
+    return _joinText(rows, "\n")
+  end function
+
+  static function setListViewCellNative(control, row, column, value)
+    if control is void then return false end if
+    if control.handle is void then return false end if
+    if control.kind != "ListView" and control.kind != "DataGrid" then return false end if
+    if row < 0 or column < 0 then return false end if
+    valueBytes = _asciiUtf16Z(value)
+    item = bytes(56, 0)
+    _writeU32LE(item, 0, LVIF_TEXT)
+    _writeU32LE(item, 4, row)
+    _writeU32LE(item, 8, column)
+    _writePtrLE(item, 24, nativeBytesPtr(valueBytes))
+    _writeU32LE(item, 32, len(value))
+    SendMessageW(control.handle, LVM_SETITEMTEXTW, row, nativeBytesPtr(item))
+    return true
+  end function
+
+  static function setCellText(control, row, column, value)
+    if control is void then return false end if
+    if control.kind != "ListView" and control.kind != "DataGrid" then return false end if
+    if row < 0 or column < 0 then return false end if
+    rowText = _itemTextAt(control.text, row)
+    rowText = Control.replaceListViewField(rowText, column, value)
+    control.text = Control.replaceListViewRowText(control.text, row, rowText)
+    return Control.setListViewCellNative(control, row, column, value)
+  end function
+
+  static function getCellText(control, row, column)
+    if control is void then return "" end if
+    if control.kind != "ListView" and control.kind != "DataGrid" then return "" end if
+    if row < 0 or column < 0 then return "" end if
+    return Control.listViewFieldAt(_itemTextAt(control.text, row), column)
   end function
 
   static function addListViewItem(control, text)
@@ -2871,7 +3000,8 @@ struct Events
     oldValue = c.scrollValue
     newX = _dragSplitterOriginX
     newY = _dragSplitterOriginY
-    if c.lastText == "vertical" then
+    orientation = Control.splitterOrientation(c)
+    if orientation == "vertical" then
       newX = _dragSplitterOriginX + x - _dragSplitterStartX
       if newX < 0 then newX = 0 end if
       c.scrollValue = newX
@@ -2880,6 +3010,7 @@ struct Events
       if newY < 0 then newY = 0 end if
       c.scrollValue = newY
     end if
+    Control.resizeSplitterTargets(app, c, c.x, c.y, newX, newY)
     Control.setBounds(c, newX, newY, c.width, c.height)
     if oldValue != c.scrollValue then
       Events.dispatchControlTextBindings(app, c, "changed", oldValue, c.scrollValue)

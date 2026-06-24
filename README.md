@@ -365,7 +365,7 @@ control-specific events in addition to those common focus events.
 | `RadioButton` | Choice inside a group | `text`, `checked` | `click`, `clicked` |
 | `Image` | Bitmap image or image placeholder | `source`, `stretch`, `text` | `click`, `clicked` |
 | `Separator` | Horizontal or vertical separator | `orientation` | - |
-| `Splitter` | Draggable horizontal or vertical split marker | `orientation` | `valueChanged`, `changed`, `change` |
+| `Splitter` | Draggable horizontal or vertical split marker | `orientation`, `targetBefore`, `targetAfter` | `valueChanged`, `changed`, `change` |
 | `LinkLabel` | Clickable text link | `text`, `url`, `visited` | `click`, `clicked` |
 | `Panel` | Borderless container | `padding`, `spacing`, `children` | - |
 | `ScrollViewer` | Scrollable container host | `horizontalScroll`, `verticalScroll`, `padding`, `spacing`, `children` | - |
@@ -813,11 +813,15 @@ value = MiniGui.Control.getScrollValue(control)
 MiniGui.Control.setValueRange(control, 0, 100)
 MiniGui.Control.setValue(control, 35)
 value = MiniGui.Control.getValue(control)
+
+MiniGui.Control.setColumnWidths(dataGrid, [160, 120, 90])
+MiniGui.Control.setCellText(dataGrid, 0, 1, "Updated")
+cell = MiniGui.Control.getCellText(dataGrid, 0, 1)
 ```
 
 `setValue` and `getValue` are useful for `Slider`, `ScrollBar`, and
-`ProgressBar`, and `NumberBox`. For `ComboBox` and `ListBox`, use the selection
-functions.
+`ProgressBar`, `NumberBox`, and `SpinBox`. For `ComboBox` and `ListBox`, use
+the selection functions.
 
 The most useful functions from `MiniGui.Events`:
 

@@ -79,7 +79,7 @@ Supported controls:
 - `RadioButton`
 - `Image`
 - `Separator`
-- `Splitter` with drag and `changed`/`valueChanged` events
+- `Splitter` with drag, optional `targetBefore`/`targetAfter` pane resizing, and `changed`/`valueChanged` events
 - `LinkLabel`
 - `Panel`
 - `ScrollViewer`
@@ -98,7 +98,7 @@ Supported controls:
 - `TreeView`
 - `ListView`
 - `Table`
-- `DataGrid` with columns, row selection, and `columnWidths`
+- `DataGrid` with columns, row selection, `columnWidths`, `setCellText`, and `getCellText`
 - `DatePicker`
 - `DateTimePicker`
 - `TimePicker`

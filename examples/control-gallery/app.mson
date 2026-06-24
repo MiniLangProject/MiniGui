@@ -321,39 +321,46 @@
                 },
                 "children": [
                   {
-                    "type": "HorizontalStack",
-                    "properties": { "spacing": 8 },
+                    "id": "layoutTopPane",
+                    "type": "Panel",
+                    "properties": { "height": 42, "width": "fill", "padding": 0, "spacing": 0 },
                     "children": [
                       {
-                        "id": "primaryButton",
-                        "type": "Button",
-                        "properties": {
-                          "text": "Apply",
-                          "width": 120,
-                          "height": 30
-                        },
-                        "events": { "click": "onPrimaryButtonClick" }
-                      },
-                      {
-                        "id": "disabledButton",
-                        "type": "Button",
-                        "properties": {
-                          "text": "Disabled until Apply",
-                          "width": 180,
-                          "height": 30,
-                          "enabled": false
-                        },
-                        "events": { "click": "onDisabledButtonClick" }
-                      },
-                      {
-                        "id": "hiddenLabel",
-                        "type": "Label",
-                        "properties": {
-                          "text": "Initially hidden",
-                          "width": 220,
-                          "height": 24,
-                          "visible": false
-                        }
+                        "type": "HorizontalStack",
+                        "properties": { "spacing": 8 },
+                        "children": [
+                          {
+                            "id": "primaryButton",
+                            "type": "Button",
+                            "properties": {
+                              "text": "Apply",
+                              "width": 120,
+                              "height": 30
+                            },
+                            "events": { "click": "onPrimaryButtonClick" }
+                          },
+                          {
+                            "id": "disabledButton",
+                            "type": "Button",
+                            "properties": {
+                              "text": "Disabled until Apply",
+                              "width": 180,
+                              "height": 30,
+                              "enabled": false
+                            },
+                            "events": { "click": "onDisabledButtonClick" }
+                          },
+                          {
+                            "id": "hiddenLabel",
+                            "type": "Label",
+                            "properties": {
+                              "text": "Initially hidden",
+                              "width": 220,
+                              "height": 24,
+                              "visible": false
+                            }
+                          }
+                        ]
                       }
                     ]
                   },
@@ -365,58 +372,65 @@
                   {
                     "id": "layoutSplitter",
                     "type": "Splitter",
-                    "properties": { "height": 8, "width": "fill", "orientation": "horizontal" },
+                    "properties": { "height": 8, "width": "fill", "orientation": "horizontal", "targetBefore": "layoutTopPane", "targetAfter": "layoutBottomPane" },
                     "events": { "changed": "onSplitterChanged" }
                   },
                   {
-                    "type": "WrapPanel",
-                    "properties": { "spacing": 8 },
+                    "id": "layoutBottomPane",
+                    "type": "Panel",
+                    "properties": { "height": 104, "width": "fill", "padding": 0, "spacing": 6 },
                     "children": [
                       {
-                        "id": "docsLink",
-                        "type": "LinkLabel",
-                        "properties": { "text": "MiniGui docs", "url": "https://github.com/MiniLangProject/MiniGui", "width": 140 },
-                        "events": { "click": "onLinkClicked" }
+                        "type": "WrapPanel",
+                        "properties": { "spacing": 8 },
+                        "children": [
+                          {
+                            "id": "docsLink",
+                            "type": "LinkLabel",
+                            "properties": { "text": "MiniGui docs", "url": "https://github.com/MiniLangProject/MiniGui", "width": 140 },
+                            "events": { "click": "onLinkClicked" }
+                          },
+                          {
+                            "id": "logoImage",
+                            "type": "Image",
+                            "properties": { "text": "Image placeholder", "source": "", "width": 160, "height": 48, "stretch": "none" },
+                            "events": { "click": "onImageClicked" }
+                          },
+                          {
+                            "id": "openFilePicker",
+                            "type": "FilePicker",
+                            "properties": { "text": "Open file", "title": "Open file", "filter": "All files (*.*)|*.*", "width": 120 },
+                            "events": { "click": "onActionClicked" }
+                          },
+                          {
+                            "id": "chooseFolderPicker",
+                            "type": "FolderPicker",
+                            "properties": { "text": "Folder", "title": "Choose folder", "width": 100 },
+                            "events": { "click": "onActionClicked" }
+                          },
+                          {
+                            "id": "accentColorPicker",
+                            "type": "ColorPicker",
+                            "properties": { "text": "Color", "title": "Choose accent color", "value": "#336699", "width": 100 },
+                            "events": { "click": "onActionClicked" }
+                          }
+                        ]
                       },
                       {
-                        "id": "logoImage",
-                        "type": "Image",
-                        "properties": { "text": "Image placeholder", "source": "", "width": 160, "height": 48, "stretch": "none" },
-                        "events": { "click": "onImageClicked" }
-                      },
-                      {
-                        "id": "openFilePicker",
-                        "type": "FilePicker",
-                        "properties": { "text": "Open file", "title": "Open file", "filter": "All files (*.*)|*.*", "width": 120 },
-                        "events": { "click": "onActionClicked" }
-                      },
-                      {
-                        "id": "chooseFolderPicker",
-                        "type": "FolderPicker",
-                        "properties": { "text": "Folder", "title": "Choose folder", "width": 100 },
-                        "events": { "click": "onActionClicked" }
-                      },
-                      {
-                        "id": "accentColorPicker",
-                        "type": "ColorPicker",
-                        "properties": { "text": "Color", "title": "Choose accent color", "value": "#336699", "width": 100 },
-                        "events": { "click": "onActionClicked" }
-                      }
-                    ]
-                  },
-                  {
-                    "type": "DockPanel",
-                    "properties": { "height": 40, "spacing": 6 },
-                    "children": [
-                      {
-                        "id": "dockLeftLabel",
-                        "type": "Label",
-                        "properties": { "text": "Dock left", "dock": "left", "width": 100 }
-                      },
-                      {
-                        "id": "dockFillLabel",
-                        "type": "Label",
-                        "properties": { "text": "Dock fill", "dock": "fill", "width": "fill" }
+                        "type": "DockPanel",
+                        "properties": { "height": 40, "spacing": 6 },
+                        "children": [
+                          {
+                            "id": "dockLeftLabel",
+                            "type": "Label",
+                            "properties": { "text": "Dock left", "dock": "left", "width": 100 }
+                          },
+                          {
+                            "id": "dockFillLabel",
+                            "type": "Label",
+                            "properties": { "text": "Dock fill", "dock": "fill", "width": "fill" }
+                          }
+                        ]
                       }
                     ]
                   }

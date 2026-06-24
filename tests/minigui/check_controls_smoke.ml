@@ -39,6 +39,7 @@ struct CheckControlsUi
   toolbar,
   tree,
   table,
+  dataGrid,
   datePicker,
   statusBar,
   resultLabel,
@@ -63,10 +64,11 @@ function main(args)
   toolbar = MiniGui.ToolBar.create(app, win, "toolbar", "", 250, 358, 180, 30, ["Save", "Refresh"])
   tree = MiniGui.TreeView.create(app, win, "tree", "", 16, 420, 160, 90, ["Root", "Child"])
   table = MiniGui.ListView.create(app, win, "table", "", 190, 420, 180, 90, ["Ada", "Grace"], 0)
+  dataGrid = MiniGui.DataGrid.create(app, win, "dataGrid", "", 190, 420, 220, 90, ["Name", "Role"], ["Ada\tAnalyst", "Grace\tCompiler"], 0)
   datePicker = MiniGui.DatePicker.create(app, win, "datePicker", "", 385, 420, 140, 26)
   statusBar = MiniGui.StatusBar.create(app, win, "statusBar", "Ready", 16, 520, 420, 24)
   label = MiniGui.Label.create(app, win, "resultLabel", "", 16, 550, 420, 24)
-  ui = CheckControlsUi(app, win, optIn, choice, panel, notes, group, combo, list, scroll, slider, valueSlider, progress, tabs, menu, toolbar, tree, table, datePicker, statusBar, label)
+  ui = CheckControlsUi(app, win, optIn, choice, panel, notes, group, combo, list, scroll, slider, valueSlider, progress, tabs, menu, toolbar, tree, table, dataGrid, datePicker, statusBar, label)
 
   if MiniGui.Control.isChecked(optIn) == false then return 1 end if
   if MiniGui.Control.isChecked(choice) then return 2 end if
@@ -113,6 +115,10 @@ function main(args)
   if toolbar.kind != "ToolBar" then return 55 end if
   if tree.kind != "TreeView" then return 56 end if
   if table.kind != "ListView" then return 57 end if
+  if dataGrid.kind != "DataGrid" then return 68 end if
+  if MiniGui.Control.getCellText(dataGrid, 0, 1) != "Analyst" then return 69 end if
+  if MiniGui.Control.setCellText(dataGrid, 0, 1, "Runtime") == false then return 70 end if
+  if MiniGui.Control.getCellText(dataGrid, 0, 1) != "Runtime" then return 71 end if
   if datePicker.kind != "DatePicker" then return 58 end if
   if MiniGui.Control.getText(statusBar) != "Ready" then return 59 end if
   if MiniGui.Control.setText(statusBar, "Updated") == false then return 60 end if

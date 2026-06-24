@@ -430,6 +430,7 @@ Assert-FileContains $galleryGen1 "generated RadioButton constructor" "MiniGui\.R
 Assert-FileContains $galleryGen1 "generated Image constructor" "MiniGui\.Image\.create"
 Assert-FileContains $galleryGen1 "generated Separator constructor" "MiniGui\.Separator\.create"
 Assert-FileContains $galleryGen1 "generated Splitter constructor" "MiniGui\.Splitter\.create"
+Assert-FileContains $galleryGen1 "generated targeted Splitter constructor" "MiniGui\.Splitter\.createPane"
 Assert-FileContains $galleryGen1 "generated LinkLabel constructor" "MiniGui\.LinkLabel\.create"
 Assert-FileContains $galleryGen1 "generated Panel constructor" "MiniGui\.Panel\.create"
 Assert-FileContains $galleryGen1 "generated ScrollViewer constructor" "MiniGui\.ScrollViewer\.create"
@@ -514,7 +515,9 @@ Write-Utf8NoBom $checkControlsMson @'
           { "id": "colorPicker", "type": "ColorPicker", "properties": { "text": "Color", "title": "Choose color", "value": "#336699" }, "events": { "click": "onToggle" } },
           { "id": "image", "type": "Image", "properties": { "text": "Image", "source": "", "height": 40 }, "events": { "click": "onToggle" } },
           { "id": "separator", "type": "Separator", "properties": { "height": 8, "orientation": "horizontal" } },
-          { "id": "splitter", "type": "Splitter", "properties": { "height": 8, "orientation": "horizontal" }, "events": { "changed": "onToggle" } },
+          { "id": "splitBefore", "type": "Panel", "properties": { "height": 32 } },
+          { "id": "splitter", "type": "Splitter", "properties": { "height": 8, "orientation": "horizontal", "targetBefore": "splitBefore", "targetAfter": "splitAfter" }, "events": { "changed": "onToggle" } },
+          { "id": "splitAfter", "type": "Panel", "properties": { "height": 32 } },
           { "id": "link", "type": "LinkLabel", "properties": { "text": "Docs", "url": "https://github.com/MiniLangProject/MiniGui" }, "events": { "click": "onToggle" } },
           {
             "id": "detailsPanel",
@@ -568,6 +571,7 @@ Assert-FileContains $checkControlsGenerated "generated ColorPicker constructor" 
 Assert-FileContains $checkControlsGenerated "generated Image constructor" "MiniGui\.Image\.create"
 Assert-FileContains $checkControlsGenerated "generated Separator constructor" "MiniGui\.Separator\.create"
 Assert-FileContains $checkControlsGenerated "generated Splitter constructor" "MiniGui\.Splitter\.create"
+Assert-FileContains $checkControlsGenerated "generated targeted Splitter constructor" "MiniGui\.Splitter\.createPane"
 Assert-FileContains $checkControlsGenerated "generated LinkLabel constructor" "MiniGui\.LinkLabel\.create"
 Assert-FileContains $checkControlsGenerated "generated ScrollViewer constructor" "MiniGui\.ScrollViewer\.create"
 Assert-FileContains $checkControlsGenerated "generated MenuBar constructor" "MiniGui\.MenuBar\.create"
