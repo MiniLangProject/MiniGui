@@ -131,6 +131,8 @@ const LVM_GETITEMCOUNT = 4100
 const LVM_DELETEALLITEMS = 4105
 const LVM_GETNEXTITEM = 4108
 const LVM_SETITEMSTATE = 4139
+const LVM_GETSUBITEMRECT = 4152
+const LVM_SUBITEMHITTEST = 4153
 const LVM_INSERTITEMW = 4173
 const LVM_INSERTCOLUMNW = 4193
 const LVM_SETITEMTEXTW = 4212
@@ -142,6 +144,7 @@ const LVCF_SUBITEM = 8
 const LVM_SETCOLUMNWIDTH = 4126
 const LVIS_FOCUSED = 1
 const LVIS_SELECTED = 2
+const LVIR_BOUNDS = 0
 const LVNI_SELECTED = 2
 const PBM_SETPOS = 1026
 const PBM_SETRANGE32 = 1030
@@ -2283,6 +2286,44 @@ struct Control
     return column
   end function
 
+  static function listViewHitTest(control, x, y)
+    if control is void then return [-1, -1] end if
+    if control.handle is void then return [-1, -1] end if
+    if control.kind != "ListView" and control.kind != "DataGrid" then return [-1, -1] end if
+    hit = bytes(32, 0)
+    _writeU32LE(hit, 0, x)
+    _writeU32LE(hit, 4, y)
+    row = SendMessageW(control.handle, LVM_SUBITEMHITTEST, 0, nativeBytesPtr(hit))
+    if row < 0 then return [-1, -1] end if
+    item = _readS32LE(hit, 12)
+    column = _readS32LE(hit, 16)
+    if item >= 0 then row = item end if
+    if column < 0 then column = Control.listViewColumnAtX(control, x) end if
+    return [row, column]
+  end function
+
+  static function listViewCellRect(control, row, column)
+    if control is void then return [0, 0, 0, 0] end if
+    if control.handle is void then return [0, 0, 0, 0] end if
+    rect = bytes(16, 0)
+    _writeU32LE(rect, 0, LVIR_BOUNDS)
+    _writeU32LE(rect, 4, column)
+    if SendMessageW(control.handle, LVM_GETSUBITEMRECT, row, nativeBytesPtr(rect)) != 0 then
+      left = _readI32LE(rect, 0)
+      top = _readI32LE(rect, 4)
+      right = _readI32LE(rect, 8)
+      bottom = _readI32LE(rect, 12)
+      width = right - left
+      height = bottom - top
+      if width > 0 and height > 0 then return [left, top, width, height] end if
+    end if
+    columnCount = Control.listViewColumnCount(control)
+    columnWidth = control.width
+    if columnCount > 0 then columnWidth = _asInt(control.width / columnCount) end if
+    if columnWidth < 40 then columnWidth = 40 end if
+    return [column * columnWidth, 20 + row * 16, columnWidth, 20]
+  end function
+
   static function listViewFieldCount(text)
     count = 1
     if len(text) > 0 then
@@ -3113,18 +3154,19 @@ struct Events
     if Control.isEditable(grid) == false then return false end if
     count = SendMessageW(grid.handle, LVM_GETITEMCOUNT, 0, 0)
     if count <= 0 then return false end if
-    row = _asInt((y - 20) / 16)
-    if row < 0 then row = 0 end if
+    hit = Control.listViewHitTest(grid, x, y)
+    row = hit[0]
+    column = hit[1]
+    if row < 0 then return false end if
     if row >= count then return false end if
-    column = Control.listViewColumnAtX(grid, x)
-    columnCount = Control.listViewColumnCount(grid)
-    columnWidth = grid.width
-    if columnCount > 0 then columnWidth = _asInt(grid.width / columnCount) end if
-    if columnWidth < 40 then columnWidth = 40 end if
-    editorX = column * columnWidth
-    editorY = 20 + row * 16
-    if editorX + columnWidth > grid.width then columnWidth = grid.width - editorX end if
+    if column < 0 then column = 0 end if
+    cellRect = Control.listViewCellRect(grid, row, column)
+    editorX = cellRect[0]
+    editorY = cellRect[1]
+    columnWidth = cellRect[2]
+    editorHeight = cellRect[3]
     if columnWidth < 20 then columnWidth = 20 end if
+    if editorHeight < 18 then editorHeight = 20 end if
     text = Control.getCellText(grid, row, column)
     global _dataGridEditor
     global _dataGridEditGrid
@@ -3134,7 +3176,7 @@ struct Events
     if _dataGridEditor != 0 then Events.commitDataGridEdit(app, _dataGridEditor, false) end if
     editId = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
-    editor = CreateWindowExW(0, "EDIT", text, WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_BORDER | ES_AUTOHSCROLL, editorX, editorY, columnWidth, 20, grid.handle, editId, void, void)
+    editor = CreateWindowExW(0, "EDIT", text, WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_BORDER | ES_AUTOHSCROLL, editorX, editorY, columnWidth, editorHeight, grid.handle, editId, void, void)
     if editor == 0 then return false end if
     _installWindowProc(editor)
     _dataGridEditor = editor
