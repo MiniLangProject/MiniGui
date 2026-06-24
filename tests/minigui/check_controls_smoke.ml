@@ -48,6 +48,23 @@ end struct
 function main(args)
   app = MiniGui.Application.create()
   win = MiniGui.Window.create(app, "mainWindow", "MiniGui Check Controls Smoke", 560, 420)
+  button = MiniGui.Button.create(app, win, "button", "Run", 16, 4, 90, 24)
+  textBox = MiniGui.TextBox.create(app, win, "textBox", "Text", 112, 4, 120, 24)
+  searchBox = MiniGui.SearchBox.create(app, win, "searchBox", "Find", 238, 4, 120, 24)
+  password = MiniGui.PasswordBox.create(app, win, "passwordBox", "secret", 364, 4, 120, 24)
+  numberBox = MiniGui.NumberBox.create(app, win, "numberBox", "", 490, 4, 60, 24, 0, 10, 2, 1)
+  spinBox = MiniGui.SpinBox.create(app, win, "spinBox", "", 490, 32, 60, 24, 0, 10, 3, 1)
+  toggle = MiniGui.ToggleSwitch.create(app, win, "toggle", "Compact", 360, 46, 120, 22, false)
+  filePicker = MiniGui.FilePicker.create(app, win, "filePicker", "File", 16, 580, 80, 24, "Open", "All files (*.*)|*.*")
+  folderPicker = MiniGui.FolderPicker.create(app, win, "folderPicker", "Folder", 102, 580, 80, 24, "Choose folder")
+  colorPicker = MiniGui.ColorPicker.create(app, win, "colorPicker", "Color", 188, 580, 80, 24, "Choose color", "#336699")
+  image = MiniGui.Image.create(app, win, "image", "Image", 274, 580, 80, 24, "", "none")
+  separator = MiniGui.Separator.create(app, win, "separator", "", 360, 580, 80, 8, "horizontal")
+  splitter = MiniGui.Splitter.createPane(app, win, "splitter", "", 446, 580, 80, 8, "horizontal", "detailsPanel", "groupBox")
+  link = MiniGui.LinkLabel.create(app, win, "link", "Docs", 16, 610, 90, 24, "https://github.com/MiniLangProject/MiniGui")
+  scrollViewer = MiniGui.ScrollViewer.create(app, win, "scrollViewer", "", 112, 610, 120, 48, false, true)
+  editableCombo = MiniGui.EditableComboBox.create(app, win, "editableComboBox", "", 238, 610, 120, 120, ["DE", "US", "FR"], 1)
+  contextMenu = MiniGui.ContextMenu.create(app, win, "contextMenu", "", 0, 0, 0, 0, ["Copy", "Paste"])
   optIn = MiniGui.CheckBox.create(app, win, "optInCheckBox", "Opt in", 16, 16, 180, 22, true)
   choice = MiniGui.RadioButton.create(app, win, "choiceRadioButton", "Choice A", 16, 46, 180, 22, false)
   panel = MiniGui.Panel.create(app, win, "detailsPanel", "", 16, 76, 240, 88)
@@ -66,9 +83,49 @@ function main(args)
   table = MiniGui.ListView.create(app, win, "table", "", 190, 420, 180, 90, ["Ada", "Grace"], 0)
   dataGrid = MiniGui.DataGrid.create(app, win, "dataGrid", "", 190, 420, 220, 90, ["Name", "Role"], ["Ada\tAnalyst", "Grace\tCompiler"], 0)
   datePicker = MiniGui.DatePicker.create(app, win, "datePicker", "", 385, 420, 140, 26)
+  dateTimePicker = MiniGui.DateTimePicker.create(app, win, "dateTimePicker", "", 385, 452, 140, 26)
+  timePicker = MiniGui.TimePicker.create(app, win, "timePicker", "", 385, 484, 140, 26)
+  calendar = MiniGui.Calendar.create(app, win, "calendar", "", 385, 516, 140, 90)
   statusBar = MiniGui.StatusBar.create(app, win, "statusBar", "Ready", 16, 520, 420, 24)
   label = MiniGui.Label.create(app, win, "resultLabel", "", 16, 550, 420, 24)
   ui = CheckControlsUi(app, win, optIn, choice, panel, notes, group, combo, list, scroll, slider, valueSlider, progress, tabs, menu, toolbar, tree, table, dataGrid, datePicker, statusBar, label)
+
+  if button.kind != "Button" then return 75 end if
+  if MiniGui.Control.setEnabled(button, false) == false then return 76 end if
+  if button.enabled then return 77 end if
+  if MiniGui.Control.setEnabled(button, true) == false then return 78 end if
+  if button.enabled == false then return 79 end if
+  if MiniGui.Control.getText(textBox) != "Text" then return 80 end if
+  if MiniGui.Control.setText(textBox, "Changed") == false then return 81 end if
+  if MiniGui.Control.getText(textBox) != "Changed" then return 82 end if
+  if searchBox.kind != "SearchBox" then return 83 end if
+  if MiniGui.Control.setMaxLength(searchBox, 20) == false then return 84 end if
+  if password.kind != "PasswordBox" then return 85 end if
+  if MiniGui.Control.setReadOnly(password, true) == false then return 86 end if
+  if MiniGui.Control.getValue(numberBox) != 2 then return 87 end if
+  if MiniGui.Control.setValue(numberBox, 12) == false then return 88 end if
+  if MiniGui.Control.getValue(numberBox) != 10 then return 89 end if
+  if MiniGui.Control.getValue(spinBox) != 3 then return 90 end if
+  if MiniGui.Control.setValue(spinBox, 8) == false then return 91 end if
+  if MiniGui.Control.getValue(spinBox) != 8 then return 92 end if
+  if toggle.kind != "ToggleSwitch" then return 93 end if
+  if MiniGui.Control.setChecked(toggle, true) == false then return 94 end if
+  if MiniGui.Control.isChecked(toggle) == false then return 95 end if
+  if filePicker.kind != "FilePicker" then return 96 end if
+  if folderPicker.kind != "FolderPicker" then return 97 end if
+  if colorPicker.kind != "ColorPicker" then return 98 end if
+  if image.kind != "Image" then return 99 end if
+  if separator.kind != "Separator" then return 100 end if
+  if splitter.kind != "Splitter" then return 101 end if
+  if link.kind != "LinkLabel" then return 102 end if
+  if scrollViewer.kind != "ScrollViewer" then return 103 end if
+  if editableCombo.kind != "EditableComboBox" then return 104 end if
+  if MiniGui.Control.getSelectedText(editableCombo) != "US" then return 105 end if
+  if contextMenu.kind != "ContextMenu" then return 106 end if
+  if MiniGui.Control.setVisible(image, false) == false then return 107 end if
+  if image.visible then return 108 end if
+  if MiniGui.Control.setVisible(image, true) == false then return 109 end if
+  if image.visible == false then return 110 end if
 
   if MiniGui.Control.isChecked(optIn) == false then return 1 end if
   if MiniGui.Control.isChecked(choice) then return 2 end if
@@ -123,6 +180,9 @@ function main(args)
   if MiniGui.Control.setCellText(dataGrid, 0, 1, "Runtime") == false then return 70 end if
   if MiniGui.Control.getCellText(dataGrid, 0, 1) != "Runtime" then return 71 end if
   if datePicker.kind != "DatePicker" then return 58 end if
+  if dateTimePicker.kind != "DateTimePicker" then return 111 end if
+  if timePicker.kind != "TimePicker" then return 112 end if
+  if calendar.kind != "Calendar" then return 113 end if
   if MiniGui.Control.getText(statusBar) != "Ready" then return 59 end if
   if MiniGui.Control.setText(statusBar, "Updated") == false then return 60 end if
   if MiniGui.Control.getText(statusBar) != "Updated" then return 61 end if
