@@ -73,13 +73,13 @@ Supported controls:
 - `TextArea`
 - `PasswordBox`
 - `NumberBox`
-- `SpinBox`
+- `SpinBox` with native up/down arrows
 - `CheckBox`
 - `ToggleSwitch`
 - `RadioButton`
 - `Image`
 - `Separator`
-- `Splitter`
+- `Splitter` with drag and `changed`/`valueChanged` events
 - `LinkLabel`
 - `Panel`
 - `ScrollViewer`
@@ -98,7 +98,7 @@ Supported controls:
 - `TreeView`
 - `ListView`
 - `Table`
-- `DataGrid`
+- `DataGrid` with columns, row selection, and `columnWidths`
 - `DatePicker`
 - `DateTimePicker`
 - `TimePicker`

@@ -67,7 +67,7 @@ function onSecretChanged(ui, event)
 end function
 
 function onQuantityChanged(ui, event)
-  MiniGui.Control.setText(ui.resultLabel, "Quantity: " + MiniGui.Control.getValue(ui.quantityNumberBox))
+  MiniGui.Control.setText(ui.resultLabel, "Quantity: " + event.newValue)
   return 0
 end function
 
@@ -164,7 +164,13 @@ end function
 
 function onTableSelected(ui, event)
   MiniGui.Control.setText(ui.dataStatusLabel, "Table row selected")
-  MiniGui.Control.setText(ui.resultLabel, "Table selected")
+  MiniGui.Control.setText(ui.resultLabel, "Table selected: " + event.newValue)
+  return 0
+end function
+
+function onSplitterChanged(ui, event)
+  MiniGui.Control.setText(ui.resultLabel, "Splitter position: " + event.newValue)
+  MiniGui.Control.setText(ui.statusLabel, "Splitter moved")
   return 0
 end function
 

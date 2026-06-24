@@ -448,6 +448,7 @@ Assert-FileContains $galleryGen1 "generated TreeView constructor" "MiniGui\.Tree
 Assert-FileContains $galleryGen1 "generated Table/ListView constructor" "MiniGui\.ListView\.create"
 Assert-FileContains $galleryGen1 "generated Table/ListView columns constructor" "MiniGui\.ListView\.createColumns"
 Assert-FileContains $galleryGen1 "generated DataGrid constructor" "MiniGui\.DataGrid\.create"
+Assert-FileContains $galleryGen1 "generated column widths mutation" "MiniGui\.Control\.setColumnWidths"
 Assert-FileContains $galleryGen1 "generated DatePicker constructor" "MiniGui\.DatePicker\.create"
 Assert-FileContains $galleryGen1 "generated DateTimePicker constructor" "MiniGui\.DateTimePicker\.create"
 Assert-FileContains $galleryGen1 "generated TimePicker constructor" "MiniGui\.TimePicker\.create"
@@ -513,7 +514,7 @@ Write-Utf8NoBom $checkControlsMson @'
           { "id": "colorPicker", "type": "ColorPicker", "properties": { "text": "Color", "title": "Choose color", "value": "#336699" }, "events": { "click": "onToggle" } },
           { "id": "image", "type": "Image", "properties": { "text": "Image", "source": "", "height": 40 }, "events": { "click": "onToggle" } },
           { "id": "separator", "type": "Separator", "properties": { "height": 8, "orientation": "horizontal" } },
-          { "id": "splitter", "type": "Splitter", "properties": { "height": 8, "orientation": "horizontal" } },
+          { "id": "splitter", "type": "Splitter", "properties": { "height": 8, "orientation": "horizontal" }, "events": { "changed": "onToggle" } },
           { "id": "link", "type": "LinkLabel", "properties": { "text": "Docs", "url": "https://github.com/MiniLangProject/MiniGui" }, "events": { "click": "onToggle" } },
           {
             "id": "detailsPanel",
@@ -536,8 +537,8 @@ Write-Utf8NoBom $checkControlsMson @'
           { "id": "contextMenu", "type": "ContextMenu", "properties": { "items": ["Copy", "Paste"] }, "events": { "clicked": "onToggle" } },
           { "id": "toolbar", "type": "ToolBar", "properties": { "items": ["Save", "Refresh"], "height": 30 }, "events": { "click": "onToggle" } },
           { "id": "tree", "type": "TreeView", "properties": { "items": ["Root", "Child"], "height": 80 }, "events": { "selected": "onSelection" } },
-          { "id": "table", "type": "Table", "properties": { "columns": ["Name", "Role"], "items": [["Ada", "Analyst"], ["Grace", "Compiler"]], "selectedIndex": 0, "height": 80 }, "events": { "selected": "onSelection" } },
-          { "id": "dataGrid", "type": "DataGrid", "properties": { "columns": ["Name", "Role"], "items": [["Ada", "Analyst"], ["Grace", "Compiler"]], "selectedIndex": 0, "height": 80 }, "events": { "selected": "onSelection" } },
+          { "id": "table", "type": "Table", "properties": { "columns": ["Name", "Role"], "columnWidths": [120, 160], "items": [["Ada", "Analyst"], ["Grace", "Compiler"]], "selectedIndex": 0, "height": 80 }, "events": { "selected": "onSelection" } },
+          { "id": "dataGrid", "type": "DataGrid", "properties": { "columns": ["Name", "Role"], "columnWidths": [120, 160], "items": [["Ada", "Analyst"], ["Grace", "Compiler"]], "selectedIndex": 0, "height": 80 }, "events": { "selected": "onSelection" } },
           { "id": "datePicker", "type": "DatePicker", "properties": { "height": 26 }, "events": { "changed": "onToggle" } },
           { "id": "dateTimePicker", "type": "DateTimePicker", "properties": { "height": 26 }, "events": { "changed": "onToggle" } },
           { "id": "timePicker", "type": "TimePicker", "properties": { "height": 26 }, "events": { "changed": "onToggle" } },
@@ -577,6 +578,7 @@ Assert-FileContains $checkControlsGenerated "generated Table constructor" "MiniG
 Assert-FileContains $checkControlsGenerated "generated Table columns constructor" "MiniGui\.ListView\.createColumns"
 Assert-FileContains $checkControlsGenerated "generated DatePicker constructor" "MiniGui\.DatePicker\.create"
 Assert-FileContains $checkControlsGenerated "generated DataGrid constructor" "MiniGui\.DataGrid\.create"
+Assert-FileContains $checkControlsGenerated "generated column widths mutation" "MiniGui\.Control\.setColumnWidths"
 Assert-FileContains $checkControlsGenerated "generated DateTimePicker constructor" "MiniGui\.DateTimePicker\.create"
 Assert-FileContains $checkControlsGenerated "generated TimePicker constructor" "MiniGui\.TimePicker\.create"
 Assert-FileContains $checkControlsGenerated "generated Calendar constructor" "MiniGui\.Calendar\.create"

@@ -829,6 +829,7 @@ function allowedControlEvents(typ)
   if typ == "NumberBox" or typ == "SpinBox" then return ["textChanged", "valueChanged", "changed", "change", "submit", "validating", "validated"] + commonEvents end if
   if contains(["ComboBox", "EditableComboBox", "ListBox", "TabControl", "TreeView", "ListView", "Table", "DataGrid"], typ) then return ["selectionChanged", "selected", "valueChanged", "changed", "change"] + commonEvents end if
   if contains(["ScrollBar", "Slider", "ProgressBar", "ScrollViewer"], typ) then return ["scrollChanged", "valueChanged", "changed", "change"] + commonEvents end if
+  if typ == "Splitter" then return ["valueChanged", "changed", "change"] + commonEvents end if
   return commonEvents
 end function
 
@@ -841,7 +842,7 @@ function allowedControlProps(typ)
   if typ == "NumberBox" or typ == "SpinBox" then return commonControlProps() + ["placeholder", "readOnly", "maxLength", "minimum", "maximum", "value", "step", "decimals", "validationMessage"] end if
   if contains(["CheckBox", "RadioButton", "ToggleSwitch"], typ) then return commonControlProps() + ["checked"] end if
   if contains(["ComboBox", "EditableComboBox", "ListBox", "TabControl", "TreeView"], typ) then return commonControlProps() + ["items", "selectedIndex"] end if
-  if contains(["ListView", "Table", "DataGrid"], typ) then return commonControlProps() + ["items", "selectedIndex", "columns"] end if
+  if contains(["ListView", "Table", "DataGrid"], typ) then return commonControlProps() + ["items", "selectedIndex", "columns", "columnWidths"] end if
   if contains(["ScrollBar", "Slider"], typ) then return commonControlProps() + ["orientation", "minimum", "maximum", "value", "smallStep", "largeStep"] end if
   if typ == "ProgressBar" then return commonControlProps() + ["minimum", "maximum", "value"] end if
   if contains(["MenuBar", "ToolBar", "ContextMenu"], typ) then return commonControlProps() + ["items"] end if
@@ -912,6 +913,14 @@ function testControlProperties(result, path, typ, properties)
       else if len(v.items) > 0 then
         for columnIndex = 0 to len(v.items) - 1
           if v.items[columnIndex].kind != "string" then addError(result, path, "Property '" + name + "' on " + typ + " must be an array of strings.") end if
+        end for
+      end if
+    end if
+    if name == "columnWidths" then
+      if v.kind != "array" then addError(result, path, "Property '" + name + "' on " + typ + " must be an array of integers.")
+      else if len(v.items) > 0 then
+        for columnWidthIndex = 0 to len(v.items) - 1
+          if v.items[columnWidthIndex].kind != "number" then addError(result, path, "Property '" + name + "' on " + typ + " must be an array of integers.") end if
         end for
       end if
     end if
@@ -1162,6 +1171,18 @@ function stringArrayLiteral(result, path, node, name)
   return "[" + str.join(parts, ", ") + "]"
 end function
 
+function intArrayLiteral(result, path, node, name)
+  v = resourceValue(result, path, prop(prop(node, "properties"), name))
+  if v.kind != "array" then return "[]" end if
+  if len(v.items) == 0 then return "[]" end if
+  parts = []
+  for i = 0 to len(v.items) - 1
+    item = resourceValue(result, path, v.items[i])
+    if item.kind == "number" then parts = parts + ["" + item.number] end if
+  end for
+  return "[" + str.join(parts, ", ") + "]"
+end function
+
 function collectTreeItemLiterals(result, path, parts, item, level)
   prefix = ""
   if level > 0 then
@@ -1395,6 +1416,10 @@ function addGeneratedNode(lines, fields, result, path, node, parentVar, parentTy
     if boolProp(result, path, node, "readOnly", false) then lines = lines + ["MiniGui.Control.setReadOnly(" + var + ", true)"] end if
     maxLength = intProp(result, path, node, "maxLength", -1)
     if maxLength >= 0 then lines = lines + ["MiniGui.Control.setMaxLength(" + var + ", " + maxLength + ")"] end if
+    if typ == "ListView" or typ == "Table" or typ == "DataGrid" then
+      columnWidths = intArrayLiteral(result, path, node, "columnWidths")
+      if columnWidths != "[]" then lines = lines + ["MiniGui.Control.setColumnWidths(" + var + ", " + columnWidths + ")"] end if
+    end if
     if contains(fields, var) == false then fields = fields + [var] end if
     if typ == "ContextMenu" then return [lines, fields, 0] end if
     if isContainerControl(typ) then

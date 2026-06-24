@@ -365,7 +365,8 @@
                   {
                     "id": "layoutSplitter",
                     "type": "Splitter",
-                    "properties": { "height": 8, "width": "fill", "orientation": "horizontal" }
+                    "properties": { "height": 8, "width": "fill", "orientation": "horizontal" },
+                    "events": { "changed": "onSplitterChanged" }
                   },
                   {
                     "type": "WrapPanel",
@@ -534,6 +535,7 @@
                         "type": "Table",
                         "properties": {
                           "columns": ["Name", "Role", "Status"],
+                          "columnWidths": [160, 90, 80],
                           "items": [
                             ["Ada Lovelace", "Analyst", "Active"],
                             ["Grace Hopper", "Compiler", "Active"],
@@ -550,6 +552,7 @@
                         "type": "ListView",
                         "properties": {
                           "columns": ["Status", "Count"],
+                          "columnWidths": [120, 70],
                           "items": [
                             ["Active", "12"],
                             ["Pending", "4"],
@@ -568,6 +571,7 @@
                     "type": "DataGrid",
                     "properties": {
                       "columns": ["Event", "User"],
+                      "columnWidths": [160, 140],
                       "items": [
                         ["Login", "Ada"],
                         ["Deploy", "Grace"]

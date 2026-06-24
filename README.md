@@ -359,13 +359,13 @@ control-specific events in addition to those common focus events.
 | `TextArea` | Multi-line input | `text`, `placeholder` | `textChanged`, `changed`, `change` |
 | `PasswordBox` | Masked single-line input | `text`, `placeholder`, `maxLength`, `readOnly` | `textChanged`, `changed`, `change`, `submit`, `validating`, `validated` |
 | `NumberBox` | Numeric input | `minimum`, `maximum`, `value`, `step`, `readOnly` | `textChanged`, `valueChanged`, `changed`, `change` |
-| `SpinBox` | Numeric input variant prepared for spinner semantics | `minimum`, `maximum`, `value`, `step`, `readOnly` | `textChanged`, `valueChanged`, `changed`, `change` |
+| `SpinBox` | Numeric input with native up/down arrows | `minimum`, `maximum`, `value`, `step`, `readOnly` | `textChanged`, `valueChanged`, `changed`, `change` |
 | `CheckBox` | Boolean choice | `text`, `checked` | `click`, `clicked` |
 | `ToggleSwitch` | Boolean toggle control | `text`, `checked` | `click`, `clicked` |
 | `RadioButton` | Choice inside a group | `text`, `checked` | `click`, `clicked` |
 | `Image` | Bitmap image or image placeholder | `source`, `stretch`, `text` | `click`, `clicked` |
 | `Separator` | Horizontal or vertical separator | `orientation` | - |
-| `Splitter` | Visible horizontal or vertical split marker | `orientation` | - |
+| `Splitter` | Draggable horizontal or vertical split marker | `orientation` | `valueChanged`, `changed`, `change` |
 | `LinkLabel` | Clickable text link | `text`, `url`, `visited` | `click`, `clicked` |
 | `Panel` | Borderless container | `padding`, `spacing`, `children` | - |
 | `ScrollViewer` | Scrollable container host | `horizontalScroll`, `verticalScroll`, `padding`, `spacing`, `children` | - |
@@ -382,9 +382,9 @@ control-specific events in addition to those common focus events.
 | `ToolBar` | Toolbar | `items` | `click`, `clicked` |
 | `StatusBar` | Status line | `text` | - |
 | `TreeView` | Tree navigation | `items` | `selectionChanged`, `selected`, `changed`, `change` |
-| `ListView` | List/report view | `columns`, `items`, `selectedIndex` | `selectionChanged`, `selected`, `changed`, `change` |
-| `Table` | Table-like list backed by `ListView` | `columns`, `items`, `selectedIndex` | `selectionChanged`, `selected`, `changed`, `change` |
-| `DataGrid` | Explicit grid/table control backed by report-mode ListView | `columns`, `items`, `selectedIndex` | `selectionChanged`, `selected`, `changed`, `change` |
+| `ListView` | List/report view | `columns`, `columnWidths`, `items`, `selectedIndex` | `selectionChanged`, `selected`, `changed`, `change` |
+| `Table` | Table-like list backed by `ListView` | `columns`, `columnWidths`, `items`, `selectedIndex` | `selectionChanged`, `selected`, `changed`, `change` |
+| `DataGrid` | Explicit grid/table control backed by report-mode ListView | `columns`, `columnWidths`, `items`, `selectedIndex` | `selectionChanged`, `selected`, `changed`, `change` |
 | `DatePicker` | Date input | `text` | `textChanged`, `changed`, `change` |
 | `DateTimePicker` | Date/time input | `text` | `textChanged`, `changed`, `change` |
 | `TimePicker` | Time input | `text` | `textChanged`, `changed`, `change` |
@@ -690,6 +690,7 @@ end function
       "type": "DataGrid",
       "properties": {
         "columns": ["Name", "Role", "Status"],
+        "columnWidths": [160, 120, 90],
         "items": [
           ["Ada Lovelace", "Analyst", "Active"],
           ["Grace Hopper", "Compiler", "Active"],

@@ -47,6 +47,8 @@ extern function GetClientRect(hwnd as ptr, rect as bytes) from "user32.dll" retu
 extern function MoveWindow(hwnd as ptr, x as int, y as int, width as int, height as int, repaint as bool) from "user32.dll" returns bool
 extern function RedrawWindow(hwnd as ptr, rect as ptr, region as ptr, flags as u32) from "user32.dll" returns bool
 extern function ClientToScreen(hwnd as ptr, point as bytes) from "user32.dll" returns bool
+extern function SetCapture(hwnd as ptr) from "user32.dll" returns ptr
+extern function ReleaseCapture() from "user32.dll" returns bool
 extern function SetScrollRange(hwnd as ptr, bar as int, minimum as int, maximum as int, redraw as bool) from "user32.dll" returns bool
 extern function SetScrollPos(hwnd as ptr, bar as int, position as int, redraw as bool) from "user32.dll" returns int
 extern function SetTimer(hwnd as ptr, timerId as u32, elapsedMs as u32, timerProc as ptr) from "user32.dll" returns ptr
@@ -94,6 +96,8 @@ const WM_CTLCOLORBTN = 309
 const WM_CTLCOLORSTATIC = 312
 const WM_HSCROLL = 276
 const WM_VSCROLL = 277
+const WM_MOUSEMOVE = 512
+const WM_LBUTTONDOWN = 513
 const WM_MOUSEWHEEL = 522
 const WM_LBUTTONUP = 514
 const WM_RBUTTONUP = 517
@@ -130,6 +134,7 @@ const LVIF_TEXT = 1
 const LVCF_TEXT = 4
 const LVCF_WIDTH = 2
 const LVCF_SUBITEM = 8
+const LVM_SETCOLUMNWIDTH = 4126
 const LVIS_FOCUSED = 1
 const LVIS_SELECTED = 2
 const LVNI_SELECTED = 2
@@ -152,6 +157,11 @@ const TBM_SETRANGEMIN = 1031
 const TBM_SETRANGEMAX = 1032
 const TBM_SETPAGESIZE = 1045
 const TBM_SETLINESIZE = 1047
+const UDM_SETBUDDY = 1129
+const UDM_SETRANGE32 = 1135
+const UDM_SETPOS32 = 1137
+const UDM_GETPOS32 = 1138
+const UDN_DELTAPOS = -722
 const TVM_DELETEITEM = 4353
 const TVM_GETNEXTITEM = 4362
 const TVM_GETITEMW = 4414
@@ -212,6 +222,10 @@ const TVS_LINESATROOT = 4
 const TVS_HASBUTTONS = 1
 const TBS_AUTOTICKS = 1
 const TBS_VERT = 2
+const UDS_SETBUDDYINT = 2
+const UDS_ALIGNRIGHT = 4
+const UDS_ARROWKEYS = 32
+const UDS_NOTHOUSANDS = 128
 const DTS_SHORTDATEFORMAT = 0
 const DTS_UPDOWN = 1
 const DTS_TIMEFORMAT = 9
@@ -245,6 +259,7 @@ const CC_RGBINIT = 1
 const CC_FULLOPEN = 2
 const BIF_RETURNONLYFSDIRS = 1
 const BIF_NEWDIALOGSTYLE = 64
+const MK_LBUTTON = 1
 
 _activeApp = void
 _windowProcPtr = 0
@@ -259,6 +274,11 @@ _styleForegrounds = []
 _styleBackgrounds = []
 _styleBrushes = []
 _resizeInitializedWindows = []
+_dragSplitter = void
+_dragSplitterStartX = 0
+_dragSplitterStartY = 0
+_dragSplitterOriginX = 0
+_dragSplitterOriginY = 0
 _windowClassRegistered = false
 _windowClassNameBytes = void
 
@@ -433,10 +453,33 @@ function _miniGuiWndProc(hwnd, msg, wParam, lParam)
     return _defaultWndProc(hwnd, msg, wParam, lParam)
   end if
 
+  if msg == WM_LBUTTONDOWN then
+    appDown = _activeApp
+    if appDown is void then appDown = _appForWindow(hwnd) end if
+    if appDown is void == false then
+      if Events.beginSplitterDrag(appDown, hwnd, lParam & 65535, (lParam >> 16) & 65535) then
+        return 0
+      end if
+    end if
+    return _defaultWndProc(hwnd, msg, wParam, lParam)
+  end if
+
+  if msg == WM_MOUSEMOVE then
+    appMove = _activeApp
+    if appMove is void then appMove = _appForWindow(hwnd) end if
+    if appMove is void == false then
+      if Events.dragSplitter(appMove, hwnd, wParam, lParam & 65535, (lParam >> 16) & 65535) then
+        return 0
+      end if
+    end if
+    return _defaultWndProc(hwnd, msg, wParam, lParam)
+  end if
+
   if msg == WM_LBUTTONUP then
     appClick = _activeApp
     if appClick is void then appClick = _appForWindow(hwnd) end if
     if appClick is void == false then
+      if Events.endSplitterDrag(appClick, hwnd) then return 0 end if
       if Events.isControlKind(appClick, hwnd, "TabControl") then
         tabClickX = lParam & 65535
         tabClickY = (lParam >> 16) & 65535
@@ -504,7 +547,7 @@ function _miniGuiWndProc(hwnd, msg, wParam, lParam)
       RtlMoveMemory(notifyHeader, lParam, 24)
       hwndFrom = _readPtrLE(notifyHeader, 0)
       notifyCode = _readS32LE(notifyHeader, 16)
-      if Events.dispatchNotify(appNotify, hwndFrom, wParam, notifyCode) then
+      if Events.dispatchNotify(appNotify, hwndFrom, wParam, notifyCode, lParam) then
         return 0
       end if
     end if
@@ -1289,14 +1332,23 @@ end struct
 
 struct SpinBox
   static function create(app, parent, id, text, x, y, width, height, minimum, maximum, value, step)
+    InitCommonControls()
     nid = app.nextNativeId
+    app.nextNativeId = app.nextNativeId + 1
+    upDownId = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
     style = WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_BORDER | ES_AUTOHSCROLL | ES_NUMBER
     startText = text
     if startText == "" then startText = "" + value end if
     hwnd = CreateWindowExW(0, "EDIT", startText, style, x, y, width, height, parent.handle, nid, void, void)
     if hwnd != 0 then _installWindowProc(hwnd) end if
-    c = NativeControl(id, "SpinBox", hwnd, nid, startText, x, y, width, height, true, true, startText, -1, minimum, maximum, value, step, step, x, y, width, height, 0, 0, parent, parent.width, parent.height)
+    upDown = CreateWindowExW(0, "msctls_updown32", "", WS_CHILD | WS_VISIBLE | UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_ARROWKEYS | UDS_NOTHOUSANDS, x + width - 18, y, 18, height, parent.handle, upDownId, void, void)
+    if upDown != 0 then
+      SendMessageW(upDown, UDM_SETBUDDY, hwnd, 0)
+      SendMessageW(upDown, UDM_SETRANGE32, minimum, maximum)
+      SendMessageW(upDown, UDM_SETPOS32, 0, value)
+    end if
+    c = NativeControl(id, "SpinBox", hwnd, nid, startText, x, y, width, height, true, true, startText, -1, minimum, maximum, value, step, step, x, y, width, height, upDownId, upDown, parent, parent.width, parent.height)
     return Application.addControl(app, c)
   end function
 end struct
@@ -1366,10 +1418,13 @@ end struct
 
 struct Splitter
   static function create(app, parent, id, text, x, y, width, height, orientation)
+    nid = app.nextNativeId
+    app.nextNativeId = app.nextNativeId + 1
     style = WS_CHILD | WS_VISIBLE | SS_ETCHEDHORZ
     if orientation == "vertical" then style = WS_CHILD | WS_VISIBLE | SS_ETCHEDVERT end if
-    hwnd = CreateWindowExW(0, "STATIC", text, style, x, y, width, height, parent.handle, void, void, void)
-    c = NativeControl(id, "Splitter", hwnd, 0, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
+    hwnd = CreateWindowExW(0, "STATIC", text, style | SS_NOTIFY, x, y, width, height, parent.handle, nid, void, void)
+    if hwnd != 0 then _installWindowProc(hwnd) end if
+    c = NativeControl(id, "Splitter", hwnd, nid, text, x, y, width, height, true, true, orientation, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     return Application.addControl(app, c)
   end function
 end struct
@@ -1937,7 +1992,14 @@ struct Control
         nativeY = control.parent.y + y
       end if
     end if
-    return MoveWindow(control.handle, nativeX, nativeY, width, height, true)
+    moved = MoveWindow(control.handle, nativeX, nativeY, width, height, true)
+    if control.kind == "SpinBox" and control.baseClientHeight != 0 then
+      MoveWindow(control.baseClientHeight, nativeX + width - 18, nativeY, 18, height, true)
+    end if
+    if control.kind == "ListView" or control.kind == "DataGrid" then
+      Control.updateListViewColumnWidths(control)
+    end if
+    return moved
   end function
 
   static function setPosition(control, x, y)
@@ -2013,6 +2075,7 @@ struct Control
     _writeU32LE(column, 24, 5)
     _writeU32LE(column, 28, 0)
     SendMessageW(control.handle, LVM_INSERTCOLUMNW, 0, nativeBytesPtr(column))
+    control.lastText = "Value"
     return true
   end function
 
@@ -2021,6 +2084,7 @@ struct Control
     if control.handle is void then return false end if
     if control.kind != "ListView" and control.kind != "DataGrid" then return false end if
     if len(columns) <= 0 then return Control.ensureListViewColumn(control) end if
+    control.lastText = _joinText(columns, "\t")
     columnWidth = control.width - 8
     if len(columns) > 0 then columnWidth = _asInt(columnWidth / len(columns)) end if
     if columnWidth < 40 then columnWidth = 40 end if
@@ -2034,6 +2098,40 @@ struct Control
       _writeU32LE(column, 24, len(title))
       _writeU32LE(column, 28, i)
       SendMessageW(control.handle, LVM_INSERTCOLUMNW, i, nativeBytesPtr(column))
+    end for
+    return true
+  end function
+
+  static function updateListViewColumnWidths(control)
+    if control is void then return false end if
+    if control.handle is void then return false end if
+    if control.kind != "ListView" and control.kind != "DataGrid" then return false end if
+    columnCount = Control.listViewFieldCount(control.lastText)
+    if columnCount <= 0 then columnCount = 1 end if
+    columnWidth = control.width - 8
+    if columnCount > 1 then columnWidth = _asInt(columnWidth / columnCount) end if
+    if columnWidth < 40 then columnWidth = 40 end if
+    for i = 0 to columnCount - 1
+      SendMessageW(control.handle, LVM_SETCOLUMNWIDTH, i, columnWidth)
+    end for
+    return true
+  end function
+
+  static function setColumnWidth(control, index, width)
+    if control is void then return false end if
+    if control.handle is void then return false end if
+    if control.kind != "ListView" and control.kind != "DataGrid" then return false end if
+    if index < 0 then return false end if
+    if width < 1 then width = 1 end if
+    SendMessageW(control.handle, LVM_SETCOLUMNWIDTH, index, width)
+    return true
+  end function
+
+  static function setColumnWidths(control, widths)
+    if control is void then return false end if
+    if len(widths) <= 0 then return false end if
+    for i = 0 to len(widths) - 1
+      Control.setColumnWidth(control, i, widths[i])
     end for
     return true
   end function
@@ -2192,6 +2290,14 @@ struct Control
     text = decode16Z(textBuf)
     if typeof(text) == "string" then return text end if
     return ""
+  end function
+
+  static function getListViewSelectedText(control)
+    if control is void then return "" end if
+    if control.kind != "ListView" and control.kind != "DataGrid" then return "" end if
+    index = control.lastSelection
+    if index < 0 then return "" end if
+    return _itemTextAt(control.text, index)
   end function
 
   static function setItems(control, items)
@@ -2422,6 +2528,9 @@ struct Control
     if control.kind == "NumberBox" or control.kind == "SpinBox" then
       control.scrollMin = minimum
       control.scrollMax = maximum
+      if control.kind == "SpinBox" and control.baseClientHeight != 0 then
+        SendMessageW(control.baseClientHeight, UDM_SETRANGE32, minimum, maximum)
+      end if
       return true
     end if
     if control.kind == "ProgressBar" then
@@ -2443,6 +2552,9 @@ struct Control
       if value < control.scrollMin then value = control.scrollMin end if
       if value > control.scrollMax then value = control.scrollMax end if
       control.scrollValue = value
+      if control.kind == "SpinBox" and control.baseClientHeight != 0 then
+        SendMessageW(control.baseClientHeight, UDM_SETPOS32, 0, value)
+      end if
       return Control.setText(control, "" + value)
     end if
     if control.kind == "ProgressBar" then
@@ -2698,6 +2810,92 @@ struct Events
     return false
   end function
 
+  static function controlByHandle(app, hwndControl)
+    if app is void then return void end if
+    if len(app.controls) > 0 then
+      for i = 0 to len(app.controls) - 1
+        c = app.controls[i]
+        if c is void == false then
+          if c.handle == hwndControl then return c end if
+        end if
+      end for
+    end if
+    return void
+  end function
+
+  static function dispatchControlTextBindings(app, control, eventType, oldValue, newValue)
+    if app is void then return false end if
+    handled = false
+    for i = 0 to len(app.textBindings) - 1
+      b = app.textBindings[i]
+      if b.control == control then
+        Events.dispatch(b, b.eventType, oldValue, newValue)
+        handled = true
+      end if
+    end for
+    return handled
+  end function
+
+  static function beginSplitterDrag(app, hwndControl, x, y)
+    c = Events.controlByHandle(app, hwndControl)
+    if c is void then return false end if
+    if c.kind != "Splitter" then return false end if
+    global _dragSplitter
+    global _dragSplitterStartX
+    global _dragSplitterStartY
+    global _dragSplitterOriginX
+    global _dragSplitterOriginY
+    _dragSplitter = c
+    _dragSplitterStartX = x
+    _dragSplitterStartY = y
+    _dragSplitterOriginX = c.x
+    _dragSplitterOriginY = c.y
+    SetCapture(hwndControl)
+    return true
+  end function
+
+  static function dragSplitter(app, hwndControl, flags, x, y)
+    global _dragSplitter
+    if _dragSplitter is void then return false end if
+    if (flags & MK_LBUTTON) == 0 then
+      ReleaseCapture()
+      _dragSplitter = void
+      return false
+    end if
+    c = _dragSplitter
+    if c.handle != hwndControl then return false end if
+    global _dragSplitterStartX
+    global _dragSplitterStartY
+    global _dragSplitterOriginX
+    global _dragSplitterOriginY
+    oldValue = c.scrollValue
+    newX = _dragSplitterOriginX
+    newY = _dragSplitterOriginY
+    if c.lastText == "vertical" then
+      newX = _dragSplitterOriginX + x - _dragSplitterStartX
+      if newX < 0 then newX = 0 end if
+      c.scrollValue = newX
+    else
+      newY = _dragSplitterOriginY + y - _dragSplitterStartY
+      if newY < 0 then newY = 0 end if
+      c.scrollValue = newY
+    end if
+    Control.setBounds(c, newX, newY, c.width, c.height)
+    if oldValue != c.scrollValue then
+      Events.dispatchControlTextBindings(app, c, "changed", oldValue, c.scrollValue)
+    end if
+    return true
+  end function
+
+  static function endSplitterDrag(app, hwndControl)
+    global _dragSplitter
+    if _dragSplitter is void then return false end if
+    if _dragSplitter.handle != hwndControl then return false end if
+    ReleaseCapture()
+    _dragSplitter = void
+    return true
+  end function
+
   static function dispatchFocusByHandle(app, hwndControl, focused)
     if app is void then return false end if
     bindings = app.blurBindings
@@ -2722,8 +2920,36 @@ struct Events
     return handled
   end function
 
-  static function dispatchNotify(app, hwndControl, nativeId, code)
+  static function dispatchNotify(app, hwndControl, nativeId, code, lParam)
     if app is void then return false end if
+    if code == UDN_DELTAPOS then
+      for u = 0 to len(app.textBindings) - 1
+        ub = app.textBindings[u]
+        uc = ub.control
+        if uc is void == false then
+          if uc.kind == "SpinBox" and (uc.baseClientHeight == hwndControl or uc.baseClientWidth == nativeId) then
+            oldSpinValue = Control.getValue(uc)
+            deltaSpin = 0
+            if lParam != 0 then
+              spinNotify = bytes(32, 0)
+              RtlMoveMemory(spinNotify, lParam, 32)
+              deltaSpin = _readS32LE(spinNotify, 28)
+            end if
+            newSpinValue = oldSpinValue
+            if deltaSpin < 0 then newSpinValue = oldSpinValue + uc.smallStep end if
+            if deltaSpin > 0 then newSpinValue = oldSpinValue - uc.smallStep end if
+            if deltaSpin == 0 then newSpinValue = oldSpinValue + uc.smallStep end if
+            Control.setValue(uc, newSpinValue)
+            finalSpinValue = Control.getValue(uc)
+            if oldSpinValue != finalSpinValue then
+              uc.lastText = "" + finalSpinValue
+              Events.dispatch(ub, ub.eventType, oldSpinValue, finalSpinValue)
+            end if
+            return true
+          end if
+        end if
+      end for
+    end if
     for s = 0 to len(app.selectionBindings) - 1
       b = app.selectionBindings[s]
       c = b.control
@@ -2741,12 +2967,14 @@ struct Events
         end if
         if (c.kind == "ListView" or c.kind == "DataGrid") and (c.handle == hwndControl or c.nativeId == nativeId) and code == LVN_ITEMCHANGED then
           oldListValue = c.lastSelection
-          newListValue = oldListValue + 1
-          if newListValue < 0 then newListValue = 0 end if
+          newListValue = SendMessageW(c.handle, LVM_GETNEXTITEM, -1, LVNI_SELECTED)
+          if newListValue < 0 then newListValue = oldListValue end if
           countNotifyList = SendMessageW(c.handle, LVM_GETITEMCOUNT, 0, 0)
           if countNotifyList > 0 and newListValue >= countNotifyList then newListValue = 0 end if
           c.lastSelection = newListValue
-          Events.dispatch(b, b.eventType, oldListValue, newListValue)
+          listEventValue = Control.getListViewSelectedText(c)
+          if listEventValue == "" then listEventValue = newListValue end if
+          if oldListValue != newListValue then Events.dispatch(b, b.eventType, oldListValue, listEventValue) end if
           return true
         end if
         if c.kind == "TreeView" and (c.handle == hwndControl or c.nativeId == nativeId) and code == TVN_SELCHANGEDW then
@@ -2910,7 +3138,8 @@ struct Events
             if newValue < 0 then newValue = 0 end if
             countList = SendMessageW(c.handle, LVM_GETITEMCOUNT, 0, 0)
             if countList > 0 and newValue >= countList then newValue = 0 end if
-            eventValue = newValue
+            eventValue = _itemTextAt(c.text, newValue)
+            if eventValue == "" then eventValue = newValue end if
           end if
           c.lastSelection = newValue
           if oldValue != newValue or c.kind == "TreeView" or c.kind == "ListView" or c.kind == "DataGrid" then
