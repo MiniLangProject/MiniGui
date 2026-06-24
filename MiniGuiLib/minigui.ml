@@ -250,11 +250,21 @@ const RDW_ALLCHILDREN = 128
 const RDW_UPDATENOW = 256
 const MB_OK = 0
 const MB_OKCANCEL = 1
+const MB_ABORTRETRYIGNORE = 2
+const MB_YESNOCANCEL = 3
+const MB_YESNO = 4
+const MB_RETRYCANCEL = 5
 const MB_ICONERROR = 16
 const MB_ICONQUESTION = 32
 const MB_ICONWARNING = 48
 const MB_ICONINFORMATION = 64
 const IDOK = 1
+const IDCANCEL = 2
+const IDABORT = 3
+const IDRETRY = 4
+const IDIGNORE = 5
+const IDYES = 6
+const IDNO = 7
 const MF_STRING = 0
 const TPM_RIGHTBUTTON = 2
 const TPM_RETURNCMD = 256
@@ -822,6 +832,32 @@ struct ApplicationState
   running,
 end struct
 
+struct DialogWindow
+  app,
+  window,
+  promptLabel,
+  inputBox,
+  okButton,
+  cancelButton,
+  result,
+  value,
+end struct
+
+function _dialogInputOk(context, event)
+  if context is void then return 0 end if
+  context.result = "ok"
+  if context.inputBox is void == false then context.value = Control.getText(context.inputBox) end if
+  if context.window is void == false and context.window.handle is void == false then ShowWindow(context.window.handle, 0) end if
+  return 0
+end function
+
+function _dialogInputCancel(context, event)
+  if context is void then return 0 end if
+  context.result = "cancel"
+  if context.window is void == false and context.window.handle is void == false then ShowWindow(context.window.handle, 0) end if
+  return 0
+end function
+
 struct Application
   static function create()
     return ApplicationState([], [], [], [], [], [], [], [], [], [], [], void, 1000, false)
@@ -1126,6 +1162,39 @@ struct Dialog
     return app.startupWindow.handle
   end function
 
+  static function _buttonFlags(buttons)
+    if buttons == "okCancel" then return MB_OKCANCEL end if
+    if buttons == "yesNo" then return MB_YESNO end if
+    if buttons == "yesNoCancel" then return MB_YESNOCANCEL end if
+    if buttons == "retryCancel" then return MB_RETRYCANCEL end if
+    if buttons == "abortRetryIgnore" then return MB_ABORTRETRYIGNORE end if
+    return MB_OK
+  end function
+
+  static function _iconFlags(icon)
+    if icon == "info" or icon == "information" then return MB_ICONINFORMATION end if
+    if icon == "warning" then return MB_ICONWARNING end if
+    if icon == "error" then return MB_ICONERROR end if
+    if icon == "question" then return MB_ICONQUESTION end if
+    return 0
+  end function
+
+  static function resultName(code)
+    if code == IDOK then return "ok" end if
+    if code == IDCANCEL then return "cancel" end if
+    if code == IDABORT then return "abort" end if
+    if code == IDRETRY then return "retry" end if
+    if code == IDIGNORE then return "ignore" end if
+    if code == IDYES then return "yes" end if
+    if code == IDNO then return "no" end if
+    return "unknown"
+  end function
+
+  static function showMessage(app, title, message, buttons, icon)
+    code = MessageBoxW(Dialog._owner(app), message, title, Dialog._buttonFlags(buttons) | Dialog._iconFlags(icon))
+    return Dialog.resultName(code)
+  end function
+
   static function _filterBytes(filter)
     raw = filter
     if raw == "" then raw = "All files (*.*)|*.*" end if
@@ -1209,16 +1278,121 @@ struct Dialog
     return MessageBoxW(Dialog._owner(app), message, title, MB_OK | MB_ICONINFORMATION)
   end function
 
+  static function info(app, title, message)
+    return Dialog.showMessage(app, title, message, "ok", "info")
+  end function
+
   static function showWarning(app, title, message)
     return MessageBoxW(Dialog._owner(app), message, title, MB_OK | MB_ICONWARNING)
+  end function
+
+  static function warning(app, title, message)
+    return Dialog.showMessage(app, title, message, "ok", "warning")
   end function
 
   static function showError(app, title, message)
     return MessageBoxW(Dialog._owner(app), message, title, MB_OK | MB_ICONERROR)
   end function
 
+  static function errorMessage(app, title, message)
+    return Dialog.showMessage(app, title, message, "ok", "error")
+  end function
+
   static function confirm(app, title, message)
     return MessageBoxW(Dialog._owner(app), message, title, MB_OKCANCEL | MB_ICONQUESTION) == IDOK
+  end function
+
+  static function question(app, title, message)
+    return Dialog.showMessage(app, title, message, "yesNo", "question")
+  end function
+
+  static function yesNo(app, title, message)
+    return Dialog.showMessage(app, title, message, "yesNo", "question")
+  end function
+
+  static function yesNoCancel(app, title, message)
+    return Dialog.showMessage(app, title, message, "yesNoCancel", "question")
+  end function
+
+  static function retryCancel(app, title, message)
+    return Dialog.showMessage(app, title, message, "retryCancel", "warning")
+  end function
+
+  static function abortRetryIgnore(app, title, message)
+    return Dialog.showMessage(app, title, message, "abortRetryIgnore", "warning")
+  end function
+
+  static function createCustom(app, id, title, width, height)
+    win = Window.create(app, id, title, width, height)
+    return DialogWindow(app, win, void, void, void, void, "", "")
+  end function
+
+  static function close(dialog, result)
+    if dialog is void then return false end if
+    dialog.result = result
+    if dialog.window is void == false and dialog.window.handle is void == false then
+      ShowWindow(dialog.window.handle, 0)
+      return true
+    end if
+    return false
+  end function
+
+  static function getResult(dialog)
+    if dialog is void then return "" end if
+    return dialog.result
+  end function
+
+  static function getValue(dialog)
+    if dialog is void then return "" end if
+    if dialog.inputBox is void == false then dialog.value = Control.getText(dialog.inputBox) end if
+    return dialog.value
+  end function
+
+  static function setValue(dialog, value)
+    if dialog is void then return false end if
+    dialog.value = value
+    if dialog.inputBox is void == false then return Control.setText(dialog.inputBox, value) end if
+    return true
+  end function
+
+  static function showModal(dialog)
+    if dialog is void then return "cancel" end if
+    if dialog.window is void then return "cancel" end if
+    dialog.result = ""
+    Window.show(dialog.window)
+    msg = bytes(48, 0)
+    while dialog.result == "" and IsWindow(dialog.window.handle)
+      rc = GetMessageW(msg, void, 0, 0)
+      if rc <= 0 then
+        if dialog.result == "" then dialog.result = "cancel" end if
+      else
+        TranslateMessage(msg)
+        DispatchMessageW(msg)
+        Application.pollResize(dialog.app)
+      end if
+    end while
+    if dialog.result == "" then dialog.result = "cancel" end if
+    return dialog.result
+  end function
+
+  static function createInput(app, id, title, prompt, defaultValue, width)
+    if width <= 0 then width = 420 end if
+    win = Window.create(app, id, title, width, 160)
+    label = Label.create(app, win, id + "_prompt", prompt, 14, 14, width - 42, 24)
+    input = TextBox.create(app, win, id + "_input", defaultValue, 14, 44, width - 42, 26)
+    ok = Button.create(app, win, id + "_ok", "OK", width - 194, 88, 80, 28)
+    cancel = Button.create(app, win, id + "_cancel", "Cancel", width - 106, 88, 80, 28)
+    dialog = DialogWindow(app, win, label, input, ok, cancel, "", defaultValue)
+    Events.bindClick(app, ok, _dialogInputOk, dialog)
+    Events.bindClick(app, cancel, _dialogInputCancel, dialog)
+    return dialog
+  end function
+
+  static function showInput(app, title, prompt, defaultValue)
+    dialog = Dialog.createInput(app, "__inputDialog", title, prompt, defaultValue, 420)
+    result = Dialog.showModal(dialog)
+    if result == "ok" then return Dialog.getValue(dialog) end if
+    return ""
   end function
 
   static function pickOpenFile(app, title, filter)

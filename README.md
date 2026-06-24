@@ -847,7 +847,8 @@ MiniGui.Events.bindBlur(app, control, onBlur, ui)
 
 ## Dialog API
 
-MiniGui includes basic native message boxes:
+MiniGui includes native message boxes. The original `show*` helpers return the
+native Windows result code:
 
 ```minilang
 MiniGui.Dialog.showInfo(ui.app, "Saved", "The record was saved.")
@@ -857,6 +858,23 @@ MiniGui.Dialog.showError(ui.app, "Error", "The operation failed.")
 if MiniGui.Dialog.confirm(ui.app, "Close", "Close without saving?") then
   MiniGui.Window.close(ui.mainWindow)
 end if
+```
+
+For new code, prefer the high-level helpers. They return stable strings:
+`ok`, `cancel`, `yes`, `no`, `retry`, `abort`, `ignore`, or `unknown`.
+
+```minilang
+result = MiniGui.Dialog.showMessage(ui.app, "Delete", "Delete this item?", "yesNoCancel", "question")
+if result == "yes" then
+  MiniGui.Control.setText(ui.statusBar, "Deleted")
+end if
+
+answer = MiniGui.Dialog.yesNo(ui.app, "Close", "Close without saving?")
+retry = MiniGui.Dialog.retryCancel(ui.app, "Network", "Try again?")
+
+MiniGui.Dialog.info(ui.app, "Saved", "The record was saved.")
+MiniGui.Dialog.warning(ui.app, "Check input", "Some fields are incomplete.")
+MiniGui.Dialog.errorMessage(ui.app, "Error", "The operation failed.")
 ```
 
 Native picker helpers are also available:
@@ -870,6 +888,27 @@ color = MiniGui.Dialog.pickColor(ui.app, "Choose color", "#336699")
 
 The picker helpers return an empty string when the user cancels. `pickColor`
 returns the fallback color when cancelled.
+
+MiniGui also provides a native MiniGui-based input dialog helper:
+
+```minilang
+name = MiniGui.Dialog.showInput(ui.app, "Customer", "Customer name", "")
+if name != "" then
+  MiniGui.Control.setText(ui.resultLabel, "Customer: " + name)
+end if
+```
+
+For custom modal dialogs, create a dialog window and add normal MiniGui controls
+to `dialog.window`:
+
+```minilang
+dialog = MiniGui.Dialog.createCustom(ui.app, "detailsDialog", "Details", 420, 220)
+label = MiniGui.Label.create(ui.app, dialog.window, "detailsLabel", "Custom content", 14, 14, 360, 24)
+MiniGui.Dialog.showModal(dialog)
+```
+
+Interactive native dialogs and modal input dialogs are intentionally not opened
+by the automated test suite, because they would block unattended test runs.
 
 ## Release Package
 

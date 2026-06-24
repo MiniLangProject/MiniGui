@@ -48,6 +48,17 @@ end struct
 function main(args)
   app = MiniGui.Application.create()
   win = MiniGui.Window.create(app, "mainWindow", "MiniGui Check Controls Smoke", 560, 420)
+  if MiniGui.Dialog.resultName(1) != "ok" then return 114 end if
+  if MiniGui.Dialog.resultName(2) != "cancel" then return 115 end if
+  if MiniGui.Dialog.resultName(4) != "retry" then return 116 end if
+  if MiniGui.Dialog.resultName(6) != "yes" then return 117 end if
+  if MiniGui.Dialog.resultName(7) != "no" then return 118 end if
+  inputDialog = MiniGui.Dialog.createInput(app, "inputDialog", "Input", "Name", "Ada", 360)
+  if MiniGui.Dialog.getValue(inputDialog) != "Ada" then return 119 end if
+  if MiniGui.Dialog.setValue(inputDialog, "Grace") == false then return 120 end if
+  if MiniGui.Dialog.getValue(inputDialog) != "Grace" then return 121 end if
+  if MiniGui.Dialog.close(inputDialog, "cancel") == false then return 122 end if
+  if MiniGui.Dialog.getResult(inputDialog) != "cancel" then return 123 end if
   button = MiniGui.Button.create(app, win, "button", "Run", 16, 4, 90, 24)
   textBox = MiniGui.TextBox.create(app, win, "textBox", "Text", 112, 4, 120, 24)
   searchBox = MiniGui.SearchBox.create(app, win, "searchBox", "Find", 238, 4, 120, 24)
