@@ -824,10 +824,10 @@ end function
 
 function allowedControlEvents(typ)
   commonEvents = ["focus", "blur"]
-  if contains(["Button", "CheckBox", "RadioButton", "ToolBar", "MenuBar", "ContextMenu", "LinkLabel", "Image"], typ) then return ["click", "clicked"] + commonEvents end if
-  if contains(["TextBox", "TextArea", "PasswordBox", "DatePicker"], typ) then return ["textChanged", "changed", "change", "submit", "validating", "validated"] + commonEvents end if
-  if typ == "NumberBox" then return ["textChanged", "valueChanged", "changed", "change", "submit", "validating", "validated"] + commonEvents end if
-  if contains(["ComboBox", "ListBox", "TabControl", "TreeView", "ListView", "Table"], typ) then return ["selectionChanged", "selected", "valueChanged", "changed", "change"] + commonEvents end if
+  if contains(["Button", "CheckBox", "RadioButton", "ToggleSwitch", "ToolBar", "MenuBar", "ContextMenu", "LinkLabel", "Image", "FilePicker", "FolderPicker", "ColorPicker"], typ) then return ["click", "clicked"] + commonEvents end if
+  if contains(["TextBox", "SearchBox", "TextArea", "PasswordBox", "DatePicker", "DateTimePicker", "TimePicker", "Calendar"], typ) then return ["textChanged", "changed", "change", "submit", "validating", "validated"] + commonEvents end if
+  if typ == "NumberBox" or typ == "SpinBox" then return ["textChanged", "valueChanged", "changed", "change", "submit", "validating", "validated"] + commonEvents end if
+  if contains(["ComboBox", "EditableComboBox", "ListBox", "TabControl", "TreeView", "ListView", "Table", "DataGrid"], typ) then return ["selectionChanged", "selected", "valueChanged", "changed", "change"] + commonEvents end if
   if contains(["ScrollBar", "Slider", "ProgressBar", "ScrollViewer"], typ) then return ["scrollChanged", "valueChanged", "changed", "change"] + commonEvents end if
   return commonEvents
 end function
@@ -837,24 +837,27 @@ function commonControlProps()
 end function
 
 function allowedControlProps(typ)
-  if contains(["TextBox", "TextArea", "PasswordBox"], typ) then return commonControlProps() + ["placeholder", "readOnly", "maxLength", "inputType", "validationMessage"] end if
-  if typ == "NumberBox" then return commonControlProps() + ["placeholder", "readOnly", "maxLength", "minimum", "maximum", "value", "step", "decimals", "validationMessage"] end if
-  if contains(["CheckBox", "RadioButton"], typ) then return commonControlProps() + ["checked"] end if
-  if contains(["ComboBox", "ListBox", "TabControl", "TreeView"], typ) then return commonControlProps() + ["items", "selectedIndex"] end if
-  if contains(["ListView", "Table"], typ) then return commonControlProps() + ["items", "selectedIndex", "columns"] end if
+  if contains(["TextBox", "SearchBox", "TextArea", "PasswordBox"], typ) then return commonControlProps() + ["placeholder", "readOnly", "maxLength", "inputType", "validationMessage"] end if
+  if typ == "NumberBox" or typ == "SpinBox" then return commonControlProps() + ["placeholder", "readOnly", "maxLength", "minimum", "maximum", "value", "step", "decimals", "validationMessage"] end if
+  if contains(["CheckBox", "RadioButton", "ToggleSwitch"], typ) then return commonControlProps() + ["checked"] end if
+  if contains(["ComboBox", "EditableComboBox", "ListBox", "TabControl", "TreeView"], typ) then return commonControlProps() + ["items", "selectedIndex"] end if
+  if contains(["ListView", "Table", "DataGrid"], typ) then return commonControlProps() + ["items", "selectedIndex", "columns"] end if
   if contains(["ScrollBar", "Slider"], typ) then return commonControlProps() + ["orientation", "minimum", "maximum", "value", "smallStep", "largeStep"] end if
   if typ == "ProgressBar" then return commonControlProps() + ["minimum", "maximum", "value"] end if
   if contains(["MenuBar", "ToolBar", "ContextMenu"], typ) then return commonControlProps() + ["items"] end if
   if typ == "Image" then return commonControlProps() + ["source", "stretch"] end if
-  if typ == "Separator" then return commonControlProps() + ["orientation"] end if
+  if typ == "Separator" or typ == "Splitter" then return commonControlProps() + ["orientation"] end if
+  if typ == "FilePicker" then return commonControlProps() + ["title", "filter"] end if
+  if typ == "FolderPicker" then return commonControlProps() + ["title"] end if
+  if typ == "ColorPicker" then return commonControlProps() + ["title", "value"] end if
   if typ == "LinkLabel" then return commonControlProps() + ["url", "visited"] end if
   if typ == "ScrollViewer" then return commonControlProps() + ["padding", "spacing", "horizontalScroll", "verticalScroll", "autoHide", "scrollX", "scrollY"] end if
-  if contains(["Button", "Label", "Panel", "GroupBox", "StatusBar", "DatePicker"], typ) then return commonControlProps() + ["padding", "spacing"] end if
+  if contains(["Button", "Label", "Panel", "GroupBox", "StatusBar", "DatePicker", "DateTimePicker", "TimePicker", "Calendar"], typ) then return commonControlProps() + ["padding", "spacing"] end if
   return []
 end function
 
 function isControl(typ)
-  return contains(["Label", "Button", "TextBox", "TextArea", "PasswordBox", "NumberBox", "CheckBox", "RadioButton", "Image", "Separator", "LinkLabel", "Panel", "ScrollViewer", "GroupBox", "ComboBox", "ListBox", "ScrollBar", "Slider", "ProgressBar", "TabControl", "MenuBar", "ContextMenu", "StatusBar", "ToolBar", "TreeView", "ListView", "Table", "DatePicker"], typ)
+  return contains(["Label", "Button", "FilePicker", "FolderPicker", "ColorPicker", "TextBox", "SearchBox", "TextArea", "PasswordBox", "NumberBox", "SpinBox", "CheckBox", "ToggleSwitch", "RadioButton", "Image", "Separator", "Splitter", "LinkLabel", "Panel", "ScrollViewer", "GroupBox", "ComboBox", "EditableComboBox", "ListBox", "ScrollBar", "Slider", "ProgressBar", "TabControl", "MenuBar", "ContextMenu", "StatusBar", "ToolBar", "TreeView", "ListView", "Table", "DataGrid", "DatePicker", "DateTimePicker", "TimePicker", "Calendar"], typ)
 end function
 
 function isContainerControl(typ)
@@ -877,10 +880,11 @@ function testControlProperties(result, path, typ, properties)
       if v.kind != "number" and v.kind != "string" then addError(result, path, "Property '" + name + "' on " + typ + " must be an integer, 'auto' or 'fill'.") end if
       if v.kind == "string" and v.text != "auto" and v.text != "fill" then addError(result, path, "Property '" + name + "' on " + typ + " must be an integer, 'auto' or 'fill'.") end if
     end if
-    if contains(["minimum", "maximum", "value", "smallStep", "largeStep", "step", "decimals", "padding", "spacing", "minWidth", "minHeight", "maxWidth", "maxHeight", "fontSize", "borderWidth", "scrollX", "scrollY"], name) and v.kind != "number" then addError(result, path, "Property '" + name + "' on " + typ + " must be an integer.") end if
+    if contains(["minimum", "maximum", "value", "smallStep", "largeStep", "step", "decimals", "padding", "spacing", "minWidth", "minHeight", "maxWidth", "maxHeight", "fontSize", "borderWidth", "scrollX", "scrollY"], name) and (typ != "ColorPicker" or name != "value") and v.kind != "number" then addError(result, path, "Property '" + name + "' on " + typ + " must be an integer.") end if
     if contains(["visible", "enabled", "fill", "readOnly", "visited", "horizontalScroll", "verticalScroll", "autoHide"], name) and v.kind != "bool" then addError(result, path, "Property '" + name + "' on " + typ + " must be a boolean.") end if
     if name == "checked" and v.kind != "bool" then addError(result, path, "Property '" + name + "' on " + typ + " must be a boolean.") end if
-    if contains(["text", "placeholder", "orientation", "horizontalAlignment", "verticalAlignment", "alignment", "dock", "tooltip", "fontFamily", "fontWeight", "foreground", "background", "borderColor", "inputType", "validationMessage", "source", "stretch", "url"], name) and v.kind != "string" then addError(result, path, "Property '" + name + "' on " + typ + " must be a string.") end if
+    if contains(["text", "placeholder", "orientation", "horizontalAlignment", "verticalAlignment", "alignment", "dock", "tooltip", "fontFamily", "fontWeight", "foreground", "background", "borderColor", "inputType", "validationMessage", "source", "stretch", "url", "title", "filter"], name) and v.kind != "string" then addError(result, path, "Property '" + name + "' on " + typ + " must be a string.") end if
+    if typ == "ColorPicker" and name == "value" and v.kind != "string" then addError(result, path, "Property '" + name + "' on " + typ + " must be a string.") end if
     if name == "orientation" and v.kind == "string" and v.text != "vertical" and v.text != "horizontal" then addError(result, path, "Property '" + name + "' on " + typ + " must be 'vertical' or 'horizontal'.") end if
     if name == "items" then
       if v.kind != "array" then addError(result, path, "Property '" + name + "' on " + typ + " must be an array of strings.")
@@ -888,7 +892,7 @@ function testControlProperties(result, path, typ, properties)
         for itemIndex = 0 to len(v.items) - 1
           if typ == "TreeView" then
             if v.items[itemIndex].kind != "string" and v.items[itemIndex].kind != "object" then addError(result, path, "Property '" + name + "' on " + typ + " must contain strings or tree item objects.") end if
-          else if typ == "ListView" or typ == "Table" then
+          else if typ == "ListView" or typ == "Table" or typ == "DataGrid" then
             if v.items[itemIndex].kind == "array" then
               rowItems = v.items[itemIndex].items
               if len(rowItems) > 0 then
@@ -1060,26 +1064,34 @@ function controlDefaultHeight(typ)
   if typ == "ToolBar" then return 30 end if
   if typ == "StatusBar" then return 24 end if
   if typ == "Button" then return 30 end if
+  if typ == "FilePicker" or typ == "FolderPicker" or typ == "ColorPicker" then return 30 end if
   if typ == "TextBox" then return 26 end if
+  if typ == "SearchBox" then return 26 end if
   if typ == "TextArea" then return 80 end if
   if typ == "PasswordBox" then return 26 end if
   if typ == "NumberBox" then return 26 end if
-  if typ == "CheckBox" or typ == "RadioButton" then return 22 end if
+  if typ == "SpinBox" then return 26 end if
+  if typ == "CheckBox" or typ == "RadioButton" or typ == "ToggleSwitch" then return 22 end if
   if typ == "Image" then return 96 end if
   if typ == "Separator" then return 8 end if
+  if typ == "Splitter" then return 8 end if
   if typ == "LinkLabel" then return 24 end if
   if typ == "Panel" then return 120 end if
   if typ == "ScrollViewer" then return 160 end if
   if typ == "GroupBox" then return 80 end if
   if typ == "ComboBox" then return 120 end if
+  if typ == "EditableComboBox" then return 120 end if
   if typ == "ListBox" then return 96 end if
   if typ == "ScrollBar" then return 100 end if
   if typ == "Slider" then return 32 end if
   if typ == "ProgressBar" then return 24 end if
   if typ == "TabControl" then return 160 end if
   if typ == "TreeView" then return 120 end if
-  if typ == "ListView" or typ == "Table" then return 120 end if
+  if typ == "ListView" or typ == "Table" or typ == "DataGrid" then return 120 end if
   if typ == "DatePicker" then return 26 end if
+  if typ == "DateTimePicker" then return 26 end if
+  if typ == "TimePicker" then return 26 end if
+  if typ == "Calendar" then return 160 end if
   return 24
 end function
 
@@ -1212,18 +1224,26 @@ end function
 function createCallFor(typ)
   if typ == "Label" then return "MiniGui.Label.create" end if
   if typ == "Button" then return "MiniGui.Button.create" end if
+  if typ == "FilePicker" then return "MiniGui.FilePicker.create" end if
+  if typ == "FolderPicker" then return "MiniGui.FolderPicker.create" end if
+  if typ == "ColorPicker" then return "MiniGui.ColorPicker.create" end if
+  if typ == "SearchBox" then return "MiniGui.SearchBox.create" end if
   if typ == "TextArea" then return "MiniGui.TextArea.create" end if
   if typ == "PasswordBox" then return "MiniGui.PasswordBox.create" end if
   if typ == "NumberBox" then return "MiniGui.NumberBox.create" end if
+  if typ == "SpinBox" then return "MiniGui.SpinBox.create" end if
   if typ == "CheckBox" then return "MiniGui.CheckBox.create" end if
+  if typ == "ToggleSwitch" then return "MiniGui.ToggleSwitch.create" end if
   if typ == "RadioButton" then return "MiniGui.RadioButton.create" end if
   if typ == "Image" then return "MiniGui.Image.create" end if
   if typ == "Separator" then return "MiniGui.Separator.create" end if
+  if typ == "Splitter" then return "MiniGui.Splitter.create" end if
   if typ == "LinkLabel" then return "MiniGui.LinkLabel.create" end if
   if typ == "Panel" then return "MiniGui.Panel.create" end if
   if typ == "ScrollViewer" then return "MiniGui.ScrollViewer.create" end if
   if typ == "GroupBox" then return "MiniGui.GroupBox.create" end if
   if typ == "ComboBox" then return "MiniGui.ComboBox.create" end if
+  if typ == "EditableComboBox" then return "MiniGui.EditableComboBox.create" end if
   if typ == "ListBox" then return "MiniGui.ListBox.create" end if
   if typ == "ScrollBar" then return "MiniGui.ScrollBar.create" end if
   if typ == "Slider" then return "MiniGui.Slider.create" end if
@@ -1235,7 +1255,11 @@ function createCallFor(typ)
   if typ == "ToolBar" then return "MiniGui.ToolBar.create" end if
   if typ == "TreeView" then return "MiniGui.TreeView.create" end if
   if typ == "ListView" or typ == "Table" then return "MiniGui.ListView.create" end if
+  if typ == "DataGrid" then return "MiniGui.DataGrid.create" end if
   if typ == "DatePicker" then return "MiniGui.DatePicker.create" end if
+  if typ == "DateTimePicker" then return "MiniGui.DateTimePicker.create" end if
+  if typ == "TimePicker" then return "MiniGui.TimePicker.create" end if
+  if typ == "Calendar" then return "MiniGui.Calendar.create" end if
   return "MiniGui.TextBox.create"
 end function
 
@@ -1271,11 +1295,22 @@ function addGeneratedNode(lines, fields, result, path, node, parentVar, parentTy
     if h < 1 then h = 1 end if
     if typ == "Panel" and parentType == "TabControl" then
       lines = lines + [var + " = MiniGui.Panel.createTabPage(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ")"]
-    else if typ == "CheckBox" or typ == "RadioButton" then
+    else if typ == "FilePicker" then
+      pickerTitle = stringProp(result, path, node, "title", "Open file")
+      pickerFilter = stringProp(result, path, node, "filter", "All files (*.*)|*.*")
+      lines = lines + [var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + mlString(pickerTitle) + ", " + mlString(pickerFilter) + ")"]
+    else if typ == "FolderPicker" then
+      folderTitle = stringProp(result, path, node, "title", "Choose folder")
+      lines = lines + [var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + mlString(folderTitle) + ")"]
+    else if typ == "ColorPicker" then
+      colorTitle = stringProp(result, path, node, "title", "Choose color")
+      colorValue = stringProp(result, path, node, "value", "#336699")
+      lines = lines + [var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + mlString(colorTitle) + ", " + mlString(colorValue) + ")"]
+    else if typ == "CheckBox" or typ == "RadioButton" or typ == "ToggleSwitch" then
       checked = "false"
       if boolProp(result, path, node, "checked", false) then checked = "true" end if
       lines = lines + [var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + checked + ")"]
-    else if typ == "NumberBox" then
+    else if typ == "NumberBox" or typ == "SpinBox" then
       numberMin = intProp(result, path, node, "minimum", 0)
       numberMax = intProp(result, path, node, "maximum", 100)
       numberValue = intProp(result, path, node, "value", numberMin)
@@ -1285,7 +1320,7 @@ function addGeneratedNode(lines, fields, result, path, node, parentVar, parentTy
       source = stringProp(result, path, node, "source", "")
       stretch = stringProp(result, path, node, "stretch", "none")
       lines = lines + [var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + mlString(source) + ", " + mlString(stretch) + ")"]
-    else if typ == "Separator" then
+    else if typ == "Separator" or typ == "Splitter" then
       sepOrientation = stringProp(result, path, node, "orientation", "horizontal")
       lines = lines + [var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + mlString(sepOrientation) + ")"]
     else if typ == "LinkLabel" then
@@ -1297,15 +1332,17 @@ function addGeneratedNode(lines, fields, result, path, node, parentVar, parentTy
       if boolProp(result, path, node, "horizontalScroll", false) then hscroll = "true" end if
       if boolProp(result, path, node, "verticalScroll", true) == false then vscroll = "false" end if
       lines = lines + [var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + hscroll + ", " + vscroll + ")"]
-    else if typ == "ComboBox" or typ == "ListBox" then
+    else if typ == "ComboBox" or typ == "EditableComboBox" or typ == "ListBox" then
       items = stringArrayLiteral(result, path, node, "items")
       selectedIndex = intProp(result, path, node, "selectedIndex", -1)
       lines = lines + [var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + items + ", " + selectedIndex + ")"]
-    else if typ == "ListView" or typ == "Table" then
+    else if typ == "ListView" or typ == "Table" or typ == "DataGrid" then
       items = tableArrayLiteral(result, path, node, "items")
       columns = stringArrayLiteral(result, path, node, "columns")
       selectedIndex = intProp(result, path, node, "selectedIndex", -1)
-      if columns == "[]" then
+      if typ == "DataGrid" then
+        lines = lines + [var + " = MiniGui.DataGrid.create(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + columns + ", " + items + ", " + selectedIndex + ")"]
+      else if columns == "[]" then
         lines = lines + [var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + items + ", " + selectedIndex + ")"]
       else
         lines = lines + [var + " = MiniGui.ListView.createColumns(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + columns + ", " + items + ", " + selectedIndex + ")"]

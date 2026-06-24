@@ -141,6 +141,30 @@
                     "properties": { "spacing": 8 },
                     "children": [
                       {
+                        "id": "searchBox",
+                        "type": "SearchBox",
+                        "properties": { "text": "Search", "width": "fill", "minWidth": 180 },
+                        "events": { "changed": "onNameChanged" }
+                      },
+                      {
+                        "id": "meetingDateTimePicker",
+                        "type": "DateTimePicker",
+                        "properties": { "width": 150 },
+                        "events": { "changed": "onDateChanged" }
+                      },
+                      {
+                        "id": "meetingTimePicker",
+                        "type": "TimePicker",
+                        "properties": { "width": 120 },
+                        "events": { "changed": "onDateChanged" }
+                      }
+                    ]
+                  },
+                  {
+                    "type": "HorizontalStack",
+                    "properties": { "spacing": 8 },
+                    "children": [
+                      {
                         "id": "passwordLabel",
                         "type": "Label",
                         "properties": { "text": "Password", "width": 80 }
@@ -155,6 +179,12 @@
                         "id": "quantityNumberBox",
                         "type": "NumberBox",
                         "properties": { "minimum": 1, "maximum": 99, "value": 3, "step": 1, "width": 90 },
+                        "events": { "valueChanged": "onQuantityChanged" }
+                      },
+                      {
+                        "id": "quantitySpinBox",
+                        "type": "SpinBox",
+                        "properties": { "minimum": 0, "maximum": 10, "value": 5, "step": 1, "width": 90 },
                         "events": { "valueChanged": "onQuantityChanged" }
                       }
                     ]
@@ -194,6 +224,12 @@
                     "id": "consentCheckBox",
                     "type": "CheckBox",
                     "properties": { "text": "Enable advanced actions", "checked": true },
+                    "events": { "clicked": "onConsentClicked" }
+                  },
+                  {
+                    "id": "darkModeToggle",
+                    "type": "ToggleSwitch",
+                    "properties": { "text": "Use compact mode", "checked": false },
                     "events": { "clicked": "onConsentClicked" }
                   },
                   {
@@ -238,6 +274,17 @@
                           "selectedIndex": 0,
                           "width": "fill",
                           "minWidth": 220
+                        },
+                        "events": { "selected": "onCountrySelected" }
+                      },
+                      {
+                        "id": "editableTagComboBox",
+                        "type": "EditableComboBox",
+                        "properties": {
+                          "items": ["Design", "Compiler", "Runtime"],
+                          "selectedIndex": 1,
+                          "width": "fill",
+                          "minWidth": 180
                         },
                         "events": { "selected": "onCountrySelected" }
                       },
@@ -316,6 +363,11 @@
                     "properties": { "height": 8, "width": "fill", "orientation": "horizontal" }
                   },
                   {
+                    "id": "layoutSplitter",
+                    "type": "Splitter",
+                    "properties": { "height": 8, "width": "fill", "orientation": "horizontal" }
+                  },
+                  {
                     "type": "WrapPanel",
                     "properties": { "spacing": 8 },
                     "children": [
@@ -330,6 +382,24 @@
                         "type": "Image",
                         "properties": { "text": "Image placeholder", "source": "", "width": 160, "height": 48, "stretch": "none" },
                         "events": { "click": "onImageClicked" }
+                      },
+                      {
+                        "id": "openFilePicker",
+                        "type": "FilePicker",
+                        "properties": { "text": "Open file", "title": "Open file", "filter": "All files (*.*)|*.*", "width": 120 },
+                        "events": { "click": "onActionClicked" }
+                      },
+                      {
+                        "id": "chooseFolderPicker",
+                        "type": "FolderPicker",
+                        "properties": { "text": "Folder", "title": "Choose folder", "width": 100 },
+                        "events": { "click": "onActionClicked" }
+                      },
+                      {
+                        "id": "accentColorPicker",
+                        "type": "ColorPicker",
+                        "properties": { "text": "Color", "title": "Choose accent color", "value": "#336699", "width": 100 },
+                        "events": { "click": "onActionClicked" }
                       }
                     ]
                   },
@@ -435,7 +505,7 @@
                 "id": "dataPanel",
                 "type": "Panel",
                 "properties": {
-                  "height": 390,
+                  "height": 520,
                   "width": "fill",
                   "padding": 8,
                   "spacing": 8
@@ -492,6 +562,27 @@
                         "events": { "selected": "onTableSelected" }
                       }
                     ]
+                  },
+                  {
+                    "id": "auditDataGrid",
+                    "type": "DataGrid",
+                    "properties": {
+                      "columns": ["Event", "User"],
+                      "items": [
+                        ["Login", "Ada"],
+                        ["Deploy", "Grace"]
+                      ],
+                      "selectedIndex": 0,
+                      "height": 90,
+                      "width": "fill"
+                    },
+                    "events": { "selected": "onTableSelected" }
+                  },
+                  {
+                    "id": "calendar",
+                    "type": "Calendar",
+                    "properties": { "height": 150, "width": 240 },
+                    "events": { "changed": "onDateChanged" }
                   },
                   {
                     "id": "dataScrollViewer",

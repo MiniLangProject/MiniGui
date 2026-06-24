@@ -351,19 +351,27 @@ control-specific events in addition to those common focus events.
 | --- | --- | --- | --- |
 | `Label` | Display text | `text` | - |
 | `Button` | Trigger an action | `text` | `click`, `clicked` |
+| `FilePicker` | Button that opens a native open-file dialog | `text`, `title`, `filter` | `click`, `clicked` |
+| `FolderPicker` | Button that opens a native folder dialog | `text`, `title` | `click`, `clicked` |
+| `ColorPicker` | Button that opens a native color dialog | `text`, `title`, `value` | `click`, `clicked` |
 | `TextBox` | Single-line input | `text`, `placeholder` | `textChanged`, `changed`, `change` |
+| `SearchBox` | Single-line search input | `text`, `placeholder`, `maxLength` | `textChanged`, `changed`, `change` |
 | `TextArea` | Multi-line input | `text`, `placeholder` | `textChanged`, `changed`, `change` |
 | `PasswordBox` | Masked single-line input | `text`, `placeholder`, `maxLength`, `readOnly` | `textChanged`, `changed`, `change`, `submit`, `validating`, `validated` |
 | `NumberBox` | Numeric input | `minimum`, `maximum`, `value`, `step`, `readOnly` | `textChanged`, `valueChanged`, `changed`, `change` |
+| `SpinBox` | Numeric input variant prepared for spinner semantics | `minimum`, `maximum`, `value`, `step`, `readOnly` | `textChanged`, `valueChanged`, `changed`, `change` |
 | `CheckBox` | Boolean choice | `text`, `checked` | `click`, `clicked` |
+| `ToggleSwitch` | Boolean toggle control | `text`, `checked` | `click`, `clicked` |
 | `RadioButton` | Choice inside a group | `text`, `checked` | `click`, `clicked` |
 | `Image` | Bitmap image or image placeholder | `source`, `stretch`, `text` | `click`, `clicked` |
 | `Separator` | Horizontal or vertical separator | `orientation` | - |
+| `Splitter` | Visible horizontal or vertical split marker | `orientation` | - |
 | `LinkLabel` | Clickable text link | `text`, `url`, `visited` | `click`, `clicked` |
 | `Panel` | Borderless container | `padding`, `spacing`, `children` | - |
 | `ScrollViewer` | Scrollable container host | `horizontalScroll`, `verticalScroll`, `padding`, `spacing`, `children` | - |
 | `GroupBox` | Labeled container | `text`, `padding`, `spacing`, `children` | - |
 | `ComboBox` | Drop-down selection | `items`, `selectedIndex` | `selectionChanged`, `selected`, `changed`, `change` |
+| `EditableComboBox` | Editable drop-down selection | `items`, `selectedIndex`, `text` | `selectionChanged`, `selected`, `changed`, `change` |
 | `ListBox` | List selection | `items`, `selectedIndex` | `selectionChanged`, `selected`, `changed`, `change` |
 | `ScrollBar` | Scroll or value control | `orientation`, `minimum`, `maximum`, `value`, `smallStep`, `largeStep` | `scrollChanged`, `valueChanged`, `changed`, `change` |
 | `Slider` | Trackbar value control | `orientation`, `minimum`, `maximum`, `value`, `smallStep`, `largeStep` | `scrollChanged`, `valueChanged`, `changed`, `change` |
@@ -376,7 +384,11 @@ control-specific events in addition to those common focus events.
 | `TreeView` | Tree navigation | `items` | `selectionChanged`, `selected`, `changed`, `change` |
 | `ListView` | List/report view | `columns`, `items`, `selectedIndex` | `selectionChanged`, `selected`, `changed`, `change` |
 | `Table` | Table-like list backed by `ListView` | `columns`, `items`, `selectedIndex` | `selectionChanged`, `selected`, `changed`, `change` |
+| `DataGrid` | Explicit grid/table control backed by report-mode ListView | `columns`, `items`, `selectedIndex` | `selectionChanged`, `selected`, `changed`, `change` |
 | `DatePicker` | Date input | `text` | `textChanged`, `changed`, `change` |
+| `DateTimePicker` | Date/time input | `text` | `textChanged`, `changed`, `change` |
+| `TimePicker` | Time input | `text` | `textChanged`, `changed`, `change` |
+| `Calendar` | Month calendar selector | `text` | `textChanged`, `changed`, `change` |
 
 ## Control Screenshot Gallery
 
@@ -597,6 +609,19 @@ end function
 
 ```json
 {
+  "id": "openFilePicker",
+  "type": "FilePicker",
+  "properties": {
+    "text": "Open file",
+    "title": "Open file",
+    "filter": "Text files (*.txt)|*.txt|All files (*.*)|*.*"
+  },
+  "events": { "click": "onOpenFile" }
+}
+```
+
+```json
+{
   "id": "mainToolBar",
   "type": "ToolBar",
   "properties": {
@@ -640,7 +665,7 @@ end function
 }
 ```
 
-### TreeView, ListView, Table, and DatePicker
+### TreeView, ListView, DataGrid, and Date Controls
 
 ```json
 {
@@ -662,7 +687,7 @@ end function
     },
     {
       "id": "customerTable",
-      "type": "Table",
+      "type": "DataGrid",
       "properties": {
         "columns": ["Name", "Role", "Status"],
         "items": [
@@ -684,6 +709,15 @@ end function
   "id": "birthDatePicker",
   "type": "DatePicker",
   "properties": { "width": 150 },
+  "events": { "changed": "onDateChanged" }
+}
+```
+
+```json
+{
+  "id": "appointmentTimePicker",
+  "type": "TimePicker",
+  "properties": { "width": 120 },
   "events": { "changed": "onDateChanged" }
 }
 ```

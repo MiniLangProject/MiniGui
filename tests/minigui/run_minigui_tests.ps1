@@ -415,19 +415,27 @@ if ($g1 -ne $g2) { throw "Control gallery generated output is not deterministic.
 Write-Host "OK: deterministic control-gallery generation"
 Assert-FileContains $galleryGen1 "generated Label constructor" "MiniGui\.Label\.create"
 Assert-FileContains $galleryGen1 "generated Button constructor" "MiniGui\.Button\.create"
+Assert-FileContains $galleryGen1 "generated FilePicker constructor" "MiniGui\.FilePicker\.create"
+Assert-FileContains $galleryGen1 "generated FolderPicker constructor" "MiniGui\.FolderPicker\.create"
+Assert-FileContains $galleryGen1 "generated ColorPicker constructor" "MiniGui\.ColorPicker\.create"
 Assert-FileContains $galleryGen1 "generated TextBox constructor" "MiniGui\.TextBox\.create"
+Assert-FileContains $galleryGen1 "generated SearchBox constructor" "MiniGui\.SearchBox\.create"
 Assert-FileContains $galleryGen1 "generated TextArea constructor" "MiniGui\.TextArea\.create"
 Assert-FileContains $galleryGen1 "generated PasswordBox constructor" "MiniGui\.PasswordBox\.create"
 Assert-FileContains $galleryGen1 "generated NumberBox constructor" "MiniGui\.NumberBox\.create"
+Assert-FileContains $galleryGen1 "generated SpinBox constructor" "MiniGui\.SpinBox\.create"
 Assert-FileContains $galleryGen1 "generated CheckBox constructor" "MiniGui\.CheckBox\.create"
+Assert-FileContains $galleryGen1 "generated ToggleSwitch constructor" "MiniGui\.ToggleSwitch\.create"
 Assert-FileContains $galleryGen1 "generated RadioButton constructor" "MiniGui\.RadioButton\.create"
 Assert-FileContains $galleryGen1 "generated Image constructor" "MiniGui\.Image\.create"
 Assert-FileContains $galleryGen1 "generated Separator constructor" "MiniGui\.Separator\.create"
+Assert-FileContains $galleryGen1 "generated Splitter constructor" "MiniGui\.Splitter\.create"
 Assert-FileContains $galleryGen1 "generated LinkLabel constructor" "MiniGui\.LinkLabel\.create"
 Assert-FileContains $galleryGen1 "generated Panel constructor" "MiniGui\.Panel\.create"
 Assert-FileContains $galleryGen1 "generated ScrollViewer constructor" "MiniGui\.ScrollViewer\.create"
 Assert-FileContains $galleryGen1 "generated GroupBox constructor" "MiniGui\.GroupBox\.create"
 Assert-FileContains $galleryGen1 "generated ComboBox constructor" "MiniGui\.ComboBox\.create"
+Assert-FileContains $galleryGen1 "generated EditableComboBox constructor" "MiniGui\.EditableComboBox\.create"
 Assert-FileContains $galleryGen1 "generated ListBox constructor" "MiniGui\.ListBox\.create"
 Assert-FileContains $galleryGen1 "generated Slider constructor" "MiniGui\.Slider\.create"
 Assert-FileContains $galleryGen1 "generated ProgressBar constructor" "MiniGui\.ProgressBar\.create"
@@ -439,7 +447,11 @@ Assert-FileContains $galleryGen1 "generated ToolBar constructor" "MiniGui\.ToolB
 Assert-FileContains $galleryGen1 "generated TreeView constructor" "MiniGui\.TreeView\.create"
 Assert-FileContains $galleryGen1 "generated Table/ListView constructor" "MiniGui\.ListView\.create"
 Assert-FileContains $galleryGen1 "generated Table/ListView columns constructor" "MiniGui\.ListView\.createColumns"
+Assert-FileContains $galleryGen1 "generated DataGrid constructor" "MiniGui\.DataGrid\.create"
 Assert-FileContains $galleryGen1 "generated DatePicker constructor" "MiniGui\.DatePicker\.create"
+Assert-FileContains $galleryGen1 "generated DateTimePicker constructor" "MiniGui\.DateTimePicker\.create"
+Assert-FileContains $galleryGen1 "generated TimePicker constructor" "MiniGui\.TimePicker\.create"
+Assert-FileContains $galleryGen1 "generated Calendar constructor" "MiniGui\.Calendar\.create"
 Assert-FileContains $galleryGen1 "generated click binding" "MiniGui\.Events\.bindClick"
 Assert-FileContains $galleryGen1 "generated change binding" "MiniGui\.Events\.bindChange"
 Assert-FileContains $galleryGen1 "generated selected binding" "MiniGui\.Events\.bindSelected"
@@ -490,11 +502,18 @@ Write-Utf8NoBom $checkControlsMson @'
         "properties": { "padding": 16, "spacing": 8 },
         "children": [
           { "id": "optInCheckBox", "type": "CheckBox", "properties": { "text": "Opt in", "checked": true }, "events": { "click": "onToggle" } },
+          { "id": "toggle", "type": "ToggleSwitch", "properties": { "text": "Compact", "checked": false }, "events": { "click": "onToggle" } },
           { "id": "choiceRadioButton", "type": "RadioButton", "properties": { "text": "Choice A", "checked": false }, "events": { "click": "onToggle" } },
+          { "id": "search", "type": "SearchBox", "properties": { "text": "Find", "maxLength": 30 }, "events": { "change": "onToggle" } },
           { "id": "passwordBox", "type": "PasswordBox", "properties": { "maxLength": 20 }, "events": { "change": "onToggle", "focus": "onToggle", "blur": "onToggle" } },
           { "id": "numberBox", "type": "NumberBox", "properties": { "minimum": 0, "maximum": 10, "value": 2, "step": 1 }, "events": { "valueChanged": "onToggle" } },
+          { "id": "spinBox", "type": "SpinBox", "properties": { "minimum": 0, "maximum": 10, "value": 3, "step": 1 }, "events": { "valueChanged": "onToggle" } },
+          { "id": "filePicker", "type": "FilePicker", "properties": { "text": "File", "title": "Open", "filter": "All files (*.*)|*.*" }, "events": { "click": "onToggle" } },
+          { "id": "folderPicker", "type": "FolderPicker", "properties": { "text": "Folder", "title": "Choose folder" }, "events": { "click": "onToggle" } },
+          { "id": "colorPicker", "type": "ColorPicker", "properties": { "text": "Color", "title": "Choose color", "value": "#336699" }, "events": { "click": "onToggle" } },
           { "id": "image", "type": "Image", "properties": { "text": "Image", "source": "", "height": 40 }, "events": { "click": "onToggle" } },
           { "id": "separator", "type": "Separator", "properties": { "height": 8, "orientation": "horizontal" } },
+          { "id": "splitter", "type": "Splitter", "properties": { "height": 8, "orientation": "horizontal" } },
           { "id": "link", "type": "LinkLabel", "properties": { "text": "Docs", "url": "https://github.com/MiniLangProject/MiniGui" }, "events": { "click": "onToggle" } },
           {
             "id": "detailsPanel",
@@ -506,6 +525,7 @@ Write-Utf8NoBom $checkControlsMson @'
           },
           { "id": "groupBox", "type": "GroupBox", "properties": { "text": "Customer", "height": 48, "visible": true } },
           { "id": "countryComboBox", "type": "ComboBox", "properties": { "items": ["DE", "US", "FR"], "selectedIndex": 1 }, "events": { "selectionChanged": "onSelection" } },
+          { "id": "editableComboBox", "type": "EditableComboBox", "properties": { "items": ["DE", "US", "FR"], "selectedIndex": 1 }, "events": { "selectionChanged": "onSelection" } },
           { "id": "cityListBox", "type": "ListBox", "properties": { "items": ["Berlin", "Bonn"], "selectedIndex": 0, "height": 72 }, "events": { "change": "onSelection" } },
           { "id": "volumeScrollBar", "type": "ScrollBar", "properties": { "orientation": "horizontal", "minimum": 0, "maximum": 100, "value": 25, "smallStep": 5, "largeStep": 20, "height": 18 }, "events": { "scrollChanged": "onScroll" } },
           { "id": "volumeSlider", "type": "Slider", "properties": { "orientation": "horizontal", "minimum": 0, "maximum": 100, "value": 30, "smallStep": 5, "largeStep": 20, "height": 32, "width": "fill", "minWidth": 220 }, "events": { "valueChanged": "onScroll" } },
@@ -517,7 +537,11 @@ Write-Utf8NoBom $checkControlsMson @'
           { "id": "toolbar", "type": "ToolBar", "properties": { "items": ["Save", "Refresh"], "height": 30 }, "events": { "click": "onToggle" } },
           { "id": "tree", "type": "TreeView", "properties": { "items": ["Root", "Child"], "height": 80 }, "events": { "selected": "onSelection" } },
           { "id": "table", "type": "Table", "properties": { "columns": ["Name", "Role"], "items": [["Ada", "Analyst"], ["Grace", "Compiler"]], "selectedIndex": 0, "height": 80 }, "events": { "selected": "onSelection" } },
+          { "id": "dataGrid", "type": "DataGrid", "properties": { "columns": ["Name", "Role"], "items": [["Ada", "Analyst"], ["Grace", "Compiler"]], "selectedIndex": 0, "height": 80 }, "events": { "selected": "onSelection" } },
           { "id": "datePicker", "type": "DatePicker", "properties": { "height": 26 }, "events": { "changed": "onToggle" } },
+          { "id": "dateTimePicker", "type": "DateTimePicker", "properties": { "height": 26 }, "events": { "changed": "onToggle" } },
+          { "id": "timePicker", "type": "TimePicker", "properties": { "height": 26 }, "events": { "changed": "onToggle" } },
+          { "id": "calendar", "type": "Calendar", "properties": { "height": 120 }, "events": { "changed": "onToggle" } },
           { "id": "statusBar", "type": "StatusBar", "properties": { "text": "Ready", "height": 24 } }
         ]
       }
@@ -534,8 +558,15 @@ Assert-FileContains $checkControlsGenerated "generated ProgressBar constructor" 
 Assert-FileContains $checkControlsGenerated "generated TabControl constructor" "MiniGui\.TabControl\.create"
 Assert-FileContains $checkControlsGenerated "generated PasswordBox constructor" "MiniGui\.PasswordBox\.create"
 Assert-FileContains $checkControlsGenerated "generated NumberBox constructor" "MiniGui\.NumberBox\.create"
+Assert-FileContains $checkControlsGenerated "generated SpinBox constructor" "MiniGui\.SpinBox\.create"
+Assert-FileContains $checkControlsGenerated "generated SearchBox constructor" "MiniGui\.SearchBox\.create"
+Assert-FileContains $checkControlsGenerated "generated ToggleSwitch constructor" "MiniGui\.ToggleSwitch\.create"
+Assert-FileContains $checkControlsGenerated "generated FilePicker constructor" "MiniGui\.FilePicker\.create"
+Assert-FileContains $checkControlsGenerated "generated FolderPicker constructor" "MiniGui\.FolderPicker\.create"
+Assert-FileContains $checkControlsGenerated "generated ColorPicker constructor" "MiniGui\.ColorPicker\.create"
 Assert-FileContains $checkControlsGenerated "generated Image constructor" "MiniGui\.Image\.create"
 Assert-FileContains $checkControlsGenerated "generated Separator constructor" "MiniGui\.Separator\.create"
+Assert-FileContains $checkControlsGenerated "generated Splitter constructor" "MiniGui\.Splitter\.create"
 Assert-FileContains $checkControlsGenerated "generated LinkLabel constructor" "MiniGui\.LinkLabel\.create"
 Assert-FileContains $checkControlsGenerated "generated ScrollViewer constructor" "MiniGui\.ScrollViewer\.create"
 Assert-FileContains $checkControlsGenerated "generated MenuBar constructor" "MiniGui\.MenuBar\.create"
@@ -545,6 +576,10 @@ Assert-FileContains $checkControlsGenerated "generated TreeView constructor" "Mi
 Assert-FileContains $checkControlsGenerated "generated Table constructor" "MiniGui\.ListView\.create"
 Assert-FileContains $checkControlsGenerated "generated Table columns constructor" "MiniGui\.ListView\.createColumns"
 Assert-FileContains $checkControlsGenerated "generated DatePicker constructor" "MiniGui\.DatePicker\.create"
+Assert-FileContains $checkControlsGenerated "generated DataGrid constructor" "MiniGui\.DataGrid\.create"
+Assert-FileContains $checkControlsGenerated "generated DateTimePicker constructor" "MiniGui\.DateTimePicker\.create"
+Assert-FileContains $checkControlsGenerated "generated TimePicker constructor" "MiniGui\.TimePicker\.create"
+Assert-FileContains $checkControlsGenerated "generated Calendar constructor" "MiniGui\.Calendar\.create"
 Assert-FileContains $checkControlsGenerated "generated StatusBar constructor" "MiniGui\.StatusBar\.create"
 Assert-FileContains $checkControlsGenerated "generated clicked binding" "MiniGui\.Events\.bindClicked"
 Assert-FileContains $checkControlsGenerated "generated selected binding" "MiniGui\.Events\.bindSelected"

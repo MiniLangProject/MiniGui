@@ -199,6 +199,7 @@ const BS_PUSHBUTTON = 0
 const BS_AUTOCHECKBOX = 3
 const BS_AUTORADIOBUTTON = 9
 const BS_GROUPBOX = 7
+const CBS_DROPDOWN = 2
 const CBS_DROPDOWNLIST = 3
 const CBS_HASSTRINGS = 512
 const LBS_NOTIFY = 1
@@ -212,6 +213,8 @@ const TVS_HASBUTTONS = 1
 const TBS_AUTOTICKS = 1
 const TBS_VERT = 2
 const DTS_SHORTDATEFORMAT = 0
+const DTS_UPDOWN = 1
+const DTS_TIMEFORMAT = 9
 const TTS_ALWAYSTIP = 1
 const TTF_IDISHWND = 1
 const TTF_SUBCLASS = 16
@@ -453,6 +456,12 @@ function _miniGuiWndProc(hwnd, msg, wParam, lParam)
         selectionClickX2 = lParam & 65535
         selectionClickY2 = (lParam >> 16) & 65535
         if Events.dispatchSelectionClickedByHandle(appClick, hwnd, selectionClickX2, selectionClickY2) then return 0 end if
+        return 0
+      end if
+      if Events.isControlKind(appClick, hwnd, "DataGrid") then
+        selectionClickX3 = lParam & 65535
+        selectionClickY3 = (lParam >> 16) & 65535
+        if Events.dispatchSelectionClickedByHandle(appClick, hwnd, selectionClickX3, selectionClickY3) then return 0 end if
         return 0
       end if
       clickX = lParam & 65535
@@ -1188,6 +1197,57 @@ struct TextBox
   end function
 end struct
 
+struct FilePicker
+  static function create(app, parent, id, text, x, y, width, height, title, filter)
+    nid = app.nextNativeId
+    app.nextNativeId = app.nextNativeId + 1
+    label = text
+    if label == "" then label = "Browse..." end if
+    hwnd = CreateWindowExW(0, "BUTTON", label, WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON, x, y, width, height, parent.handle, nid, void, void)
+    if hwnd != 0 then _installWindowProc(hwnd) end if
+    c = NativeControl(id, "FilePicker", hwnd, nid, label, x, y, width, height, true, true, title + "\n" + filter, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
+    return Application.addControl(app, c)
+  end function
+end struct
+
+struct FolderPicker
+  static function create(app, parent, id, text, x, y, width, height, title)
+    nid = app.nextNativeId
+    app.nextNativeId = app.nextNativeId + 1
+    label = text
+    if label == "" then label = "Browse..." end if
+    hwnd = CreateWindowExW(0, "BUTTON", label, WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON, x, y, width, height, parent.handle, nid, void, void)
+    if hwnd != 0 then _installWindowProc(hwnd) end if
+    c = NativeControl(id, "FolderPicker", hwnd, nid, label, x, y, width, height, true, true, title, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
+    return Application.addControl(app, c)
+  end function
+end struct
+
+struct ColorPicker
+  static function create(app, parent, id, text, x, y, width, height, title, value)
+    nid = app.nextNativeId
+    app.nextNativeId = app.nextNativeId + 1
+    label = text
+    if label == "" then label = "Choose color" end if
+    hwnd = CreateWindowExW(0, "BUTTON", label, WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON, x, y, width, height, parent.handle, nid, void, void)
+    if hwnd != 0 then _installWindowProc(hwnd) end if
+    c = NativeControl(id, "ColorPicker", hwnd, nid, label, x, y, width, height, true, true, title + "\n" + value, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
+    return Application.addControl(app, c)
+  end function
+end struct
+
+struct SearchBox
+  static function create(app, parent, id, text, x, y, width, height)
+    nid = app.nextNativeId
+    app.nextNativeId = app.nextNativeId + 1
+    style = WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_BORDER | ES_AUTOHSCROLL
+    hwnd = CreateWindowExW(0, "EDIT", text, style, x, y, width, height, parent.handle, nid, void, void)
+    if hwnd != 0 then _installWindowProc(hwnd) end if
+    c = NativeControl(id, "SearchBox", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
+    return Application.addControl(app, c)
+  end function
+end struct
+
 struct TextArea
   static function create(app, parent, id, text, x, y, width, height)
     nid = app.nextNativeId
@@ -1227,6 +1287,20 @@ struct NumberBox
   end function
 end struct
 
+struct SpinBox
+  static function create(app, parent, id, text, x, y, width, height, minimum, maximum, value, step)
+    nid = app.nextNativeId
+    app.nextNativeId = app.nextNativeId + 1
+    style = WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_BORDER | ES_AUTOHSCROLL | ES_NUMBER
+    startText = text
+    if startText == "" then startText = "" + value end if
+    hwnd = CreateWindowExW(0, "EDIT", startText, style, x, y, width, height, parent.handle, nid, void, void)
+    if hwnd != 0 then _installWindowProc(hwnd) end if
+    c = NativeControl(id, "SpinBox", hwnd, nid, startText, x, y, width, height, true, true, startText, -1, minimum, maximum, value, step, step, x, y, width, height, 0, 0, parent, parent.width, parent.height)
+    return Application.addControl(app, c)
+  end function
+end struct
+
 struct CheckBox
   static function create(app, parent, id, text, x, y, width, height, checked)
     nid = app.nextNativeId
@@ -1235,6 +1309,18 @@ struct CheckBox
     if hwnd != 0 then _installWindowProc(hwnd) end if
     if checked then SendMessageW(hwnd, BM_SETCHECK, BST_CHECKED, 0) end if
     c = NativeControl(id, "CheckBox", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
+    return Application.addControl(app, c)
+  end function
+end struct
+
+struct ToggleSwitch
+  static function create(app, parent, id, text, x, y, width, height, checked)
+    nid = app.nextNativeId
+    app.nextNativeId = app.nextNativeId + 1
+    hwnd = CreateWindowExW(0, "BUTTON", text, WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX, x, y, width, height, parent.handle, nid, void, void)
+    if hwnd != 0 then _installWindowProc(hwnd) end if
+    if checked then SendMessageW(hwnd, BM_SETCHECK, BST_CHECKED, 0) end if
+    c = NativeControl(id, "ToggleSwitch", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     return Application.addControl(app, c)
   end function
 end struct
@@ -1274,6 +1360,16 @@ struct Separator
     if orientation == "vertical" then style = WS_CHILD | WS_VISIBLE | SS_ETCHEDVERT end if
     hwnd = CreateWindowExW(0, "STATIC", text, style, x, y, width, height, parent.handle, void, void, void)
     c = NativeControl(id, "Separator", hwnd, 0, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
+    return Application.addControl(app, c)
+  end function
+end struct
+
+struct Splitter
+  static function create(app, parent, id, text, x, y, width, height, orientation)
+    style = WS_CHILD | WS_VISIBLE | SS_ETCHEDHORZ
+    if orientation == "vertical" then style = WS_CHILD | WS_VISIBLE | SS_ETCHEDVERT end if
+    hwnd = CreateWindowExW(0, "STATIC", text, style, x, y, width, height, parent.handle, void, void, void)
+    c = NativeControl(id, "Splitter", hwnd, 0, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     return Application.addControl(app, c)
   end function
 end struct
@@ -1520,6 +1616,22 @@ struct ListView
   end function
 end struct
 
+struct DataGrid
+  static function create(app, parent, id, text, x, y, width, height, columns, items, selectedIndex)
+    InitCommonControls()
+    nid = app.nextNativeId
+    app.nextNativeId = app.nextNativeId + 1
+    hwnd = CreateWindowExW(0, "SysListView32", text, WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_BORDER | LVS_REPORT | LVS_SINGLESEL, x, y, width, height, parent.handle, nid, void, void)
+    if hwnd != 0 then _installWindowProc(hwnd) end if
+    c = NativeControl(id, "DataGrid", hwnd, nid, text, x, y, width, height, true, true, text, selectedIndex, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
+    Control.setListViewColumns(c, columns)
+    Control.setItems(c, items)
+    if selectedIndex >= 0 then Control.setSelectedIndex(c, selectedIndex) end if
+    c.lastSelection = Control.getSelectedIndex(c)
+    return Application.addControl(app, c)
+  end function
+end struct
+
 struct DatePicker
   static function create(app, parent, id, text, x, y, width, height)
     InitCommonControls()
@@ -1532,6 +1644,42 @@ struct DatePicker
   end function
 end struct
 
+struct DateTimePicker
+  static function create(app, parent, id, text, x, y, width, height)
+    InitCommonControls()
+    nid = app.nextNativeId
+    app.nextNativeId = app.nextNativeId + 1
+    hwnd = CreateWindowExW(0, "SysDateTimePick32", text, WS_CHILD | WS_VISIBLE | WS_TABSTOP | DTS_SHORTDATEFORMAT, x, y, width, height, parent.handle, nid, void, void)
+    if hwnd != 0 then _installWindowProc(hwnd) end if
+    c = NativeControl(id, "DateTimePicker", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
+    return Application.addControl(app, c)
+  end function
+end struct
+
+struct TimePicker
+  static function create(app, parent, id, text, x, y, width, height)
+    InitCommonControls()
+    nid = app.nextNativeId
+    app.nextNativeId = app.nextNativeId + 1
+    hwnd = CreateWindowExW(0, "SysDateTimePick32", text, WS_CHILD | WS_VISIBLE | WS_TABSTOP | DTS_TIMEFORMAT | DTS_UPDOWN, x, y, width, height, parent.handle, nid, void, void)
+    if hwnd != 0 then _installWindowProc(hwnd) end if
+    c = NativeControl(id, "TimePicker", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
+    return Application.addControl(app, c)
+  end function
+end struct
+
+struct Calendar
+  static function create(app, parent, id, text, x, y, width, height)
+    InitCommonControls()
+    nid = app.nextNativeId
+    app.nextNativeId = app.nextNativeId + 1
+    hwnd = CreateWindowExW(0, "SysMonthCal32", text, WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_BORDER, x, y, width, height, parent.handle, nid, void, void)
+    if hwnd != 0 then _installWindowProc(hwnd) end if
+    c = NativeControl(id, "Calendar", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
+    return Application.addControl(app, c)
+  end function
+end struct
+
 struct ComboBox
   static function create(app, parent, id, text, x, y, width, height, items, selectedIndex)
     nid = app.nextNativeId
@@ -1540,6 +1688,21 @@ struct ComboBox
     hwnd = CreateWindowExW(0, "COMBOBOX", text, style, x, y, width, height, parent.handle, nid, void, void)
     if hwnd != 0 then _installWindowProc(hwnd) end if
     c = NativeControl(id, "ComboBox", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
+    Control.setItems(c, items)
+    if selectedIndex >= 0 then Control.setSelectedIndex(c, selectedIndex) end if
+    c.lastSelection = Control.getSelectedIndex(c)
+    return Application.addControl(app, c)
+  end function
+end struct
+
+struct EditableComboBox
+  static function create(app, parent, id, text, x, y, width, height, items, selectedIndex)
+    nid = app.nextNativeId
+    app.nextNativeId = app.nextNativeId + 1
+    style = WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_VSCROLL | CBS_DROPDOWN | CBS_HASSTRINGS
+    hwnd = CreateWindowExW(0, "COMBOBOX", text, style, x, y, width, height, parent.handle, nid, void, void)
+    if hwnd != 0 then _installWindowProc(hwnd) end if
+    c = NativeControl(id, "EditableComboBox", hwnd, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     Control.setItems(c, items)
     if selectedIndex >= 0 then Control.setSelectedIndex(c, selectedIndex) end if
     c.lastSelection = Control.getSelectedIndex(c)
@@ -1725,7 +1888,7 @@ struct Control
   static function setReadOnly(control, readOnly)
     if control is void then return false end if
     if control.handle is void then return false end if
-    if control.kind == "TextBox" or control.kind == "TextArea" or control.kind == "PasswordBox" or control.kind == "NumberBox" then
+    if control.kind == "TextBox" or control.kind == "SearchBox" or control.kind == "TextArea" or control.kind == "PasswordBox" or control.kind == "NumberBox" or control.kind == "SpinBox" then
       flag = 0
       if readOnly then flag = 1 end if
       SendMessageW(control.handle, EM_SETREADONLY, flag, 0)
@@ -1738,7 +1901,7 @@ struct Control
     if control is void then return false end if
     if control.handle is void then return false end if
     if maxLength < 0 then maxLength = 0 end if
-    if control.kind == "TextBox" or control.kind == "TextArea" or control.kind == "PasswordBox" or control.kind == "NumberBox" then
+    if control.kind == "TextBox" or control.kind == "SearchBox" or control.kind == "TextArea" or control.kind == "PasswordBox" or control.kind == "NumberBox" or control.kind == "SpinBox" then
       SendMessageW(control.handle, EM_LIMITTEXT, maxLength, 0)
       return true
     end if
@@ -1805,7 +1968,7 @@ struct Control
   static function clearItems(control)
     if control is void then return false end if
     if control.handle is void then return false end if
-    if control.kind == "ComboBox" then
+    if control.kind == "ComboBox" or control.kind == "EditableComboBox" then
       SendMessageW(control.handle, CB_RESETCONTENT, 0, 0)
       control.lastSelection = -1
       return true
@@ -1815,7 +1978,7 @@ struct Control
       control.lastSelection = -1
       return true
     end if
-    if control.kind == "ListView" then
+    if control.kind == "ListView" or control.kind == "DataGrid" then
       SendMessageW(control.handle, LVM_DELETEALLITEMS, 0, 0)
       control.lastSelection = -1
       return true
@@ -1831,9 +1994,9 @@ struct Control
   static function addItem(control, text)
     if control is void then return -1 end if
     if control.handle is void then return -1 end if
-    if control.kind == "ComboBox" then return SendMessageTextW(control.handle, CB_ADDSTRING, 0, text) end if
+    if control.kind == "ComboBox" or control.kind == "EditableComboBox" then return SendMessageTextW(control.handle, CB_ADDSTRING, 0, text) end if
     if control.kind == "ListBox" then return SendMessageTextW(control.handle, LB_ADDSTRING, 0, text) end if
-    if control.kind == "ListView" then return Control.addListViewItem(control, text) end if
+    if control.kind == "ListView" or control.kind == "DataGrid" then return Control.addListViewItem(control, text) end if
     if control.kind == "TreeView" then return Control.addTreeViewItem(control, text) end if
     return -1
   end function
@@ -1841,7 +2004,7 @@ struct Control
   static function ensureListViewColumn(control)
     if control is void then return false end if
     if control.handle is void then return false end if
-    if control.kind != "ListView" then return false end if
+    if control.kind != "ListView" and control.kind != "DataGrid" then return false end if
     titleBytes = _asciiUtf16Z("Value")
     column = bytes(40, 0)
     _writeU32LE(column, 0, LVCF_TEXT | LVCF_WIDTH | LVCF_SUBITEM)
@@ -1856,7 +2019,7 @@ struct Control
   static function setListViewColumns(control, columns)
     if control is void then return false end if
     if control.handle is void then return false end if
-    if control.kind != "ListView" then return false end if
+    if control.kind != "ListView" and control.kind != "DataGrid" then return false end if
     if len(columns) <= 0 then return Control.ensureListViewColumn(control) end if
     columnWidth = control.width - 8
     if len(columns) > 0 then columnWidth = _asInt(columnWidth / len(columns)) end if
@@ -2046,17 +2209,17 @@ struct Control
   static function getSelectedIndex(control)
     if control is void then return -1 end if
     if control.handle is void then return -1 end if
-    if control.kind == "ComboBox" then return SendMessageW(control.handle, CB_GETCURSEL, 0, 0) end if
+    if control.kind == "ComboBox" or control.kind == "EditableComboBox" then return SendMessageW(control.handle, CB_GETCURSEL, 0, 0) end if
     if control.kind == "ListBox" then return SendMessageW(control.handle, LB_GETCURSEL, 0, 0) end if
     if control.kind == "TabControl" then return SendMessageW(control.handle, TCM_GETCURSEL, 0, 0) end if
-    if control.kind == "ListView" then return control.lastSelection end if
+    if control.kind == "ListView" or control.kind == "DataGrid" then return control.lastSelection end if
     return -1
   end function
 
   static function setSelectedIndex(control, index)
     if control is void then return false end if
     if control.handle is void then return false end if
-    if control.kind == "ComboBox" then
+    if control.kind == "ComboBox" or control.kind == "EditableComboBox" then
       SendMessageW(control.handle, CB_SETCURSEL, index, 0)
       control.lastSelection = Control.getSelectedIndex(control)
       return true
@@ -2075,7 +2238,7 @@ struct Control
       end if
       return true
     end if
-    if control.kind == "ListView" then
+    if control.kind == "ListView" or control.kind == "DataGrid" then
       item = bytes(56, 0)
       _writeU32LE(item, 12, LVIS_SELECTED | LVIS_FOCUSED)
       _writeU32LE(item, 16, LVIS_SELECTED | LVIS_FOCUSED)
@@ -2239,7 +2402,7 @@ struct Control
     if idx < 0 then return "" end if
     msgLen = LB_GETTEXTLEN
     msgText = LB_GETTEXT
-    if control.kind == "ComboBox" then
+    if control.kind == "ComboBox" or control.kind == "EditableComboBox" then
       msgLen = CB_GETLBTEXTLEN
       msgText = CB_GETLBTEXT
     else if control.kind != "ListBox" then
@@ -2256,7 +2419,7 @@ struct Control
 
   static function setValueRange(control, minimum, maximum)
     if control is void then return false end if
-    if control.kind == "NumberBox" then
+    if control.kind == "NumberBox" or control.kind == "SpinBox" then
       control.scrollMin = minimum
       control.scrollMax = maximum
       return true
@@ -2276,7 +2439,7 @@ struct Control
 
   static function setValue(control, value)
     if control is void then return false end if
-    if control.kind == "NumberBox" then
+    if control.kind == "NumberBox" or control.kind == "SpinBox" then
       if value < control.scrollMin then value = control.scrollMin end if
       if value > control.scrollMax then value = control.scrollMax end if
       control.scrollValue = value
@@ -2295,7 +2458,7 @@ struct Control
 
   static function getValue(control)
     if control is void then return 0 end if
-    if control.kind == "NumberBox" then
+    if control.kind == "NumberBox" or control.kind == "SpinBox" then
       return _asInt(Control.getText(control))
     end if
     if control.kind == "ProgressBar" then return control.scrollValue end if
@@ -2437,7 +2600,7 @@ struct Events
 
   static function bindValueChanged(app, control, callback, context)
     if control is void == false then
-      if control.kind == "ComboBox" or control.kind == "ListBox" or control.kind == "TabControl" or control.kind == "TreeView" or control.kind == "ListView" then
+      if control.kind == "ComboBox" or control.kind == "EditableComboBox" or control.kind == "ListBox" or control.kind == "TabControl" or control.kind == "TreeView" or control.kind == "ListView" or control.kind == "DataGrid" then
         return Events.bindSelectionEvent(app, control, callback, context, "valueChanged")
       end if
       if control.kind == "ScrollBar" or control.kind == "Slider" or control.kind == "ProgressBar" or control.kind == "ScrollViewer" then
@@ -2449,7 +2612,7 @@ struct Events
 
   static function bindChanged(app, control, callback, context)
     if control is void == false then
-      if control.kind == "ComboBox" or control.kind == "ListBox" or control.kind == "TabControl" or control.kind == "TreeView" or control.kind == "ListView" then
+      if control.kind == "ComboBox" or control.kind == "EditableComboBox" or control.kind == "ListBox" or control.kind == "TabControl" or control.kind == "TreeView" or control.kind == "ListView" or control.kind == "DataGrid" then
         return Events.bindSelectionEvent(app, control, callback, context, "changed")
       end if
       if control.kind == "ScrollBar" or control.kind == "Slider" or control.kind == "ProgressBar" or control.kind == "ScrollViewer" then
@@ -2461,7 +2624,7 @@ struct Events
 
   static function bindChange(app, control, callback, context)
     if control is void == false then
-      if control.kind == "ComboBox" or control.kind == "ListBox" or control.kind == "TabControl" or control.kind == "TreeView" or control.kind == "ListView" then
+      if control.kind == "ComboBox" or control.kind == "EditableComboBox" or control.kind == "ListBox" or control.kind == "TabControl" or control.kind == "TreeView" or control.kind == "ListView" or control.kind == "DataGrid" then
         return Events.bindSelectionEvent(app, control, callback, context, "change")
       end if
       if control.kind == "ScrollBar" or control.kind == "Slider" or control.kind == "ProgressBar" or control.kind == "ScrollViewer" then
@@ -2576,7 +2739,7 @@ struct Events
           end if
           return true
         end if
-        if c.kind == "ListView" and (c.handle == hwndControl or c.nativeId == nativeId) and code == LVN_ITEMCHANGED then
+        if (c.kind == "ListView" or c.kind == "DataGrid") and (c.handle == hwndControl or c.nativeId == nativeId) and code == LVN_ITEMCHANGED then
           oldListValue = c.lastSelection
           newListValue = oldListValue + 1
           if newListValue < 0 then newListValue = 0 end if
@@ -2612,6 +2775,12 @@ struct Events
           if c.kind == "MenuBar" or c.kind == "ToolBar" then
             itemText = Control.getItemTextAtClick(c, x)
             if itemText != "" then clickValue = itemText end if
+          else if c.kind == "FilePicker" then
+            clickValue = Dialog.pickOpenFile(app, _itemTextAt(c.lastText, 0), _itemTextAt(c.lastText, 1))
+          else if c.kind == "FolderPicker" then
+            clickValue = Dialog.pickFolder(app, c.lastText)
+          else if c.kind == "ColorPicker" then
+            clickValue = Dialog.pickColor(app, _itemTextAt(c.lastText, 0), _itemTextAt(c.lastText, 1))
           end if
           Events.dispatch(b, b.eventType, false, clickValue)
           return true
@@ -2721,7 +2890,7 @@ struct Events
       b = app.selectionBindings[s]
       c = b.control
       if c is void == false then
-        if (c.kind == "TreeView" or c.kind == "ListView") and c.handle == hwndControl then
+        if (c.kind == "TreeView" or c.kind == "ListView" or c.kind == "DataGrid") and c.handle == hwndControl then
           oldValue = c.lastSelection
           newValue = Control.getSelectedIndex(c)
           eventValue = newValue
@@ -2744,7 +2913,7 @@ struct Events
             eventValue = newValue
           end if
           c.lastSelection = newValue
-          if oldValue != newValue or c.kind == "TreeView" or c.kind == "ListView" then
+          if oldValue != newValue or c.kind == "TreeView" or c.kind == "ListView" or c.kind == "DataGrid" then
             Events.dispatch(b, b.eventType, oldValue, eventValue)
             return true
           end if
@@ -2822,7 +2991,15 @@ struct Events
         c = b.control
         if c is void == false then
           if c.nativeId == nativeId or c.handle == hwndControl then
-            Events.dispatch(b, b.eventType, false, true)
+            clickValue = true
+            if c.kind == "FilePicker" then
+              clickValue = Dialog.pickOpenFile(app, _itemTextAt(c.lastText, 0), _itemTextAt(c.lastText, 1))
+            else if c.kind == "FolderPicker" then
+              clickValue = Dialog.pickFolder(app, c.lastText)
+            else if c.kind == "ColorPicker" then
+              clickValue = Dialog.pickColor(app, _itemTextAt(c.lastText, 0), _itemTextAt(c.lastText, 1))
+            end if
+            Events.dispatch(b, b.eventType, false, clickValue)
             return true
           end if
         end if

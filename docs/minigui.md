@@ -65,19 +65,27 @@ Supported controls:
 - `Window`
 - `Label`
 - `Button`
+- `FilePicker`
+- `FolderPicker`
+- `ColorPicker`
 - `TextBox`
+- `SearchBox`
 - `TextArea`
 - `PasswordBox`
 - `NumberBox`
+- `SpinBox`
 - `CheckBox`
+- `ToggleSwitch`
 - `RadioButton`
 - `Image`
 - `Separator`
+- `Splitter`
 - `LinkLabel`
 - `Panel`
 - `ScrollViewer`
 - `GroupBox`
 - `ComboBox`
+- `EditableComboBox`
 - `ListBox`
 - `ScrollBar`
 - `Slider`
@@ -90,7 +98,11 @@ Supported controls:
 - `TreeView`
 - `ListView`
 - `Table`
+- `DataGrid`
 - `DatePicker`
+- `DateTimePicker`
+- `TimePicker`
+- `Calendar`
 - Component names declared in `components`
 
 Supported layouts:
