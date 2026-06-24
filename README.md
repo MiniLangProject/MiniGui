@@ -384,7 +384,7 @@ control-specific events in addition to those common focus events.
 | `TreeView` | Tree navigation | `items` | `selectionChanged`, `selected`, `changed`, `change` |
 | `ListView` | List/report view | `columns`, `columnWidths`, `items`, `selectedIndex` | `selectionChanged`, `selected`, `changed`, `change` |
 | `Table` | Table-like list backed by `ListView` | `columns`, `columnWidths`, `items`, `selectedIndex` | `selectionChanged`, `selected`, `changed`, `change` |
-| `DataGrid` | Explicit grid/table control backed by report-mode ListView | `columns`, `columnWidths`, `items`, `selectedIndex` | `selectionChanged`, `selected`, `changed`, `change` |
+| `DataGrid` | Explicit grid/table control backed by report-mode ListView | `columns`, `columnWidths`, `items`, `selectedIndex`, `editable` | `selectionChanged`, `selected`, `changed`, `change` |
 | `DatePicker` | Date input | `text` | `textChanged`, `changed`, `change` |
 | `DateTimePicker` | Date/time input | `text` | `textChanged`, `changed`, `change` |
 | `TimePicker` | Time input | `text` | `textChanged`, `changed`, `change` |
@@ -697,6 +697,7 @@ end function
           ["Margaret Hamilton", "Apollo", "Active"]
         ],
         "selectedIndex": 0,
+        "editable": true,
         "height": 120
       },
       "events": { "selected": "onTableSelected" }
@@ -815,6 +816,7 @@ MiniGui.Control.setValue(control, 35)
 value = MiniGui.Control.getValue(control)
 
 MiniGui.Control.setColumnWidths(dataGrid, [160, 120, 90])
+MiniGui.Control.setEditable(dataGrid, true)
 MiniGui.Control.setCellText(dataGrid, 0, 1, "Updated")
 cell = MiniGui.Control.getCellText(dataGrid, 0, 1)
 ```
@@ -822,6 +824,10 @@ cell = MiniGui.Control.getCellText(dataGrid, 0, 1)
 `setValue` and `getValue` are useful for `Slider`, `ScrollBar`, and
 `ProgressBar`, `NumberBox`, and `SpinBox`. For `ComboBox` and `ListBox`, use
 the selection functions.
+
+When a `DataGrid` is editable, the user can double-click a cell to open an
+inline editor. Press Enter or move focus away to commit the value; press Escape
+to cancel the edit.
 
 The most useful functions from `MiniGui.Events`:
 

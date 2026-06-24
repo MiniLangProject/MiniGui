@@ -591,6 +591,7 @@
                         ["Deploy", "Grace"]
                       ],
                       "selectedIndex": 0,
+                      "editable": true,
                       "height": 90,
                       "width": "fill"
                     },

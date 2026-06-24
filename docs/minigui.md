@@ -98,7 +98,7 @@ Supported controls:
 - `TreeView`
 - `ListView`
 - `Table`
-- `DataGrid` with columns, row selection, `columnWidths`, `setCellText`, and `getCellText`
+- `DataGrid` with columns, row selection, `columnWidths`, `editable`, inline cell editing, `setCellText`, and `getCellText`
 - `DatePicker`
 - `DateTimePicker`
 - `TimePicker`

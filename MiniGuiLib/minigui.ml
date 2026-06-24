@@ -49,6 +49,7 @@ extern function RedrawWindow(hwnd as ptr, rect as ptr, region as ptr, flags as u
 extern function ClientToScreen(hwnd as ptr, point as bytes) from "user32.dll" returns bool
 extern function SetCapture(hwnd as ptr) from "user32.dll" returns ptr
 extern function ReleaseCapture() from "user32.dll" returns bool
+extern function SetFocus(hwnd as ptr) from "user32.dll" returns ptr
 extern function SetScrollRange(hwnd as ptr, bar as int, minimum as int, maximum as int, redraw as bool) from "user32.dll" returns bool
 extern function SetScrollPos(hwnd as ptr, bar as int, position as int, redraw as bool) from "user32.dll" returns int
 extern function SetTimer(hwnd as ptr, timerId as u32, elapsedMs as u32, timerProc as ptr) from "user32.dll" returns ptr
@@ -100,6 +101,10 @@ const WM_MOUSEMOVE = 512
 const WM_LBUTTONDOWN = 513
 const WM_MOUSEWHEEL = 522
 const WM_LBUTTONUP = 514
+const WM_LBUTTONDBLCLK = 515
+const WM_KEYDOWN = 256
+const VK_RETURN = 13
+const VK_ESCAPE = 27
 const WM_RBUTTONUP = 517
 const BN_CLICKED = 0
 const EN_CHANGE = 768
@@ -279,6 +284,11 @@ _dragSplitterStartX = 0
 _dragSplitterStartY = 0
 _dragSplitterOriginX = 0
 _dragSplitterOriginY = 0
+_dataGridEditor = 0
+_dataGridEditGrid = void
+_dataGridEditRow = -1
+_dataGridEditColumn = -1
+_dataGridEditOriginal = ""
 _windowClassRegistered = false
 _windowClassNameBytes = void
 
@@ -406,6 +416,17 @@ function _normalizeEditText(text)
   return outv
 end function
 
+function _getWindowText(hwnd)
+  if hwnd == 0 then return "" end if
+  n = GetWindowTextLengthW(hwnd)
+  if n < 0 then return "" end if
+  buf = bytes((n + 2) * 2, 0)
+  GetWindowTextW(hwnd, buf, n + 1)
+  text = decode16Z(buf)
+  if typeof(text) == "string" then return text end if
+  return ""
+end function
+
 function _defaultWndProc(hwnd, msg, wParam, lParam)
   global _subclassHandles
   global _subclassOldProcs
@@ -442,10 +463,27 @@ function _miniGuiWndProc(hwnd, msg, wParam, lParam)
     return _defaultWndProc(hwnd, msg, wParam, lParam)
   end if
 
+  if msg == WM_KEYDOWN then
+    appKey = _activeApp
+    if appKey is void then appKey = _appForWindow(hwnd) end if
+    if appKey is void == false then
+      if wParam == VK_RETURN then
+        if Events.commitDataGridEdit(appKey, hwnd, false) then return 0 end if
+      end if
+      if wParam == VK_ESCAPE then
+        if Events.commitDataGridEdit(appKey, hwnd, true) then return 0 end if
+      end if
+    end if
+    return _defaultWndProc(hwnd, msg, wParam, lParam)
+  end if
+
   if msg == WM_SETFOCUS or msg == WM_KILLFOCUS then
     appFocus = _activeApp
     if appFocus is void then appFocus = _appForWindow(hwnd) end if
     if appFocus is void == false then
+      if msg == WM_KILLFOCUS then
+        if Events.commitDataGridEdit(appFocus, hwnd, false) then return 0 end if
+      end if
       if Events.dispatchFocusByHandle(appFocus, hwnd, msg == WM_SETFOCUS) then
         return _defaultWndProc(hwnd, msg, wParam, lParam)
       end if
@@ -471,6 +509,15 @@ function _miniGuiWndProc(hwnd, msg, wParam, lParam)
       if Events.dragSplitter(appMove, hwnd, wParam, lParam & 65535, (lParam >> 16) & 65535) then
         return 0
       end if
+    end if
+    return _defaultWndProc(hwnd, msg, wParam, lParam)
+  end if
+
+  if msg == WM_LBUTTONDBLCLK then
+    appDbl = _activeApp
+    if appDbl is void then appDbl = _appForWindow(hwnd) end if
+    if appDbl is void == false then
+      if Events.beginDataGridEdit(appDbl, hwnd, lParam & 65535, (lParam >> 16) & 65535) then return 0 end if
     end if
     return _defaultWndProc(hwnd, msg, wParam, lParam)
   end if
@@ -1683,7 +1730,7 @@ struct DataGrid
     app.nextNativeId = app.nextNativeId + 1
     hwnd = CreateWindowExW(0, "SysListView32", text, WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_BORDER | LVS_REPORT | LVS_SINGLESEL, x, y, width, height, parent.handle, nid, void, void)
     if hwnd != 0 then _installWindowProc(hwnd) end if
-    c = NativeControl(id, "DataGrid", hwnd, nid, text, x, y, width, height, true, true, text, selectedIndex, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
+    c = NativeControl(id, "DataGrid", hwnd, nid, text, x, y, width, height, true, true, text, selectedIndex, 0, 100, 0, 1, 0, x, y, width, height, 0, 0, parent, parent.width, parent.height)
     Control.setListViewColumns(c, columns)
     Control.setItems(c, items)
     if selectedIndex >= 0 then Control.setSelectedIndex(c, selectedIndex) end if
@@ -2202,6 +2249,38 @@ struct Control
       Control.setColumnWidth(control, i, widths[i])
     end for
     return true
+  end function
+
+  static function setEditable(control, editable)
+    if control is void then return false end if
+    if control.kind != "DataGrid" then return false end if
+    control.largeStep = 0
+    if editable then control.largeStep = 1 end if
+    return true
+  end function
+
+  static function isEditable(control)
+    if control is void then return false end if
+    if control.kind != "DataGrid" then return false end if
+    return control.largeStep == 1
+  end function
+
+  static function listViewColumnCount(control)
+    if control is void then return 1 end if
+    count = Control.listViewFieldCount(control.lastText)
+    if count <= 0 then count = 1 end if
+    return count
+  end function
+
+  static function listViewColumnAtX(control, x)
+    count = Control.listViewColumnCount(control)
+    columnWidth = control.width
+    if count > 0 then columnWidth = _asInt(control.width / count) end if
+    if columnWidth < 1 then columnWidth = 1 end if
+    column = _asInt(x / columnWidth)
+    if column < 0 then column = 0 end if
+    if column >= count then column = count - 1 end if
+    return column
   end function
 
   static function listViewFieldCount(text)
@@ -3024,6 +3103,74 @@ struct Events
     if _dragSplitter.handle != hwndControl then return false end if
     ReleaseCapture()
     _dragSplitter = void
+    return true
+  end function
+
+  static function beginDataGridEdit(app, hwndControl, x, y)
+    grid = Events.controlByHandle(app, hwndControl)
+    if grid is void then return false end if
+    if grid.kind != "DataGrid" then return false end if
+    if Control.isEditable(grid) == false then return false end if
+    count = SendMessageW(grid.handle, LVM_GETITEMCOUNT, 0, 0)
+    if count <= 0 then return false end if
+    row = _asInt((y - 20) / 16)
+    if row < 0 then row = 0 end if
+    if row >= count then return false end if
+    column = Control.listViewColumnAtX(grid, x)
+    columnCount = Control.listViewColumnCount(grid)
+    columnWidth = grid.width
+    if columnCount > 0 then columnWidth = _asInt(grid.width / columnCount) end if
+    if columnWidth < 40 then columnWidth = 40 end if
+    editorX = column * columnWidth
+    editorY = 20 + row * 16
+    if editorX + columnWidth > grid.width then columnWidth = grid.width - editorX end if
+    if columnWidth < 20 then columnWidth = 20 end if
+    text = Control.getCellText(grid, row, column)
+    global _dataGridEditor
+    global _dataGridEditGrid
+    global _dataGridEditRow
+    global _dataGridEditColumn
+    global _dataGridEditOriginal
+    if _dataGridEditor != 0 then Events.commitDataGridEdit(app, _dataGridEditor, false) end if
+    editId = app.nextNativeId
+    app.nextNativeId = app.nextNativeId + 1
+    editor = CreateWindowExW(0, "EDIT", text, WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_BORDER | ES_AUTOHSCROLL, editorX, editorY, columnWidth, 20, grid.handle, editId, void, void)
+    if editor == 0 then return false end if
+    _installWindowProc(editor)
+    _dataGridEditor = editor
+    _dataGridEditGrid = grid
+    _dataGridEditRow = row
+    _dataGridEditColumn = column
+    _dataGridEditOriginal = text
+    SetFocus(editor)
+    return true
+  end function
+
+  static function commitDataGridEdit(app, hwndControl, cancel)
+    global _dataGridEditor
+    if _dataGridEditor == 0 then return false end if
+    if hwndControl != _dataGridEditor then return false end if
+    global _dataGridEditGrid
+    global _dataGridEditRow
+    global _dataGridEditColumn
+    global _dataGridEditOriginal
+    editor = _dataGridEditor
+    grid = _dataGridEditGrid
+    row = _dataGridEditRow
+    column = _dataGridEditColumn
+    original = _dataGridEditOriginal
+    _dataGridEditor = 0
+    _dataGridEditGrid = void
+    _dataGridEditRow = -1
+    _dataGridEditColumn = -1
+    _dataGridEditOriginal = ""
+    if cancel == false then
+      newText = _getWindowText(editor)
+      if newText != original then
+        Control.setCellText(grid, row, column, newText)
+      end if
+    end if
+    DestroyWindow(editor)
     return true
   end function
 

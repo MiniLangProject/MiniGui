@@ -116,6 +116,9 @@ function main(args)
   if tree.kind != "TreeView" then return 56 end if
   if table.kind != "ListView" then return 57 end if
   if dataGrid.kind != "DataGrid" then return 68 end if
+  if MiniGui.Control.isEditable(dataGrid) then return 72 end if
+  if MiniGui.Control.setEditable(dataGrid, true) == false then return 73 end if
+  if MiniGui.Control.isEditable(dataGrid) == false then return 74 end if
   if MiniGui.Control.getCellText(dataGrid, 0, 1) != "Analyst" then return 69 end if
   if MiniGui.Control.setCellText(dataGrid, 0, 1, "Runtime") == false then return 70 end if
   if MiniGui.Control.getCellText(dataGrid, 0, 1) != "Runtime" then return 71 end if

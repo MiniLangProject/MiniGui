@@ -842,7 +842,7 @@ function allowedControlProps(typ)
   if typ == "NumberBox" or typ == "SpinBox" then return commonControlProps() + ["placeholder", "readOnly", "maxLength", "minimum", "maximum", "value", "step", "decimals", "validationMessage"] end if
   if contains(["CheckBox", "RadioButton", "ToggleSwitch"], typ) then return commonControlProps() + ["checked"] end if
   if contains(["ComboBox", "EditableComboBox", "ListBox", "TabControl", "TreeView"], typ) then return commonControlProps() + ["items", "selectedIndex"] end if
-  if contains(["ListView", "Table", "DataGrid"], typ) then return commonControlProps() + ["items", "selectedIndex", "columns", "columnWidths"] end if
+  if contains(["ListView", "Table", "DataGrid"], typ) then return commonControlProps() + ["items", "selectedIndex", "columns", "columnWidths", "editable"] end if
   if contains(["ScrollBar", "Slider"], typ) then return commonControlProps() + ["orientation", "minimum", "maximum", "value", "smallStep", "largeStep"] end if
   if typ == "ProgressBar" then return commonControlProps() + ["minimum", "maximum", "value"] end if
   if contains(["MenuBar", "ToolBar", "ContextMenu"], typ) then return commonControlProps() + ["items"] end if
@@ -883,7 +883,7 @@ function testControlProperties(result, path, typ, properties)
       if v.kind == "string" and v.text != "auto" and v.text != "fill" then addError(result, path, "Property '" + name + "' on " + typ + " must be an integer, 'auto' or 'fill'.") end if
     end if
     if contains(["minimum", "maximum", "value", "smallStep", "largeStep", "step", "decimals", "padding", "spacing", "minWidth", "minHeight", "maxWidth", "maxHeight", "fontSize", "borderWidth", "scrollX", "scrollY"], name) and (typ != "ColorPicker" or name != "value") and v.kind != "number" then addError(result, path, "Property '" + name + "' on " + typ + " must be an integer.") end if
-    if contains(["visible", "enabled", "fill", "readOnly", "visited", "horizontalScroll", "verticalScroll", "autoHide"], name) and v.kind != "bool" then addError(result, path, "Property '" + name + "' on " + typ + " must be a boolean.") end if
+    if contains(["visible", "enabled", "fill", "readOnly", "visited", "horizontalScroll", "verticalScroll", "autoHide", "editable"], name) and v.kind != "bool" then addError(result, path, "Property '" + name + "' on " + typ + " must be a boolean.") end if
     if name == "checked" and v.kind != "bool" then addError(result, path, "Property '" + name + "' on " + typ + " must be a boolean.") end if
     if contains(["text", "placeholder", "orientation", "horizontalAlignment", "verticalAlignment", "alignment", "dock", "tooltip", "fontFamily", "fontWeight", "foreground", "background", "borderColor", "inputType", "validationMessage", "source", "stretch", "url", "title", "filter", "targetBefore", "targetAfter"], name) and v.kind != "string" then addError(result, path, "Property '" + name + "' on " + typ + " must be a string.") end if
     if typ == "ColorPicker" and name == "value" and v.kind != "string" then addError(result, path, "Property '" + name + "' on " + typ + " must be a string.") end if
@@ -1430,6 +1430,7 @@ function addGeneratedNode(lines, fields, result, path, node, parentVar, parentTy
     if typ == "ListView" or typ == "Table" or typ == "DataGrid" then
       columnWidths = intArrayLiteral(result, path, node, "columnWidths")
       if columnWidths != "[]" then lines = lines + ["MiniGui.Control.setColumnWidths(" + var + ", " + columnWidths + ")"] end if
+      if typ == "DataGrid" and boolProp(result, path, node, "editable", false) then lines = lines + ["MiniGui.Control.setEditable(" + var + ", true)"] end if
     end if
     if contains(fields, var) == false then fields = fields + [var] end if
     if typ == "ContextMenu" then return [lines, fields, 0] end if
