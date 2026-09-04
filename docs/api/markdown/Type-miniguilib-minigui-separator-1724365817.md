@@ -12,7 +12,7 @@ struct Separator
 Represents the separator data used by the minigui module.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2590)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2734)
 
 ## Members
 
@@ -38,4 +38,4 @@ Creates separator for the minigui separator module.
 | `orientation` | `dynamic` | — | orientation value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2601)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2745)

@@ -12,7 +12,7 @@ struct Panel
 Represents the panel data used by the minigui module.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2676)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2820)
 
 ## Members
 
@@ -37,7 +37,7 @@ Creates panel for the minigui panel module.
 | `height` | `dynamic` | — | Height in the coordinate or storage units used by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2686)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2830)
 
 <a id="static_method-static-method-miniguilib-minigui-panel-createtabpage-static-function-createtabpage-app-tabcontrol-id-text-x-y-width-height-miniguilib-minigui-ml-1972181435"></a>
 ### createTabPage
@@ -60,4 +60,4 @@ Creates tab page for the minigui panel module.
 | `height` | `dynamic` | — | Height in the coordinate or storage units used by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2704)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2848)

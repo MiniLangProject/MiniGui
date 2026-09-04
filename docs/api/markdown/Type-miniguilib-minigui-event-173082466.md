@@ -12,7 +12,7 @@ struct Event
 Represents the event data used by the minigui module.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1308)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1451)
 
 ## Members
 
@@ -26,7 +26,7 @@ cancel
 Stores the cancel value associated with event.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1318)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1461)
 
 <a id="field-field-miniguilib-minigui-event-eventtype-eventtype-miniguilib-minigui-ml-71941269"></a>
 ### eventType
@@ -38,7 +38,7 @@ eventType
 Stores the event type value associated with event.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1312)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1455)
 
 <a id="field-field-miniguilib-minigui-event-newvalue-newvalue-miniguilib-minigui-ml-1187781895"></a>
 ### newValue
@@ -50,7 +50,7 @@ newValue
 Stores the new value value associated with event.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1316)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1459)
 
 <a id="field-field-miniguilib-minigui-event-oldvalue-oldvalue-miniguilib-minigui-ml-774455285"></a>
 ### oldValue
@@ -62,7 +62,7 @@ oldValue
 Stores the old value value associated with event.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1314)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1457)
 
 <a id="field-field-miniguilib-minigui-event-sender-sender-miniguilib-minigui-ml-975068211"></a>
 ### sender
@@ -74,4 +74,4 @@ sender
 Stores the sender value associated with event.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1310)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1453)

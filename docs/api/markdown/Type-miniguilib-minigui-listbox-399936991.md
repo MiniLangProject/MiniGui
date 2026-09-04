@@ -12,7 +12,7 @@ struct ListBox
 Represents the list box data used by the minigui module.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L3256)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L3400)
 
 ## Members
 
@@ -39,4 +39,4 @@ Creates list box for the minigui list box module.
 | `selectedIndex` | `dynamic` | — | Zero-based index of selected. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L3268)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L3412)

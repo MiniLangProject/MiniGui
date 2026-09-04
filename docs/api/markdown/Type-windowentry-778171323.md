@@ -12,7 +12,7 @@ struct WindowEntry
 Represents the window entry data used by the minigui module.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L88)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L113)
 
 ## Members
 
@@ -26,7 +26,7 @@ path
 Stores the path value associated with window entry.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L90)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L115)
 
 <a id="field-field-windowentry-window-window-tools-minigui-ml-1270859796"></a>
 ### window
@@ -38,4 +38,4 @@ window
 Stores the window value associated with window entry.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L92)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L117)

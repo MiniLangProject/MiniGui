@@ -12,7 +12,7 @@ struct ToggleSwitch
 Represents the toggle switch data used by the minigui module.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2515)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2659)
 
 ## Members
 
@@ -38,4 +38,4 @@ Creates toggle switch for the minigui toggle switch module.
 | `checked` | `dynamic` | — | checked value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2526)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2670)

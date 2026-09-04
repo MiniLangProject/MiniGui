@@ -59,6 +59,8 @@ MiniGui/
 ```
 
 The Python compiler is currently the faster compiler for MiniGui builds.
+MiniGui targets native Windows x64; the compiler toolchains themselves may also
+target Linux, but the MiniGui runtime deliberately binds Win32 controls.
 
 ## Quick Start
 
@@ -1072,7 +1074,14 @@ Build the control gallery:
 
 The MiniGui test suite builds the CLI, validates the example applications,
 checks generated code, starts GUI smoke tests, and verifies interactions such as
-button clicks, slider changes, and resize behavior.
+button clicks, slider changes, and resize behavior. Regression coverage also
+includes Unicode/UTF-16 conversion, GDI and tooltip resource replacement,
+shell-free compiler argument handling, malformed JSON/MSON, import cycles and
+diamond imports, reserved identifiers, invalid handlers, and deterministic code
+generation. When both compiler projects are available beside MiniGui, the suite
+also builds the CLI with the Python and self-hosted compilers, verifies that the
+two CLI executables and their generated MiniLang sources are byte-identical, and
+runs a self-hosted build and runtime smoke test.
 
 ```powershell
 .\tests\minigui\run_minigui_tests.ps1
@@ -1080,7 +1089,12 @@ button clicks, slider changes, and resize behavior.
 
 ## Compiler Requirements
 
-MiniGui uses native interop helpers from the MiniLang compiler:
+MiniGui requires MiniLang Compiler 1.2.3 or newer and is tested with both the
+Python and self-hosted compilers. It uses current language/runtime features such
+as `const`, explicit `function inline` helpers, exact typed FFI declarations,
+`copyArray`-backed growable lists, and the standard-library `StringBuilder`.
+
+The runtime additionally uses these native interop helpers:
 
 - `nativeCallback(fn, "wndproc")`
 - `nativeBytesPtr(bytes)`
@@ -1089,6 +1103,56 @@ MiniGui uses native interop helpers from the MiniLang compiler:
 
 `MiniGuiLib` uses these helpers for Win32 windows, window procedures, native
 handles, and callback bridges.
+
+The generator uses `std.ds.list`, `std.string_builder`, and `std.process` to
+avoid repeated immutable array/string copies. Python-compiler builds resolve a
+Python 3.14 interpreter directly; compiler arguments are passed to
+`CreateProcessW` with Windows CRT quoting and never through `cmd.exe`.
+
+## Performance and resource lifetime
+
+Append-heavy MSON parsing and source generation use geometrically growing
+buffers and materialize ordinary arrays only at API boundaries. This keeps
+large declarative interfaces linear instead of repeatedly copying every
+previous node or output line. Small scalar helpers that remain hot during
+layout and native buffer access are explicitly inlineable.
+
+The message loop handles normal resizing through `WM_SIZE`; its fallback timer
+continues to cover native-window edge cases, while redundant polling after
+every dispatched message is avoided. MiniGui owns style brushes and tooltip
+windows: replacing a color or tooltip releases the previous native resource,
+and leaving the application loop releases all remaining MiniGui-owned handles.
+
+On Windows x64, a synthetic 3,000-label document (about 202 KiB of MSON) showed
+the following results over five paired runs against the pre-optimization audit
+baseline. Generated source was byte-identical in both cases.
+
+| Measurement | Audit baseline | Current | Change |
+| --- | ---: | ---: | ---: |
+| Median generation time | 1,844.81 ms | 222.80 ms | -87.9% |
+| Peak working set | 157.48 MiB | 43.70 MiB | -72.3% |
+
+Small documents remain dominated by process startup; the hello/control-gallery
+generation path showed no material regression.
+
+## Security and input limits
+
+The MSON reader rejects duplicate object keys, malformed JSON numbers, invalid
+Unicode surrogate pairs, reserved MiniLang identifiers, and invalid event
+handler names before source is emitted. Each MSON document is limited to 16 MiB,
+container nesting to 128 levels, and one import graph to 4,096 distinct files.
+Imports are cycle-checked, case-insensitively deduplicated on Windows, and shared
+diamond dependencies are loaded once.
+
+`minigui build` compiles and links the selected code-behind file. Therefore,
+treat code-behind sources and explicitly supplied compiler executables as code,
+not as untrusted data. MSON import paths may intentionally refer to any readable
+local path; applications that accept third-party MSON should constrain their
+own allowed roots before invoking MiniGui.
+
+Win32 controls have UI-thread affinity. Worker threads may prepare data, but
+must not mutate MiniGui controls directly; marshal such changes back to the UI
+thread in application code.
 
 ## Extending MiniGui
 

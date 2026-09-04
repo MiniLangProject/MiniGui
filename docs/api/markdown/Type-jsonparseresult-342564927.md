@@ -12,7 +12,7 @@ struct JsonParseResult
 Represents the json parse result data used by the minigui module.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L46)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L71)
 
 ## Members
 
@@ -26,7 +26,7 @@ message
 Stores the message value associated with json parse result.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L52)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L77)
 
 <a id="field-field-jsonparseresult-ok-ok-tools-minigui-ml-17185028"></a>
 ### ok
@@ -38,7 +38,7 @@ ok
 Stores the ok value associated with json parse result.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L48)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L73)
 
 <a id="field-field-jsonparseresult-value-value-tools-minigui-ml-2122750868"></a>
 ### value
@@ -50,4 +50,4 @@ value
 Stores the value value associated with json parse result.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L50)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L75)

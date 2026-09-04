@@ -12,7 +12,7 @@ struct Dialog
 Represents the dialog data used by the minigui module.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1821)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1965)
 
 ## Members
 
@@ -30,7 +30,7 @@ Performs the _buttonFlags operation for the minigui dialog module.
 | `buttons` | `dynamic` | — | buttons value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1832)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1976)
 
 <a id="static_method-static-method-miniguilib-minigui-dialog-colorfromhex-static-function-colorfromhex-text-miniguilib-minigui-ml-845117327"></a>
 ### _colorFromHex
@@ -46,7 +46,7 @@ Performs the _colorFromHex operation for the minigui dialog module.
 | `text` | `dynamic` | — | Text consumed by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1955)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2099)
 
 <a id="static_method-static-method-miniguilib-minigui-dialog-colortohex-static-function-colortohex-color-miniguilib-minigui-ml-78817243"></a>
 ### _colorToHex
@@ -62,7 +62,7 @@ Performs the _colorToHex operation for the minigui dialog module.
 | `color` | `dynamic` | — | color value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1965)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2109)
 
 <a id="static_method-static-method-miniguilib-minigui-dialog-filedialog-static-function-filedialog-app-title-filter-savedialog-miniguilib-minigui-ml-1045818614"></a>
 ### _fileDialog
@@ -81,7 +81,7 @@ Performs the _fileDialog operation for the minigui dialog module.
 | `saveDialog` | `dynamic` | — | saveDialog value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1902)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2046)
 
 <a id="static_method-static-method-miniguilib-minigui-dialog-filterbytes-static-function-filterbytes-filter-miniguilib-minigui-ml-88419072"></a>
 ### _filterBytes
@@ -97,7 +97,7 @@ Performs the _filterBytes operation for the minigui dialog module.
 | `filter` | `dynamic` | — | filter value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1877)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2021)
 
 <a id="static_method-static-method-miniguilib-minigui-dialog-hexbyte-static-function-hexbyte-value-miniguilib-minigui-ml-1659154677"></a>
 ### _hexByte
@@ -113,7 +113,7 @@ Performs the _hexByte operation for the minigui dialog module.
 | `value` | `dynamic` | — | Value consumed or transformed by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1937)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2081)
 
 <a id="static_method-static-method-miniguilib-minigui-dialog-hexdigit-static-function-hexdigit-value-miniguilib-minigui-ml-547276841"></a>
 ### _hexDigit
@@ -129,7 +129,7 @@ Performs the _hexDigit operation for the minigui dialog module.
 | `value` | `dynamic` | — | Value consumed or transformed by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1929)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2073)
 
 <a id="static_method-static-method-miniguilib-minigui-dialog-hexvalueat-static-function-hexvalueat-text-pos-miniguilib-minigui-ml-1448169679"></a>
 ### _hexValueAt
@@ -146,7 +146,7 @@ Performs the _hexValueAt operation for the minigui dialog module.
 | `pos` | `dynamic` | — | pos value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1944)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2088)
 
 <a id="static_method-static-method-miniguilib-minigui-dialog-iconflags-static-function-iconflags-icon-miniguilib-minigui-ml-343763499"></a>
 ### _iconFlags
@@ -162,7 +162,7 @@ Performs the _iconFlags operation for the minigui dialog module.
 | `icon` | `dynamic` | — | icon value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1843)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1987)
 
 <a id="static_method-static-method-miniguilib-minigui-dialog-owner-static-function-owner-app-miniguilib-minigui-ml-186149539"></a>
 ### _owner
@@ -178,7 +178,7 @@ Performs the _owner operation for the minigui dialog module.
 | `app` | `dynamic` | — | Application instance operated on by this call. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1824)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1968)
 
 <a id="static_method-static-method-miniguilib-minigui-dialog-abortretryignore-static-function-abortretryignore-app-title-message-miniguilib-minigui-ml-662816968"></a>
 ### abortRetryIgnore
@@ -196,7 +196,7 @@ Performs the abortRetryIgnore operation for the minigui dialog module.
 | `message` | `dynamic` | — | Human-readable message associated with the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2064)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2208)
 
 <a id="static_method-static-method-miniguilib-minigui-dialog-close-static-function-close-dialog-result-miniguilib-minigui-ml-1280988937"></a>
 ### close
@@ -213,7 +213,7 @@ Closes close owned by the minigui module.
 | `result` | `dynamic` | — | Result object populated or inspected by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2082)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2226)
 
 <a id="static_method-static-method-miniguilib-minigui-dialog-confirm-static-function-confirm-app-title-message-miniguilib-minigui-ml-598608940"></a>
 ### confirm
@@ -231,7 +231,7 @@ Performs the confirm operation for the minigui dialog module.
 | `message` | `dynamic` | — | Human-readable message associated with the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2024)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2168)
 
 <a id="static_method-static-method-miniguilib-minigui-dialog-createcustom-static-function-createcustom-app-id-title-width-height-miniguilib-minigui-ml-671246221"></a>
 ### createCustom
@@ -251,7 +251,7 @@ Creates custom for the minigui dialog module.
 | `height` | `dynamic` | — | Height in the coordinate or storage units used by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2074)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2218)
 
 <a id="static_method-static-method-miniguilib-minigui-dialog-createinput-static-function-createinput-app-id-title-prompt-defaultvalue-width-miniguilib-minigui-ml-1295018710"></a>
 ### createInput
@@ -272,7 +272,7 @@ Creates input for the minigui dialog module.
 | `width` | `dynamic` | — | Width in the coordinate or storage units used by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2146)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2290)
 
 <a id="static_method-static-method-miniguilib-minigui-dialog-errormessage-static-function-errormessage-app-title-message-miniguilib-minigui-ml-888258862"></a>
 ### errorMessage
@@ -290,7 +290,7 @@ Performs the errorMessage operation for the minigui dialog module.
 | `message` | `dynamic` | — | Human-readable message associated with the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2016)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2160)
 
 <a id="static_method-static-method-miniguilib-minigui-dialog-getresult-static-function-getresult-dialog-miniguilib-minigui-ml-1311561314"></a>
 ### getResult
@@ -306,7 +306,7 @@ Returns result maintained by the minigui module.
 | `dialog` | `dynamic` | — | dialog value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2094)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2238)
 
 <a id="static_method-static-method-miniguilib-minigui-dialog-getvalue-static-function-getvalue-dialog-miniguilib-minigui-ml-2137203328"></a>
 ### getValue
@@ -322,7 +322,7 @@ Returns value maintained by the minigui module.
 | `dialog` | `dynamic` | — | dialog value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2101)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2245)
 
 <a id="static_method-static-method-miniguilib-minigui-dialog-info-static-function-info-app-title-message-miniguilib-minigui-ml-133940052"></a>
 ### info
@@ -340,7 +340,7 @@ Performs the info operation for the minigui dialog module.
 | `message` | `dynamic` | — | Human-readable message associated with the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1984)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2128)
 
 <a id="static_method-static-method-miniguilib-minigui-dialog-pickcolor-static-function-pickcolor-app-title-fallback-miniguilib-minigui-ml-901897117"></a>
 ### pickColor
@@ -358,7 +358,7 @@ Performs the pickColor operation for the minigui dialog module.
 | `fallback` | `dynamic` | — | Value returned when no explicit result is available. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2211)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2355)
 
 <a id="static_method-static-method-miniguilib-minigui-dialog-pickfolder-static-function-pickfolder-app-title-miniguilib-minigui-ml-497446665"></a>
 ### pickFolder
@@ -375,7 +375,7 @@ Performs the pickFolder operation for the minigui dialog module.
 | `title` | `dynamic` | — | Human-readable title presented to the user. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2190)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2334)
 
 <a id="static_method-static-method-miniguilib-minigui-dialog-pickopenfile-static-function-pickopenfile-app-title-filter-miniguilib-minigui-ml-697429695"></a>
 ### pickOpenFile
@@ -393,7 +393,7 @@ Performs the pickOpenFile operation for the minigui dialog module.
 | `filter` | `dynamic` | — | filter value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2175)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2319)
 
 <a id="static_method-static-method-miniguilib-minigui-dialog-picksavefile-static-function-picksavefile-app-title-filter-miniguilib-minigui-ml-344312933"></a>
 ### pickSaveFile
@@ -411,7 +411,7 @@ Performs the pickSaveFile operation for the minigui dialog module.
 | `filter` | `dynamic` | — | filter value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2183)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2327)
 
 <a id="static_method-static-method-miniguilib-minigui-dialog-question-static-function-question-app-title-message-miniguilib-minigui-ml-1509293812"></a>
 ### question
@@ -429,7 +429,7 @@ Performs the question operation for the minigui dialog module.
 | `message` | `dynamic` | — | Human-readable message associated with the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2032)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2176)
 
 <a id="static_method-static-method-miniguilib-minigui-dialog-resultname-static-function-resultname-code-miniguilib-minigui-ml-109138141"></a>
 ### resultName
@@ -445,7 +445,7 @@ Performs the resultName operation for the minigui dialog module.
 | `code` | `dynamic` | — | code value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1853)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1997)
 
 <a id="static_method-static-method-miniguilib-minigui-dialog-retrycancel-static-function-retrycancel-app-title-message-miniguilib-minigui-ml-466623524"></a>
 ### retryCancel
@@ -463,7 +463,7 @@ Performs the retryCancel operation for the minigui dialog module.
 | `message` | `dynamic` | — | Human-readable message associated with the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2056)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2200)
 
 <a id="static_method-static-method-miniguilib-minigui-dialog-setvalue-static-function-setvalue-dialog-value-miniguilib-minigui-ml-420652195"></a>
 ### setValue
@@ -480,7 +480,7 @@ Updates value maintained by the minigui module.
 | `value` | `dynamic` | — | Value consumed or transformed by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2110)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2254)
 
 <a id="static_method-static-method-miniguilib-minigui-dialog-showerror-static-function-showerror-app-title-message-miniguilib-minigui-ml-1379798868"></a>
 ### showError
@@ -498,7 +498,7 @@ Performs the showError operation for the minigui dialog module.
 | `message` | `dynamic` | — | Human-readable message associated with the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2008)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2152)
 
 <a id="static_method-static-method-miniguilib-minigui-dialog-showinfo-static-function-showinfo-app-title-message-miniguilib-minigui-ml-1643086678"></a>
 ### showInfo
@@ -516,7 +516,7 @@ Performs the showInfo operation for the minigui dialog module.
 | `message` | `dynamic` | — | Human-readable message associated with the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1976)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2120)
 
 <a id="static_method-static-method-miniguilib-minigui-dialog-showinput-static-function-showinput-app-title-prompt-defaultvalue-miniguilib-minigui-ml-1039424635"></a>
 ### showInput
@@ -535,7 +535,7 @@ Performs the showInput operation for the minigui dialog module.
 | `defaultValue` | `dynamic` | — | defaultValue value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2164)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2308)
 
 <a id="static_method-static-method-miniguilib-minigui-dialog-showmessage-static-function-showmessage-app-title-message-buttons-icon-miniguilib-minigui-ml-1675846092"></a>
 ### showMessage
@@ -555,7 +555,7 @@ Performs the showMessage operation for the minigui dialog module.
 | `icon` | `dynamic` | — | icon value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1870)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2014)
 
 <a id="static_method-static-method-miniguilib-minigui-dialog-showmodal-static-function-showmodal-dialog-miniguilib-minigui-ml-917583810"></a>
 ### showModal
@@ -571,7 +571,7 @@ Performs the showModal operation for the minigui dialog module.
 | `dialog` | `dynamic` | — | dialog value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2119)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2263)
 
 <a id="static_method-static-method-miniguilib-minigui-dialog-showwarning-static-function-showwarning-app-title-message-miniguilib-minigui-ml-869786756"></a>
 ### showWarning
@@ -589,7 +589,7 @@ Performs the showWarning operation for the minigui dialog module.
 | `message` | `dynamic` | — | Human-readable message associated with the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1992)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2136)
 
 <a id="static_method-static-method-miniguilib-minigui-dialog-warning-static-function-warning-app-title-message-miniguilib-minigui-ml-406805796"></a>
 ### warning
@@ -607,7 +607,7 @@ Performs the warning operation for the minigui dialog module.
 | `message` | `dynamic` | — | Human-readable message associated with the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2000)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2144)
 
 <a id="static_method-static-method-miniguilib-minigui-dialog-yesno-static-function-yesno-app-title-message-miniguilib-minigui-ml-94362612"></a>
 ### yesNo
@@ -625,7 +625,7 @@ Performs the yesNo operation for the minigui dialog module.
 | `message` | `dynamic` | — | Human-readable message associated with the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2040)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2184)
 
 <a id="static_method-static-method-miniguilib-minigui-dialog-yesnocancel-static-function-yesnocancel-app-title-message-miniguilib-minigui-ml-1637556960"></a>
 ### yesNoCancel
@@ -643,4 +643,4 @@ Performs the yesNoCancel operation for the minigui dialog module.
 | `message` | `dynamic` | — | Human-readable message associated with the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2048)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2192)

@@ -1,121 +1,135 @@
-# MiniGui architecture plan
+# MiniGui architecture
 
-MiniGui is implemented as a vertical prototype that fits the current MiniLang
-compiler instead of extending the compiler syntax. MiniLang already provides:
+MiniGui keeps the declarative UI format separate from MiniLang compiler syntax.
+Applications describe their windows in JSON-based `.mson` files, the generator
+emits readable MiniLang source, and `MiniGuiLib/minigui.ml` supplies the native
+Windows x64 runtime.
+
+The implementation uses current MiniLang Compiler 1.2.3 features and standard
+library facilities:
 
 - `package` and `import` for multi-file programs.
-- Structs with static and instance methods.
-- First-class MiniLang functions.
-- `extern function` imports for Win32 DLL calls.
-- `nativeCallback(fn, "wndproc")` for ABI-safe Win32 window procedures.
-- `nativeBytesPtr(bytes)` for passing byte-buffer payload pointers to Win32
-  structs.
-- `nativeRawValue(value)` and `nativeValueFromRaw(int)` for storing opaque
-  MiniLang values in Win32 userdata slots.
-- A source stdlib with file I/O.
-- Compiler option `--subsystem gui` for Windows GUI executables.
+- Structs with static and instance methods and first-class functions.
+- `const`, explicit `function inline`, and exact typed FFI declarations.
+- `std.ds.list` and `std.string_builder` for geometrically growing collections
+  and output buffers.
+- `std.process` plus native Windows process APIs for compiler discovery and
+  execution.
+- `nativeCallback`, `nativeBytesPtr`, `nativeRawValue`, and
+  `nativeValueFromRaw` for Win32 callbacks and opaque handles.
+- Compiler option `--subsystem gui` for native Windows applications.
 
-The native backend keeps the public API backend-neutral and uses a small Win32
-bridge. The runtime registers a `MiniGuiWindow` class with a MiniLang `WNDPROC`
-callback, falling back to subclassing a standard `#32770` window if class
-registration is unavailable. Standard Win32 `WM_COMMAND` notifications and
-window lifecycle messages are routed to MiniLang event bindings. The application
-state is attached to each top-level window through `GWLP_USERDATA`, so the
-WndProc can recover the right MiniLang app object from the HWND. The MSON parser,
-validator and generator are independent from this backend.
+The public runtime API remains largely backend-neutral, but the current
+implementation deliberately binds Win32. The MiniLang compiler toolchains can
+also target Linux; MiniGui applications cannot until a separate native backend
+implements the same public API.
 
 ## Build-time flow
 
 ```text
 app.mson + app.ml
   -> tools/minigui.exe validate/generate/build
-  -> generated readable MiniLang code
-  -> build/mlc_win64.exe + MiniGuiLib/minigui.ml
-  -> Windows PE executable
+  -> deterministic generated MiniLang source
+  -> selected Python or self-hosted compiler + MiniGuiLib/minigui.ml
+  -> Windows x64 PE executable
 ```
 
-MSON is never parsed at runtime. The generated file imports the code-behind
-file and `MiniGuiLib.minigui`. In the separated project layout, `tools/minigui.ml`
-uses `..\MiniLangCompilerML\build\mlc_win64.exe` as the default compiler and
-passes the MiniGui project root as an import path.
+MSON is parsed only during generation. The generated file imports the
+code-behind module and `MiniGuiLib.minigui`, creates the application object and
+controls, binds handlers, and enters the runtime message loop.
 
-## Runtime flow
+The CLI defaults to the neighboring self-hosted compiler and accepts either
+compiler through `--compiler`. It locates the selected compiler's standard
+library root and invokes the process directly through `CreateProcessW` using
+Windows CRT argument quoting. No command shell participates in the build path.
 
-`MiniGuiLib/minigui.ml` contains the first MiniGui runtime:
+## Parser, imports, and validation
 
-- `Application.create()` stores windows, controls and event bindings.
-- `Window.create(...)` creates a top-level Win32 window from the registered
-  `MiniGuiWindow` class, with subclassing as fallback.
-- `Label.create(...)`, `Button.create(...)`, `TextBox.create(...)`,
-  `TextArea.create(...)`, `CheckBox.create(...)`, `RadioButton.create(...)`,
-  `Panel.create(...)`, `GroupBox.create(...)`, `ComboBox.create(...)`,
-  `ListBox.create(...)` and `ScrollBar.create(...)` create standard Win32
-  controls.
-- `Control.getText`, `Control.setText`, `Control.setEnabled` and
-  `Control.setVisible` hide native handles from application code.
-- `Control.isChecked` and `Control.setChecked` expose checked state for
-  checkbox-style controls.
-- `Control.addItem`, `Control.setItems`, `Control.getSelectedIndex` and related
-  APIs expose list-style controls without leaking Win32 messages.
-- `Control.getScrollValue`, `Control.setScrollValue`, `Control.setScrollRange`
-  and `Control.setScrollSteps` expose scrollbar state.
-- `Events.bindLoad`, `Events.bindClose`, `Events.bindClick`,
-  `Events.bindTextChanged`, `Events.bindSelectionChanged` and
-  `Events.bindScrollChanged` bind MiniLang callbacks.
-- `Application.run(app)` processes the Windows message queue with `GetMessageW`.
-- The runtime WndProc handles `WM_COMMAND`, `WM_HSCROLL`, `WM_VSCROLL`,
-  `WM_CLOSE` and `WM_DESTROY`.
-- Button clicks (`BN_CLICKED`), textbox changes (`EN_CHANGE`) and selection
-  changes (`CBN_SELCHANGE`/`LBN_SELCHANGE`) are dispatched from `WM_COMMAND`.
-- Scrollbar changes are dispatched from `WM_HSCROLL` and `WM_VSCROLL`.
-- Window `load` is dispatched when a window is shown. Window `close` is
-  dispatched from `WM_CLOSE`; setting `event.cancel = true` prevents closing.
+The hand-written JSON parser enforces strict integer syntax, rejects duplicate
+keys and raw control characters, and decodes Unicode surrogate pairs. Before
+code generation, semantic validation rejects duplicate or reserved IDs,
+unknown controls and components, invalid resources, and handler names that
+cannot be emitted as MiniLang references.
 
-The generated code passes a typed UI context struct to each handler:
+Resource and component imports are resolved relative to the importing document
+and then through explicit include directories. Active import stacks detect
+cycles, while a separate document set deduplicates shared diamond dependencies.
+Windows path identity is case-insensitive.
 
-```ml
-function onGreetButtonClick(ui, event)
-  name = MiniGui.Control.getText(ui.nameTextBox)
-  MiniGui.Control.setText(ui.resultLabel, "Hallo, " + name + "!")
-end function
-```
+Defensive limits bound untrusted input work: 16 MiB per document, 128 container
+levels, and 4,096 documents per import graph. Import paths remain intentionally
+capable of naming any readable file, so callers that accept untrusted MSON must
+apply their own root policy.
 
 ## Generated code strategy
 
-The generator emits deterministic MiniLang:
+The generator emits stable, readable MiniLang:
 
 - Stable function and struct names derived from the MSON namespace.
-- A generated UI context struct with one field per named window/control.
-- Literal source comments referencing the input MSON file.
-- Direct calls to public `MiniGuiLib.minigui` APIs only.
-- Event binding calls to imported code-behind functions.
+- A typed UI context struct with one field per named window and control.
+- Literal source comments that identify the input MSON file.
+- Direct calls to the public `MiniGuiLib.minigui` API.
+- Event bindings to an explicitly imported code-behind module.
+- Deterministic traversal and output independent of compiler choice.
 
-The code-behind file should declare a package. The generator imports it with
-an alias so handlers are referenced as `CodeBehind.handlerName`.
+Append-heavy parser and generator paths use growable lists and string builders,
+then materialize normal MiniLang arrays only at API boundaries. This avoids
+quadratic array and string copying for large UI descriptions.
 
-## Scope of this prototype
+## Runtime flow
 
-Implemented end to end:
+`MiniGuiLib/minigui.ml` registers a `MiniGuiWindow` class with a MiniLang
+`WNDPROC` callback and falls back to subclassing a standard `#32770` window if
+registration is unavailable. Each top-level HWND stores its MiniLang
+application object in `GWLP_USERDATA`, allowing callbacks to recover the correct
+runtime state.
 
-- JSON-based `.mson` parsing with validation.
-- Relative imports for additional MSON files.
-- Reusable components with stable ID prefixes.
-- Local and imported resources.
-- VerticalStack, HorizontalStack, Grid and Canvas code generation.
-- Panel and GroupBox container controls with nested child generation.
-- Window, Label, Button, TextBox, TextArea, CheckBox, RadioButton, Panel,
-  GroupBox, ComboBox, ListBox and ScrollBar runtime controls.
-- Native window-class registration plus `WNDPROC` bridge for Win32 command and
-  window lifecycle events.
-- Per-window app-state lookup through `GWLP_USERDATA`.
-- CLI commands `validate`, `generate` and `build`.
-- Hello-GUI, full control-gallery and modular customer-form examples.
-- Test framework coverage for generated constructors, event bindings, runtime
-  control APIs and code-behind behavior.
+The runtime provides:
 
-Documented extension points:
+- Application and window creation plus a `GetMessageW` message loop.
+- Standard controls, container controls, menus, pickers, list/table controls,
+  date/time controls, and the public APIs documented in the user guide.
+- Vertical/horizontal stacks, grids, canvases, dock panels, and wrap panels.
+- Typed event objects for load, close, resize, click, text, selection, scroll,
+  value, focus, blur, validation, submit, and control-specific notifications.
+- Runtime resize modes (`scale`, `none`, `anchor`, and `fill`) with size limits.
+- UTF-8 to UTF-16 conversion for native text, including non-BMP characters.
 
-- Additional controls can be added through the MiniLang control registry and
-  `MiniGuiLib/minigui.ml` runtime constructors.
-- Additional Win32 notifications can be added in `Events.dispatchCommand`
-  without changing MSON or generated handler signatures.
+`WM_COMMAND`, scroll, notify, close, size, destroy, and related messages are
+routed through binding tables. Closing a secondary window destroys only that
+window; only destruction of the configured startup window posts the application
+quit message. Normal resizing is driven by `WM_SIZE`, with a low-frequency timer
+fallback for native edge cases.
+
+Win32 controls have UI-thread affinity. Background work may use MiniLang
+threads, but control mutations must be marshalled to the message-loop thread by
+the application.
+
+## Native resource ownership
+
+MiniGui owns native brushes and tooltip windows created for its controls.
+Replacing a background brush or tooltip first releases the previous handle.
+When `Application.run` exits, the runtime clears bindings and releases all
+remaining MiniGui-owned resources. This ownership rule prevents long-running
+applications from accumulating GDI or USER handles during repeated updates.
+
+## Verification
+
+The test suite exercises validation, deterministic source generation, examples,
+control construction and interaction, resize behavior, code-behind dispatch,
+Unicode conversion, resource replacement, empty runtime state, import graphs,
+and hostile command-line paths.
+
+When both compiler repositories are present, it also verifies byte-identical
+MiniGui CLI executables and generated source from the Python and self-hosted
+compilers, followed by a self-hosted application build and runtime smoke test.
+MiniDoc generation runs in strict mode so declaration comments and committed API
+reference output cannot drift silently.
+
+## Extension points
+
+To add a control, extend the generator's control metadata and validation, add a
+runtime constructor and behavior in `MiniGuiLib/minigui.ml`, update the schema,
+and cover it in the gallery and tests. New native backends should preserve the
+public runtime API and generated MSON shape, replacing only platform-specific
+windowing, controls, events, and resource management.

@@ -12,7 +12,7 @@ struct EditableComboBox
 Represents the editable combo box data used by the minigui module.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L3229)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L3373)
 
 ## Members
 
@@ -39,4 +39,4 @@ Creates editable combo box for the minigui editable combo box module.
 | `selectedIndex` | `dynamic` | — | Zero-based index of selected. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L3241)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L3385)

@@ -19,6 +19,7 @@ limitations under the License.
 */
 
 package MiniGuiLib.minigui
+import std.string_builder as sb
 
 /// Invokes the native CreateWindowExW entry point used by the minigui module.
 /// @param exStyle exStyle value consumed by this operation.
@@ -235,6 +236,16 @@ extern function SetBkColor(hdc as ptr, color as u32) from "gdi32.dll" returns u3
 /// @param color color value consumed by this operation.
 /// @returns Native ptr result produced by the call.
 extern function CreateSolidBrush(color as u32) from "gdi32.dll" returns ptr
+/// Releases a GDI object created by this module.
+/// @param object Native GDI object handle.
+/// @returns Whether the object was released.
+extern function DeleteObject(object as ptr) from "gdi32.dll" returns bool
+/// Computes the UTF-16 capacity required for a UTF-8 string.
+/// @internal
+extern function MultiByteToWideCharSize(codePage as u32, flags as u32, text as cstr, inputCount as int, output as ptr, outputCount as int) from "kernel32.dll" symbol "MultiByteToWideChar" returns int
+/// Converts a UTF-8 string into a caller-owned UTF-16 buffer.
+/// @internal
+extern function MultiByteToWideCharBytes(codePage as u32, flags as u32, text as cstr, inputCount as int, output as bytes, outputCount as int) from "kernel32.dll" symbol "MultiByteToWideChar" returns int
 /// Invokes the native GetOpenFileNameW entry point used by the minigui module.
 /// @param openFileName openFileName value consumed by this operation.
 /// @returns Native bool result produced by the call.
@@ -696,6 +707,10 @@ const BIF_RETURNONLYFSDIRS = 1
 const BIF_NEWDIALOGSTYLE = 64
 /// Defines the mk lbutton constant used by the minigui module.
 const MK_LBUTTON = 1
+/// UTF-8 code page used for explicit native string buffers.
+const CP_UTF8 = 65001
+/// Reject malformed UTF-8 instead of silently replacing invalid input.
+const MB_ERR_INVALID_CHARS = 8
 
 /// Stores module-wide active app state for the minigui module.
 _activeApp = void
@@ -711,6 +726,8 @@ _subclassHandles = []
 _subclassOldProcs = []
 /// Stores module-wide tooltip handles state for the minigui module.
 _tooltipHandles = []
+/// Maps tooltip entries to their target control handles.
+_tooltipControlHandles = []
 /// Stores module-wide tooltip text bytes state for the minigui module.
 _tooltipTextBytes = []
 /// Stores module-wide style handles state for the minigui module.
@@ -762,11 +779,131 @@ _windowClassRegistered = false
 /// Stores module-wide window class name bytes state for the minigui module.
 _windowClassNameBytes = void
 
+/// Restores module runtime defaults when MiniGui is loaded through a compiler
+/// pipeline that does not materialize imported-module initializers eagerly.
+/// Keeping this idempotent also makes repeated in-process application runs safe.
+/// @internal
+function _ensureRuntimeState()
+  global _windowProcPtr
+  global _timerProcPtr
+  global _oldWindowProcPtr
+  global _subclassHandles
+  global _subclassOldProcs
+  global _tooltipHandles
+  global _tooltipControlHandles
+  global _tooltipTextBytes
+  global _styleHandles
+  global _styleForegrounds
+  global _styleBackgrounds
+  global _styleBrushes
+  global _layoutHandles
+  global _layoutResizeModes
+  global _layoutAnchors
+  global _layoutMinWidths
+  global _layoutMinHeights
+  global _layoutMaxWidths
+  global _layoutMaxHeights
+  global _resizeInitializedWindows
+  global _dragSplitterStartX
+  global _dragSplitterStartY
+  global _dragSplitterOriginX
+  global _dragSplitterOriginY
+  global _dataGridEditor
+  global _dataGridEditRow
+  global _dataGridEditColumn
+  global _dataGridEditOriginal
+  global _windowClassRegistered
+  if _windowProcPtr is void then _windowProcPtr = 0 end if
+  if _timerProcPtr is void then _timerProcPtr = 0 end if
+  if _oldWindowProcPtr is void then _oldWindowProcPtr = 0 end if
+  if _subclassHandles is void then _subclassHandles = [] end if
+  if _subclassOldProcs is void then _subclassOldProcs = [] end if
+  if _tooltipHandles is void then _tooltipHandles = [] end if
+  if _tooltipControlHandles is void then _tooltipControlHandles = [] end if
+  if _tooltipTextBytes is void then _tooltipTextBytes = [] end if
+  if _styleHandles is void then _styleHandles = [] end if
+  if _styleForegrounds is void then _styleForegrounds = [] end if
+  if _styleBackgrounds is void then _styleBackgrounds = [] end if
+  if _styleBrushes is void then _styleBrushes = [] end if
+  if _layoutHandles is void then _layoutHandles = [] end if
+  if _layoutResizeModes is void then _layoutResizeModes = [] end if
+  if _layoutAnchors is void then _layoutAnchors = [] end if
+  if _layoutMinWidths is void then _layoutMinWidths = [] end if
+  if _layoutMinHeights is void then _layoutMinHeights = [] end if
+  if _layoutMaxWidths is void then _layoutMaxWidths = [] end if
+  if _layoutMaxHeights is void then _layoutMaxHeights = [] end if
+  if _resizeInitializedWindows is void then _resizeInitializedWindows = [] end if
+  if _dragSplitterStartX is void then _dragSplitterStartX = 0 end if
+  if _dragSplitterStartY is void then _dragSplitterStartY = 0 end if
+  if _dragSplitterOriginX is void then _dragSplitterOriginX = 0 end if
+  if _dragSplitterOriginY is void then _dragSplitterOriginY = 0 end if
+  if _dataGridEditor is void then _dataGridEditor = 0 end if
+  if _dataGridEditRow is void then _dataGridEditRow = -1 end if
+  if _dataGridEditColumn is void then _dataGridEditColumn = -1 end if
+  if _dataGridEditOriginal is void then _dataGridEditOriginal = "" end if
+  if _windowClassRegistered is void then _windowClassRegistered = false end if
+end function
+
+/// Releases process-local GUI resources after an application message loop.
+/// Native windows own and destroy tooltip HWNDs; this function releases the
+/// GDI brushes owned directly by MiniGui and drops the corresponding roots.
+/// @internal
+function _releaseRuntimeResources()
+  global _activeApp
+  global _subclassHandles
+  global _subclassOldProcs
+  global _tooltipHandles
+  global _tooltipControlHandles
+  global _tooltipTextBytes
+  global _styleHandles
+  global _styleForegrounds
+  global _styleBackgrounds
+  global _styleBrushes
+  global _layoutHandles
+  global _layoutResizeModes
+  global _layoutAnchors
+  global _layoutMinWidths
+  global _layoutMinHeights
+  global _layoutMaxWidths
+  global _layoutMaxHeights
+  global _resizeInitializedWindows
+  if len(_styleBrushes) > 0 then
+    for i = 0 to len(_styleBrushes) - 1
+      brush = _styleBrushes[i]
+      if brush != 0 then DeleteObject(brush) end if
+    end for
+  end if
+  if len(_tooltipHandles) > 0 then
+    for tooltipIndex = 0 to len(_tooltipHandles) - 1
+      tooltip = _tooltipHandles[tooltipIndex]
+      if tooltip != 0 and IsWindow(tooltip) then DestroyWindow(tooltip) end if
+    end for
+  end if
+  _activeApp = void
+  _subclassHandles = []
+  _subclassOldProcs = []
+  _tooltipHandles = []
+  _tooltipControlHandles = []
+  _tooltipTextBytes = []
+  _styleHandles = []
+  _styleForegrounds = []
+  _styleBackgrounds = []
+  _styleBrushes = []
+  _layoutHandles = []
+  _layoutResizeModes = []
+  _layoutAnchors = []
+  _layoutMinWidths = []
+  _layoutMinHeights = []
+  _layoutMaxWidths = []
+  _layoutMaxHeights = []
+  _resizeInitializedWindows = []
+end function
+
 /// Writes u32 le for the minigui workflow.
 /// @param buf buf value consumed by this operation.
 /// @param off off value consumed by this operation.
 /// @param value Value consumed or transformed by the operation.
-function _writeU32LE(buf, off, value)
+function inline _writeU32LE(buf, off, value)
   buf[off] = value & 255
   buf[off + 1] = (value >> 8) & 255
   buf[off + 2] = (value >> 16) & 255
@@ -778,7 +915,7 @@ end function
 /// @param buf buf value consumed by this operation.
 /// @param off off value consumed by this operation.
 /// @param value Value consumed or transformed by the operation.
-function _writePtrLE(buf, off, value)
+function inline _writePtrLE(buf, off, value)
   buf[off] = value & 255
   buf[off + 1] = (value >> 8) & 255
   buf[off + 2] = (value >> 16) & 255
@@ -793,7 +930,7 @@ end function
 /// Reads i32 le for the minigui workflow.
 /// @param buf buf value consumed by this operation.
 /// @param off off value consumed by this operation.
-function _readI32LE(buf, off)
+function inline _readI32LE(buf, off)
   value = buf[off] | (buf[off + 1] << 8) | (buf[off + 2] << 16) | (buf[off + 3] << 24)
   return value
 end function
@@ -801,7 +938,7 @@ end function
 /// Reads s32 le for the minigui workflow.
 /// @param buf buf value consumed by this operation.
 /// @param off off value consumed by this operation.
-function _readS32LE(buf, off)
+function inline _readS32LE(buf, off)
   value = _readI32LE(buf, off)
   if value >= 2147483648 then return value - 4294967296 end if
   return value
@@ -810,7 +947,7 @@ end function
 /// Reads ptr le for the minigui workflow.
 /// @param buf buf value consumed by this operation.
 /// @param off off value consumed by this operation.
-function _readPtrLE(buf, off)
+function inline _readPtrLE(buf, off)
   value = buf[off] | (buf[off + 1] << 8) | (buf[off + 2] << 16) | (buf[off + 3] << 24)
   value = value | (buf[off + 4] << 32) | (buf[off + 5] << 40) | (buf[off + 6] << 48) | (buf[off + 7] << 56)
   return value
@@ -820,14 +957,15 @@ end function
 /// @param value Value consumed or transformed by the operation.
 function _asInt(value)
   text = "" + value
-  intText = ""
+  output = sb.StringBuilder.withCapacity(len(text))
   if len(text) > 0 then
     for i = 0 to len(text) - 1
       ch = text[i]
       if ch == "." then break end if
-      intText = intText + ch
+      output.appendString(ch)
     end for
   end if
+  intText = output.toString()
   if intText == "" or intText == "-" then intText = "0" end if
   n = toNumber(intText)
   if typeof(n) == "int" then return n end if
@@ -838,27 +976,25 @@ end function
 /// @param items Items consumed or updated by the operation.
 /// @param separator separator value consumed by this operation.
 function _joinText(items, separator)
-  outv = ""
+  output = sb.StringBuilder.new()
   if len(items) > 0 then
     for i = 0 to len(items) - 1
-      if i > 0 then outv = outv + separator end if
-      outv = outv + items[i]
+      if i > 0 then output.appendString(separator) end if
+      output.appendString(items[i])
     end for
   end if
-  return outv
+  return output.toString()
 end function
 
-/// Performs the _asciiUtf16Z operation for the minigui module.
+/// Converts a MiniLang UTF-8 string to a NUL-terminated UTF-16LE buffer.
 /// @param text Text consumed by the operation.
-function _asciiUtf16Z(text)
-  outv = bytes((len(text) + 1) * 2, 0)
-  for i = 0 to len(text) - 1
-    ch = bytes(text[i])
-    if len(ch) > 0 then
-      outv[i * 2] = ch[0]
-    end if
-  end for
-  return outv
+function _utf16Z(text)
+  if typeof(text) != "string" then text = "" end if
+  required = MultiByteToWideCharSize(CP_UTF8, MB_ERR_INVALID_CHARS, text, -1, 0, 0)
+  if required <= 0 then return bytes(2, 0) end if
+  output = bytes(required * 2, 0)
+  if MultiByteToWideCharBytes(CP_UTF8, MB_ERR_INVALID_CHARS, text, -1, output, required) <= 0 then return bytes(2, 0) end if
+  return output
 end function
 
 /// Performs the _ord operation for the minigui module.
@@ -873,21 +1009,21 @@ end function
 /// @param itemsText itemsText value consumed by this operation.
 /// @param index Zero-based index of the affected item.
 function _itemTextAt(itemsText, index)
-  current = ""
+  current = sb.StringBuilder.new()
   currentIndex = 0
   if len(itemsText) > 0 then
     for i = 0 to len(itemsText) - 1
       ch = itemsText[i]
       if ch == "\n" then
-        if currentIndex == index then return current end if
-        current = ""
+        if currentIndex == index then return current.toString() end if
+        current.clear()
         currentIndex = currentIndex + 1
       else
-        current = current + ch
+        current.appendString(ch)
       end if
     end for
   end if
-  if currentIndex == index then return current end if
+  if currentIndex == index then return current.toString() end if
   return ""
 end function
 
@@ -922,18 +1058,20 @@ end function
 /// Normalizes edit text for the minigui workflow.
 /// @param text Text consumed by the operation.
 function _normalizeEditText(text)
-  outv = ""
+  output = sb.StringBuilder.withCapacity(len(text) + 16)
   prev = ""
-  for i = 0 to len(text) - 1
-    ch = text[i]
-    if ch == "\n" and prev != "\r" then
-      outv = outv + "\r\n"
-    else
-      outv = outv + ch
-    end if
-    prev = ch
-  end for
-  return outv
+  if len(text) > 0 then
+    for i = 0 to len(text) - 1
+      ch = text[i]
+      if ch == "\n" and prev != "\r" then
+        output.appendString("\r\n")
+      else
+        output.appendString(ch)
+      end if
+      prev = ch
+    end for
+  end if
+  return output.toString()
 end function
 
 /// Returns window text maintained by the minigui module.
@@ -1188,7 +1326,7 @@ function _miniGuiWndProc(hwnd, msg, wParam, lParam)
       if Events.dispatchClose(appClose, win) then
         return 0
       end if
-      appClose.running = false
+      if appClose.startupWindow == win then appClose.running = false end if
     end if
     DestroyWindow(hwnd)
     return 0
@@ -1197,11 +1335,16 @@ function _miniGuiWndProc(hwnd, msg, wParam, lParam)
   if msg == WM_DESTROY then
     appDestroy = _activeApp
     if appDestroy is void then appDestroy = _appForWindow(hwnd) end if
-    if appDestroy is void == false then
+    if appDestroy is void then return _defaultWndProc(hwnd, msg, wParam, lParam) end if
+    destroyedWindow = Events.findWindowByHandle(appDestroy, hwnd)
+    // Child controls use the same subclass procedure and also receive
+    // WM_DESTROY. Only destruction of the startup window ends the app loop.
+    if destroyedWindow is void then return _defaultWndProc(hwnd, msg, wParam, lParam) end if
+    if appDestroy.startupWindow == destroyedWindow then
       appDestroy.running = false
+      PostQuitMessage(0)
     end if
-    PostQuitMessage(0)
-    return 0
+    return _defaultWndProc(hwnd, msg, wParam, lParam)
   end if
 
   return _defaultWndProc(hwnd, msg, wParam, lParam)
@@ -1216,7 +1359,7 @@ function _registerWindowClass()
   cb = _ensureWindowProc()
   if cb == 0 then return false end if
 
-  _windowClassNameBytes = _asciiUtf16Z("MiniGuiWindow")
+  _windowClassNameBytes = _utf16Z("MiniGuiWindow")
   namePtr = nativeBytesPtr(_windowClassNameBytes)
   if namePtr == 0 then return false end if
 
@@ -1465,6 +1608,7 @@ end function
 struct Application
   /// Creates application for the minigui application module.
   static function create()
+    _ensureRuntimeState()
     return ApplicationState([], [], [], [], [], [], [], [], [], [], [], void, 1000, false)
   end function
 
@@ -1698,11 +1842,11 @@ struct Application
       else
         TranslateMessage(msg)
         DispatchMessageW(msg)
-        Application.pollResize(app)
       end if
     end while
 
     app.running = false
+    _releaseRuntimeResources()
     return 0
   end function
 end struct
@@ -1902,7 +2046,7 @@ struct Dialog
   static function _fileDialog(app, title, filter, saveDialog)
     fileBytes = bytes(4096, 0)
     filterBytes = Dialog._filterBytes(filter)
-    titleBytes = _asciiUtf16Z(title)
+    titleBytes = _utf16Z(title)
     ofn = bytes(152, 0)
     _writeU32LE(ofn, 0, 152)
     _writePtrLE(ofn, 8, Dialog._owner(app))
@@ -2189,7 +2333,7 @@ struct Dialog
   /// @param title Human-readable title presented to the user.
   static function pickFolder(app, title)
     pathBytes = bytes(4096, 0)
-    titleBytes = _asciiUtf16Z(title)
+    titleBytes = _utf16Z(title)
     displayName = bytes(520, 0)
     bi = bytes(64, 0)
     _writePtrLE(bi, 0, Dialog._owner(app))
@@ -2895,7 +3039,7 @@ struct TabControl
   static function addTab(control, index, text)
     if control is void then return false end if
     if control.handle is void then return false end if
-    textBytes = _asciiUtf16Z(text)
+    textBytes = _utf16Z(text)
     item = bytes(40, 0)
     _writeU32LE(item, 0, TCIF_TEXT)
     _writePtrLE(item, 16, nativeBytesPtr(textBytes))
@@ -3359,7 +3503,7 @@ struct Control
     if control.parent is void == false then owner = control.parent.handle end if
     tooltip = CreateWindowExW(0, "tooltips_class32", "", TTS_ALWAYSTIP, 0, 0, 0, 0, owner, void, void, void)
     if tooltip == 0 then return false end if
-    textBytes = _asciiUtf16Z(text)
+    textBytes = _utf16Z(text)
     tool = bytes(72, 0)
     _writeU32LE(tool, 0, 72)
     _writeU32LE(tool, 4, TTF_IDISHWND | TTF_SUBCLASS)
@@ -3369,9 +3513,24 @@ struct Control
     SendMessageW(tooltip, TTM_ADDTOOLW, 0, nativeBytesPtr(tool))
     SendMessageW(tooltip, TTM_SETMAXTIPWIDTH, 0, 360)
     global _tooltipHandles
+    global _tooltipControlHandles
     global _tooltipTextBytes
-    _tooltipHandles = _tooltipHandles + [tooltip]
-    _tooltipTextBytes = _tooltipTextBytes + [textBytes]
+    existing = -1
+    if len(_tooltipControlHandles) > 0 then
+      for i = 0 to len(_tooltipControlHandles) - 1
+        if _tooltipControlHandles[i] == control.handle then existing = i end if
+      end for
+    end if
+    if existing >= 0 then
+      oldTooltip = _tooltipHandles[existing]
+      _tooltipHandles[existing] = tooltip
+      _tooltipTextBytes[existing] = textBytes
+      if oldTooltip != 0 then DestroyWindow(oldTooltip) end if
+    else
+      _tooltipHandles = _tooltipHandles + [tooltip]
+      _tooltipControlHandles = _tooltipControlHandles + [control.handle]
+      _tooltipTextBytes = _tooltipTextBytes + [textBytes]
+    end if
     return true
   end function
 
@@ -3435,7 +3594,11 @@ struct Control
     global _styleBrushes
     nativeColor = Dialog._colorFromHex(color)
     _styleBackgrounds[index] = nativeColor
-    _styleBrushes[index] = CreateSolidBrush(nativeColor)
+    oldBrush = _styleBrushes[index]
+    newBrush = CreateSolidBrush(nativeColor)
+    if newBrush == 0 then return false end if
+    _styleBrushes[index] = newBrush
+    if oldBrush != 0 then DeleteObject(oldBrush) end if
     RedrawWindow(control.handle, void, void, RDW_INVALIDATE | RDW_ERASE | RDW_UPDATENOW)
     return true
   end function
@@ -3868,7 +4031,7 @@ struct Control
     if control is void then return false end if
     if control.handle is void then return false end if
     if control.kind != "ListView" and control.kind != "DataGrid" then return false end if
-    titleBytes = _asciiUtf16Z("Value")
+    titleBytes = _utf16Z("Value")
     column = bytes(40, 0)
     _writeU32LE(column, 0, LVCF_TEXT | LVCF_WIDTH | LVCF_SUBITEM)
     _writeU32LE(column, 8, control.width - 8)
@@ -3894,7 +4057,7 @@ struct Control
     if columnWidth < 40 then columnWidth = 40 end if
     for i = 0 to len(columns) - 1
       title = columns[i]
-      titleBytes = _asciiUtf16Z(title)
+      titleBytes = _utf16Z(title)
       column = bytes(40, 0)
       _writeU32LE(column, 0, LVCF_TEXT | LVCF_WIDTH | LVCF_SUBITEM)
       _writeU32LE(column, 8, columnWidth)
@@ -4053,21 +4216,21 @@ struct Control
   /// @param text Text consumed by the operation.
   /// @param index Zero-based index of the affected item.
   static function listViewFieldAt(text, index)
-    current = ""
+    current = sb.StringBuilder.new()
     currentIndex = 0
     if len(text) > 0 then
       for i = 0 to len(text) - 1
         ch = text[i]
         if ch == "\t" then
-          if currentIndex == index then return current end if
-          current = ""
+          if currentIndex == index then return current.toString() end if
+          current.clear()
           currentIndex = currentIndex + 1
         else
-          current = current + ch
+          current.appendString(ch)
         end if
       end for
     end if
-    if currentIndex == index then return current end if
+    if currentIndex == index then return current.toString() end if
     return ""
   end function
 
@@ -4078,12 +4241,12 @@ struct Control
   static function replaceListViewField(text, index, value)
     fieldCount = Control.listViewFieldCount(text)
     if index >= fieldCount then fieldCount = index + 1 end if
-    parts = []
+    parts = array(fieldCount)
     for i = 0 to fieldCount - 1
       if i == index then
-        parts = parts + [value]
+        parts[i] = value
       else
-        parts = parts + [Control.listViewFieldAt(text, i)]
+        parts[i] = Control.listViewFieldAt(text, i)
       end if
     end for
     return _joinText(parts, "\t")
@@ -4096,12 +4259,12 @@ struct Control
   static function replaceListViewRowText(text, row, rowText)
     rowCount = _itemCount(text)
     if row >= rowCount then rowCount = row + 1 end if
-    rows = []
+    rows = array(rowCount)
     for i = 0 to rowCount - 1
       if i == row then
-        rows = rows + [rowText]
+        rows[i] = rowText
       else
-        rows = rows + [_itemTextAt(text, i)]
+        rows[i] = _itemTextAt(text, i)
       end if
     end for
     return _joinText(rows, "\n")
@@ -4117,7 +4280,7 @@ struct Control
     if control.handle is void then return false end if
     if control.kind != "ListView" and control.kind != "DataGrid" then return false end if
     if row < 0 or column < 0 then return false end if
-    valueBytes = _asciiUtf16Z(value)
+    valueBytes = _utf16Z(value)
     item = bytes(56, 0)
     _writeU32LE(item, 0, LVIF_TEXT)
     _writeU32LE(item, 4, row)
@@ -4159,7 +4322,7 @@ struct Control
   /// @param text Text consumed by the operation.
   static function addListViewItem(control, text)
     firstText = Control.listViewFieldAt(text, 0)
-    textBytes = _asciiUtf16Z(firstText)
+    textBytes = _utf16Z(firstText)
     item = bytes(56, 0)
     index = SendMessageW(control.handle, LVM_GETITEMCOUNT, 0, 0)
     _writeU32LE(item, 0, LVIF_TEXT)
@@ -4172,7 +4335,7 @@ struct Control
     if fieldCount > 1 then
       for s = 1 to fieldCount - 1
         subText = Control.listViewFieldAt(text, s)
-        subBytes = _asciiUtf16Z(subText)
+        subBytes = _utf16Z(subText)
         subItem = bytes(56, 0)
         _writeU32LE(subItem, 0, LVIF_TEXT)
         _writeU32LE(subItem, 4, inserted)
@@ -4197,7 +4360,7 @@ struct Control
   /// @param text Text consumed by the operation.
   /// @param parentItem parentItem value consumed by this operation.
   static function addTreeViewItemWithParent(control, text, parentItem)
-    textBytes = _asciiUtf16Z(text)
+    textBytes = _utf16Z(text)
     item = bytes(80, 0)
     _writePtrLE(item, 0, parentItem)
     _writePtrLE(item, 8, TVI_LAST)
@@ -4226,13 +4389,13 @@ struct Control
     while pos + 1 < len(text) and text[pos] == " " and text[pos + 1] == " "
       pos = pos + 2
     end while
-    outv = ""
+    output = sb.StringBuilder.withCapacity(len(text) - pos)
     if pos < len(text) then
       for i = pos to len(text) - 1
-        outv = outv + text[i]
+        output.appendString(text[i])
       end for
     end if
-    return outv
+    return output.toString()
   end function
 
   /// Updates tree items maintained by the minigui module.
@@ -4923,6 +5086,7 @@ struct Events
   /// @param hwnd hwnd value consumed by this operation.
   static function findWindowByHandle(app, hwnd)
     if app is void then return void end if
+    if len(app.windows) == 0 then return void end if
     for i = 0 to len(app.windows) - 1
       w = app.windows[i]
       if w is void == false and w.handle == hwnd then return w end if
@@ -4935,6 +5099,7 @@ struct Events
   static function dispatchLoad(window)
     global _activeApp
     if _activeApp is void then return false end if
+    if len(_activeApp.loadBindings) == 0 then return false end if
     for i = 0 to len(_activeApp.loadBindings) - 1
       b = _activeApp.loadBindings[i]
       if b.control == window then
@@ -4950,6 +5115,7 @@ struct Events
   /// @param window window value consumed by this operation.
   static function dispatchClose(app, window)
     if app is void then return false end if
+    if len(app.closeBindings) == 0 then return false end if
     handled = false
     for i = 0 to len(app.closeBindings) - 1
       b = app.closeBindings[i]
@@ -4970,6 +5136,7 @@ struct Events
   /// @param newValue newValue value consumed by this operation.
   static function dispatchResize(app, window, oldValue, newValue)
     if app is void then return false end if
+    if len(app.resizeBindings) == 0 then return false end if
     for i = 0 to len(app.resizeBindings) - 1
       b = app.resizeBindings[i]
       if b.control == window then
@@ -5003,6 +5170,7 @@ struct Events
   /// @param newValue newValue value consumed by this operation.
   static function dispatchControlTextBindings(app, control, eventType, oldValue, newValue)
     if app is void then return false end if
+    if len(app.textBindings) == 0 then return false end if
     handled = false
     for i = 0 to len(app.textBindings) - 1
       b = app.textBindings[i]
@@ -5204,7 +5372,7 @@ struct Events
   /// @param lParam lParam value consumed by this operation.
   static function dispatchNotify(app, hwndControl, nativeId, code, lParam)
     if app is void then return false end if
-    if code == UDN_DELTAPOS then
+    if code == UDN_DELTAPOS and len(app.textBindings) > 0 then
       for u = 0 to len(app.textBindings) - 1
         ub = app.textBindings[u]
         uc = ub.control
@@ -5232,6 +5400,7 @@ struct Events
         end if
       end for
     end if
+    if len(app.selectionBindings) == 0 then return false end if
     for s = 0 to len(app.selectionBindings) - 1
       b = app.selectionBindings[s]
       c = b.control
@@ -5280,6 +5449,7 @@ struct Events
   /// @param x Horizontal coordinate used by the operation.
   static function dispatchClickByHandle(app, hwndControl, x)
     if app is void then return false end if
+    if len(app.clickBindings) == 0 then return false end if
     for i = 0 to len(app.clickBindings) - 1
       b = app.clickBindings[i]
       c = b.control
@@ -5326,13 +5496,15 @@ struct Events
           if command <= 0 then return true end if
           itemText = _itemTextAt(c.lastText, command - 1)
           if itemText == "" then itemText = command end if
-          for b = 0 to len(app.clickBindings) - 1
-            binding = app.clickBindings[b]
-            if binding.control == c then
-              Events.dispatch(binding, binding.eventType, false, itemText)
-              return true
-            end if
-          end for
+          if len(app.clickBindings) > 0 then
+            for b = 0 to len(app.clickBindings) - 1
+              binding = app.clickBindings[b]
+              if binding.control == c then
+                Events.dispatch(binding, binding.eventType, false, itemText)
+                return true
+              end if
+            end for
+          end if
           return true
         end if
       end if
@@ -5362,6 +5534,7 @@ struct Events
   /// @param hwndControl hwndControl value consumed by this operation.
   static function dispatchTabChangedByHandle(app, hwndControl)
     if app is void then return false end if
+    if len(app.selectionBindings) == 0 then return false end if
     for s = 0 to len(app.selectionBindings) - 1
       b = app.selectionBindings[s]
       c = b.control
@@ -5482,7 +5655,7 @@ struct Events
             if code == SB_BOTTOM then newValue = c.scrollMax end if
             if code == SB_THUMBPOSITION or code == SB_THUMBTRACK then newValue = pos end if
             Control.scrollViewerTo(app, c, newValue)
-            if oldValue != c.scrollValue then
+            if oldValue != c.scrollValue and len(app.scrollBindings) > 0 then
               for s = 0 to len(app.scrollBindings) - 1
                 b = app.scrollBindings[s]
                 if b.control == c then Events.dispatch(b, b.eventType, oldValue, c.scrollValue) end if
@@ -5503,6 +5676,7 @@ struct Events
   /// @param hwndControl hwndControl value consumed by this operation.
   static function dispatchScroll(app, code, pos, hwndControl)
     if app is void then return false end if
+    if len(app.scrollBindings) == 0 then return false end if
     for s = 0 to len(app.scrollBindings) - 1
       b = app.scrollBindings[s]
       c = b.control
@@ -5537,7 +5711,7 @@ struct Events
   static function dispatchCommand(app, code, nativeId, hwndControl)
     if app is void then return false end if
 
-    if code == BN_CLICKED then
+    if code == BN_CLICKED and len(app.clickBindings) > 0 then
       for i = 0 to len(app.clickBindings) - 1
         b = app.clickBindings[i]
         c = b.control
@@ -5558,7 +5732,7 @@ struct Events
       end for
     end if
 
-    if code == EN_CHANGE then
+    if code == EN_CHANGE and len(app.textBindings) > 0 then
       for j = 0 to len(app.textBindings) - 1
         tb = app.textBindings[j]
         tc = tb.control
@@ -5576,7 +5750,7 @@ struct Events
       end for
     end if
 
-    if code == CBN_SELCHANGE or code == LBN_SELCHANGE then
+    if (code == CBN_SELCHANGE or code == LBN_SELCHANGE) and len(app.selectionBindings) > 0 then
       for k = 0 to len(app.selectionBindings) - 1
         sb = app.selectionBindings[k]
         sc = sb.control

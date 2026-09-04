@@ -12,7 +12,7 @@ struct ComponentEntry
 Represents the component entry data used by the minigui module.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L96)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L121)
 
 ## Members
 
@@ -26,7 +26,7 @@ definition
 Stores the definition value associated with component entry.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L100)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L125)
 
 <a id="field-field-componententry-name-name-tools-minigui-ml-1485991031"></a>
 ### name
@@ -38,7 +38,7 @@ name
 Stores the name value associated with component entry.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L98)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L123)
 
 <a id="field-field-componententry-path-path-tools-minigui-ml-998402071"></a>
 ### path
@@ -50,4 +50,4 @@ path
 Stores the path value associated with component entry.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L102)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L127)

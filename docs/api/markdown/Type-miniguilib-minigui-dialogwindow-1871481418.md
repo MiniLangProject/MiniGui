@@ -12,7 +12,7 @@ struct DialogWindow
 Represents the dialog window data used by the minigui module.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1424)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1567)
 
 ## Members
 
@@ -26,7 +26,7 @@ app
 Stores the app value associated with dialog window.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1426)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1569)
 
 <a id="field-field-miniguilib-minigui-dialogwindow-cancelbutton-cancelbutton-miniguilib-minigui-ml-2010352233"></a>
 ### cancelButton
@@ -38,7 +38,7 @@ cancelButton
 Stores the cancel button value associated with dialog window.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1436)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1579)
 
 <a id="field-field-miniguilib-minigui-dialogwindow-inputbox-inputbox-miniguilib-minigui-ml-2100016731"></a>
 ### inputBox
@@ -50,7 +50,7 @@ inputBox
 Stores the input box value associated with dialog window.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1432)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1575)
 
 <a id="field-field-miniguilib-minigui-dialogwindow-okbutton-okbutton-miniguilib-minigui-ml-1623708681"></a>
 ### okButton
@@ -62,7 +62,7 @@ okButton
 Stores the ok button value associated with dialog window.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1434)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1577)
 
 <a id="field-field-miniguilib-minigui-dialogwindow-promptlabel-promptlabel-miniguilib-minigui-ml-1568923957"></a>
 ### promptLabel
@@ -74,7 +74,7 @@ promptLabel
 Stores the prompt label value associated with dialog window.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1430)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1573)
 
 <a id="field-field-miniguilib-minigui-dialogwindow-result-result-miniguilib-minigui-ml-833060551"></a>
 ### result
@@ -86,7 +86,7 @@ result
 Stores the result value associated with dialog window.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1438)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1581)
 
 <a id="field-field-miniguilib-minigui-dialogwindow-value-value-miniguilib-minigui-ml-1170812853"></a>
 ### value
@@ -98,7 +98,7 @@ value
 Stores the value value associated with dialog window.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1440)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1583)
 
 <a id="field-field-miniguilib-minigui-dialogwindow-window-window-miniguilib-minigui-ml-264627349"></a>
 ### window
@@ -110,4 +110,4 @@ window
 Stores the window value associated with dialog window.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1428)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1571)

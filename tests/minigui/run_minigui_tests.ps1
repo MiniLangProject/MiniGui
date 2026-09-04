@@ -5,6 +5,8 @@ $Here = Split-Path -Parent $PSCommandPath
 $Root = [System.IO.Path]::GetFullPath((Join-Path $Here "..\.."))
 $CompilerRoot = [System.IO.Path]::GetFullPath((Join-Path $Root "..\MiniLangCompilerPy"))
 $Compiler = Join-Path $CompilerRoot "mlc_win64.py"
+$SelfCompilerRoot = [System.IO.Path]::GetFullPath((Join-Path $Root "..\MiniLangCompilerML"))
+$SelfCompiler = Join-Path $SelfCompilerRoot "build\mlc_win64.exe"
 $ToolSource = Join-Path $Root "tools\minigui.ml"
 $Tool = Join-Path $Root "tools\minigui.exe"
 $Tmp = Join-Path $Root "tests\tmp\minigui"
@@ -33,10 +35,13 @@ function Invoke-Capture {
 
 function Invoke-Compiler {
   param([string[]]$Arguments)
+  # Current stdlib-backed transitive imports need the compiler repository root
+  # explicitly available in addition to the MiniGui source root.
+  $allArguments = $Arguments + @("-I", $CompilerRoot)
   if ($Compiler -like "*.py") {
-    return Invoke-Capture "py" (@("-3.14", $Compiler) + $Arguments)
+    return Invoke-Capture "py" (@("-3.14", $Compiler) + $allArguments)
   }
-  return Invoke-Capture $Compiler $Arguments
+  return Invoke-Capture $Compiler $allArguments
 }
 
 function Assert-Ok {
@@ -56,6 +61,14 @@ function Assert-FailsLike {
     throw "$Name failed, but output did not match '$Pattern':`n$($Result.Output)"
   }
   Write-Host "OK: $Name"
+}
+
+function Assert-OkWithoutRuntimeError {
+  param($Result, [string]$Name)
+  Assert-Ok $Result $Name
+  if ($Result.Output -match "Error occured:") {
+    throw "$Name reported an unhandled MiniLang runtime error:`n$($Result.Output)"
+  }
 }
 
 function Assert-FileContains {
@@ -384,6 +397,14 @@ if (Test-Path -LiteralPath $Tmp) {
 New-Item -ItemType Directory -Force -Path $Tmp | Out-Null
 
 Assert-Ok (Invoke-Compiler @($ToolSource, $Tool, "-I", $Root, "-I", $CompilerRoot)) "compile MiniGui CLI"
+$SelfTool = Join-Path $Tmp "minigui-self.exe"
+if (Test-Path -LiteralPath $SelfCompiler) {
+  Assert-Ok (Invoke-Capture $SelfCompiler @($ToolSource, $SelfTool, "-I", $Root, "-I", $SelfCompilerRoot)) "compile MiniGui CLI with self-hosted compiler"
+  $pythonToolHash = (Get-FileHash -LiteralPath $Tool -Algorithm SHA256).Hash
+  $selfToolHash = (Get-FileHash -LiteralPath $SelfTool -Algorithm SHA256).Hash
+  if ($pythonToolHash -ne $selfToolHash) { throw "Python and self-hosted compilers emitted different MiniGui CLI binaries." }
+  Write-Host "OK: byte-identical MiniGui CLI compilers"
+}
 
 $hello = Join-Path $Root "examples\hello-gui\app.mson"
 $customer = Join-Path $Root "examples\customer-form\app.mson"
@@ -405,6 +426,11 @@ Write-Host "OK: deterministic generation"
 $helloExe = Join-Path $Tmp "hello-gui.exe"
 Assert-Ok (Invoke-Capture $Tool @("build", $hello, "--output", $helloExe, "--compiler", $Compiler, "--library-dir", $Root)) "build hello-gui"
 
+$literalArgumentDir = Join-Path $Tmp "args & %PATH%"
+$literalArgumentExe = Join-Path $literalArgumentDir "hello literal.exe"
+Assert-Ok (Invoke-Capture $Tool @("build", $hello, "--output", $literalArgumentExe, "--generated-dir", $literalArgumentDir, "--compiler", $Compiler, "--library-dir", $Root)) "build with shell metacharacters kept literal"
+if (-not (Test-Path -LiteralPath $literalArgumentExe)) { throw "literal compiler argument output was not created." }
+
 $galleryGen1 = Join-Path $Tmp "control-gallery1.gui.ml"
 $galleryGen2 = Join-Path $Tmp "control-gallery2.gui.ml"
 Assert-Ok (Invoke-Capture $Tool @("generate", $gallery, "--output", $galleryGen1)) "generate control-gallery 1"
@@ -413,6 +439,16 @@ $g1 = (Get-FileHash -LiteralPath $galleryGen1 -Algorithm SHA256).Hash
 $g2 = (Get-FileHash -LiteralPath $galleryGen2 -Algorithm SHA256).Hash
 if ($g1 -ne $g2) { throw "Control gallery generated output is not deterministic." }
 Write-Host "OK: deterministic control-gallery generation"
+if (Test-Path -LiteralPath $SelfTool) {
+  $gallerySelf = Join-Path $Tmp "control-gallery-self.gui.ml"
+  Assert-Ok (Invoke-Capture $SelfTool @("generate", $gallery, "--output", $gallerySelf)) "generate control-gallery with self-hosted MiniGui CLI"
+  $selfGalleryHash = (Get-FileHash -LiteralPath $gallerySelf -Algorithm SHA256).Hash
+  if ($g1 -ne $selfGalleryHash) { throw "Python and self-hosted MiniGui CLIs emitted different generated source." }
+  Write-Host "OK: byte-identical generated source"
+
+  $selfHelloExe = Join-Path $Tmp "hello-gui-self.exe"
+  Assert-Ok (Invoke-Capture $SelfTool @("build", $hello, "--output", $selfHelloExe, "--compiler", $SelfCompiler, "--library-dir", $Root)) "build hello-gui with self-hosted compiler"
+}
 Assert-FileContains $galleryGen1 "generated Label constructor" "MiniGui\.Label\.create"
 Assert-FileContains $galleryGen1 "generated Button constructor" "MiniGui\.Button\.create"
 Assert-FileContains $galleryGen1 "generated FilePicker constructor" "MiniGui\.FilePicker\.create"
@@ -602,6 +638,19 @@ $smokeExe = Join-Path $Tmp "runtime-smoke.exe"
 Assert-Ok (Invoke-Compiler @((Join-Path $Root "tests\minigui\runtime_smoke.ml"), $smokeExe, "-I", $Root, "--subsystem", "gui")) "compile runtime smoke"
 Assert-Ok (Invoke-Capture $smokeExe @()) "run runtime smoke"
 
+$emptyStateExe = Join-Path $Tmp "empty-state-smoke.exe"
+Assert-Ok (Invoke-Compiler @((Join-Path $Root "tests\minigui\empty_state_smoke.ml"), $emptyStateExe, "-I", $Root, "--subsystem", "gui")) "compile empty-state smoke"
+Assert-OkWithoutRuntimeError (Invoke-Capture $emptyStateExe @()) "run empty-state smoke"
+
+$unicodeResourcesExe = Join-Path $Tmp "unicode-and-resources-smoke.exe"
+Assert-Ok (Invoke-Compiler @((Join-Path $Root "tests\minigui\unicode_and_resources_smoke.ml"), $unicodeResourcesExe, "-I", $Root, "--subsystem", "gui")) "compile Unicode/resource smoke"
+Assert-Ok (Invoke-Capture $unicodeResourcesExe @()) "run Unicode/resource smoke"
+if (Test-Path -LiteralPath $SelfCompiler) {
+  $unicodeResourcesSelfExe = Join-Path $Tmp "unicode-and-resources-self-smoke.exe"
+  Assert-Ok (Invoke-Capture $SelfCompiler @((Join-Path $Root "tests\minigui\unicode_and_resources_smoke.ml"), $unicodeResourcesSelfExe, "-I", $Root, "-I", $SelfCompilerRoot, "--subsystem", "gui")) "compile Unicode/resource smoke with self-hosted compiler"
+  Assert-OkWithoutRuntimeError (Invoke-Capture $unicodeResourcesSelfExe @()) "run self-hosted Unicode/resource smoke"
+}
+
 $wmCommandExe = Join-Path $Tmp "wm-command-smoke.exe"
 Assert-Ok (Invoke-Compiler @((Join-Path $Root "tests\minigui\wm_command_smoke.ml"), $wmCommandExe, "-I", $Root, "--subsystem", "gui")) "compile WM_COMMAND smoke"
 Assert-Ok (Invoke-Capture $wmCommandExe @()) "run WM_COMMAND smoke"
@@ -654,6 +703,20 @@ $badJson = Join-Path $Tmp "bad-json.mson"
 Write-Utf8NoBom $badJson '{ "version": 1, '
 Assert-FailsLike (Invoke-Capture $Tool @("validate", $badJson)) "invalid JSON diagnostic" "JSON syntax error"
 
+$duplicateKey = Join-Path $Tmp "duplicate-key.mson"
+Write-Utf8NoBom $duplicateKey '{ "version": 1, "version": 1 }'
+Assert-FailsLike (Invoke-Capture $Tool @("validate", $duplicateKey)) "duplicate JSON key diagnostic" "Duplicate object key 'version'"
+
+$invalidNumber = Join-Path $Tmp "invalid-number.mson"
+Write-Utf8NoBom $invalidNumber '{ "version": 01 }'
+Assert-FailsLike (Invoke-Capture $Tool @("validate", $invalidNumber)) "invalid JSON number diagnostic" "Leading zero in number"
+
+$deepMson = Join-Path $Tmp "too-deep.mson"
+Write-Utf8NoBom $deepMson (('[' * 129) + ('0') + (']' * 129))
+Assert-FailsLike (Invoke-Capture $Tool @("validate", $deepMson)) "MSON nesting limit diagnostic" "MSON nesting exceeds limit"
+
+Assert-FailsLike (Invoke-Capture $Tool @("generate", (Join-Path $Root "examples\hello-gui\app.mson"), "--output")) "missing option value diagnostic" "Missing value for option: --output"
+
 $badPropMl = Join-Path $Tmp "bad-prop.ml"
 Write-Utf8NoBom $badPropMl @'
 package bad_prop
@@ -661,6 +724,28 @@ function onClick(ui, event)
   return 0
 end function
 '@
+
+$unicodeEscape = Join-Path $Tmp "unicode-escape.mson"
+$unicodeEscapeGenerated = Join-Path $Tmp "unicode-escape.gui.ml"
+Write-Utf8NoBom $unicodeEscape @'
+{
+  "version": 1,
+  "namespace": "unicode_escape",
+  "codeBehind": "bad-prop.ml",
+  "application": { "name": "Unicode", "startupWindow": "mainWindow" },
+  "windows": [
+    {
+      "id": "mainWindow",
+      "type": "Window",
+      "properties": { "title": "Launch \uD83D\uDE80" },
+      "layout": { "type": "VerticalStack", "children": [] }
+    }
+  ]
+}
+'@
+Assert-Ok (Invoke-Capture $Tool @("generate", $unicodeEscape, "--output", $unicodeEscapeGenerated)) "decode JSON surrogate pair"
+Assert-FileContains $unicodeEscapeGenerated "generated non-BMP Unicode" "Launch 🚀"
+
 $badProp = Join-Path $Tmp "bad-prop.mson"
 Write-Utf8NoBom $badProp @'
 {
@@ -707,6 +792,14 @@ Write-Utf8NoBom $badWindowEvent @'
 '@
 Assert-FailsLike (Invoke-Capture $Tool @("validate", $badWindowEvent)) "window event diagnostic" "Unknown event 'closing' for window 'mainWindow'"
 
+$reservedId = Join-Path $Tmp "reserved-id.mson"
+Write-Utf8NoBom $reservedId ((Get-Content -LiteralPath $badProp -Raw) -replace '"saveButton"', '"function"' -replace '"bogus": true, ', '')
+Assert-FailsLike (Invoke-Capture $Tool @("validate", $reservedId)) "reserved identifier diagnostic" "Invalid id 'function'"
+
+$invalidHandler = Join-Path $Tmp "invalid-handler.mson"
+Write-Utf8NoBom $invalidHandler ((Get-Content -LiteralPath $badProp -Raw) -replace '"bogus": true, ', '' -replace '"onClick"', '"onClick; injected"')
+Assert-FailsLike (Invoke-Capture $Tool @("validate", $invalidHandler)) "invalid handler diagnostic" "Invalid event handler name"
+
 $missingHandler = Join-Path $Tmp "missing-handler.mson"
 Write-Utf8NoBom $missingHandler ((Get-Content -LiteralPath $badProp -Raw) -replace '"bogus": true, ', '' -replace '"onClick"', '"onMissing"')
 Assert-FailsLike (Invoke-Capture $Tool @("validate", $missingHandler)) "missing handler diagnostic" "no function was found"
@@ -733,5 +826,26 @@ Write-Utf8NoBom $cycleB @'
 }
 '@
 Assert-FailsLike (Invoke-Capture $Tool @("validate", $cycleA)) "cyclic import diagnostic" "Cyclic MSON import"
+
+$diamondShared = Join-Path $Tmp "diamond-shared.mson"
+$diamondLeft = Join-Path $Tmp "diamond-left.mson"
+$diamondRight = Join-Path $Tmp "diamond-right.mson"
+$diamondRoot = Join-Path $Tmp "diamond-root.mson"
+Write-Utf8NoBom $diamondShared '{ "version": 1, "namespace": "diamond_shared", "resources": { "accent": "blue" } }'
+Write-Utf8NoBom $diamondLeft '{ "version": 1, "namespace": "diamond_left", "imports": ["diamond-shared.mson"] }'
+Write-Utf8NoBom $diamondRight '{ "version": 1, "namespace": "diamond_right", "imports": ["diamond-shared.mson"] }'
+Write-Utf8NoBom $diamondRoot @'
+{
+  "version": 1,
+  "namespace": "diamond_root",
+  "imports": ["diamond-left.mson", "diamond-right.mson"],
+  "codeBehind": "bad-prop.ml",
+  "application": { "name": "Diamond", "startupWindow": "mainWindow" },
+  "windows": [
+    { "id": "mainWindow", "type": "Window", "layout": { "type": "VerticalStack", "children": [] } }
+  ]
+}
+'@
+Assert-Ok (Invoke-Capture $Tool @("validate", $diamondRoot)) "deduplicate diamond import graph"
 
 Write-Host "MiniGui tests OK"

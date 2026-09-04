@@ -12,7 +12,7 @@ struct Parser
 Represents the parser data used by the minigui module.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L36)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L61)
 
 ## Members
 
@@ -26,7 +26,7 @@ errors
 Stores the errors value associated with parser.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L42)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L67)
 
 <a id="field-field-parser-pos-pos-tools-minigui-ml-575805503"></a>
 ### pos
@@ -38,7 +38,7 @@ pos
 Stores the pos value associated with parser.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L40)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L65)
 
 <a id="field-field-parser-text-text-tools-minigui-ml-2037314625"></a>
 ### text
@@ -50,4 +50,4 @@ text
 Stores the text value associated with parser.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L38)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L63)

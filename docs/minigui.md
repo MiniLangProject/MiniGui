@@ -1,7 +1,9 @@
 # MiniGui user guide
 
 MiniGui describes MiniLang desktop UIs in JSON `.mson` files and keeps
-application logic in normal `.ml` files.
+application logic in normal `.ml` files. The current native backend targets
+Windows x64 and requires MiniLang Compiler 1.2.3 or newer. Both the Python and
+self-hosted compiler are supported.
 
 ## CLI
 
@@ -26,6 +28,12 @@ Useful options:
 - `--compiler <path>` selects the MiniLang compiler.
 - `--no-compile` makes `build` stop after generation.
 - `--keep-generated` preserves generated files.
+
+`build` starts the selected compiler directly with `CreateProcessW`; arguments
+are quoted according to the Windows CRT rules and are never interpreted by a
+command shell. The CLI also discovers the selected compiler's standard-library
+root, so a Python compiler script and a self-hosted compiler executable can be
+used interchangeably.
 
 ## MSON basics
 
@@ -204,7 +212,17 @@ all event binding paths.
 
 `tests/minigui/run_minigui_tests.ps1` builds the MiniGui CLI, validates and
 builds the example applications, checks generated code for expected constructors
-and event bindings, and runs runtime smoke tests for code-behind behavior.
+and event bindings, and runs runtime smoke tests for code-behind behavior. It
+also covers malformed MSON, import graphs, shell metacharacters in paths,
+Unicode conversion, repeated GDI/tooltip replacement, empty runtime state, and
+deterministic generation. If both compilers are available, the suite verifies
+byte-identical Python/self-hosted CLI builds and generated source, then performs
+a self-hosted application build and runtime smoke test.
+
+For a 3,000-label synthetic input (about 202 KiB), the optimized parser and
+generator reduced median generation time from 1,844.81 ms to 222.80 ms and peak
+working set from 157.48 MiB to 43.70 MiB over five paired Windows x64 runs.
+Generated output remained byte-identical.
 
 ## Imports, components and resources
 
@@ -222,6 +240,31 @@ Resource references use:
 ```
 
 Resources are resolved at build time.
+
+## Input validation and trust boundary
+
+The parser rejects duplicate object keys, malformed JSON integers, unpaired
+Unicode surrogates, raw control characters, reserved MiniLang identifiers, and
+invalid event handler names. A single MSON document is limited to 16 MiB,
+container nesting to 128 levels, and an import graph to 4,096 distinct files.
+Import cycles are diagnosed; shared dependencies in a diamond graph are loaded
+only once and Windows paths are deduplicated case-insensitively.
+
+MSON imports may intentionally refer to any readable local path. If an
+application accepts third-party MSON, it should enforce its own allowed import
+roots before invoking MiniGui. Code-behind files and explicitly selected
+compiler executables are trusted code because `build` compiles and links them.
+
+## Unicode, resources, and threading
+
+MiniGui converts MiniLang UTF-8 strings to native UTF-16, including non-BMP
+characters represented by surrogate pairs. Style brushes and tooltip windows
+are owned by the runtime: replacements release the previous native handle and
+`Application.run` releases remaining MiniGui-owned resources when the message
+loop exits.
+
+Win32 controls have UI-thread affinity. Worker threads may prepare data, but
+must marshal UI mutations back to the thread running `Application.run`.
 
 ## Extending MiniGui
 

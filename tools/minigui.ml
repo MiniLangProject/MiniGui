@@ -4,15 +4,40 @@
 
 import std.fs as fs
 import std.string as str
+import std.string_builder as sb
+import std.ds.list as list
+import std.process as process
 
-/// Invokes the native _wsystem entry point used by the minigui module.
-/// @param cmd cmd value consumed by this operation.
-/// @returns Native int result produced by the call.
-extern function _wsystem(cmd as wstr) from "msvcrt.dll" returns int
 /// Invokes the native _wmkdir entry point used by the minigui module.
 /// @param path Path of the file or directory used by the operation.
 /// @returns Native int result produced by the call.
 extern function _wmkdir(path as wstr) from "msvcrt.dll" returns int
+/// Starts a child compiler directly, without exposing its arguments to cmd.exe.
+/// @internal
+extern function _CreateProcessW(applicationName as wstr, commandLine as wstr, processAttributes as ptr, threadAttributes as ptr, inheritHandles as bool, creationFlags as u32, environment as ptr, currentDirectory as ptr, startupInfo as bytes, processInformation as bytes) from "kernel32.dll" symbol "CreateProcessW" returns bool
+/// Waits for a child compiler to terminate.
+/// @internal
+extern function _WaitForSingleObject(handle as ptr, milliseconds as u32) from "kernel32.dll" symbol "WaitForSingleObject" returns u32
+/// Reads the child compiler's process exit code.
+/// @internal
+extern function _GetExitCodeProcess(handle as ptr, exitCode as bytes) from "kernel32.dll" symbol "GetExitCodeProcess" returns bool
+/// Releases a process or thread handle returned by CreateProcessW.
+/// @internal
+extern function _CloseHandle(handle as ptr) from "kernel32.dll" symbol "CloseHandle" returns bool
+/// Resolves an executable through the Windows search path.
+/// @internal
+extern function _SearchPathW(path as ptr, fileName as wstr, extension as ptr, bufferCount as u32, output as bytes, filePart as ptr) from "kernel32.dll" symbol "SearchPathW" returns u32
+
+/// Maximum accepted MSON document size in UTF-8 bytes (16 MiB).
+const MAX_MSON_BYTES = 16777216
+/// Maximum JSON container nesting accepted by the MSON parser.
+const MAX_MSON_DEPTH = 128
+/// Maximum number of distinct files in one MSON import graph.
+const MAX_MSON_DOCUMENTS = 4096
+/// Infinite timeout value used while waiting for the compiler process.
+const INFINITE = 0xFFFFFFFF
+/// Maximum UTF-16 path capacity used for executable resolution.
+const MAX_WINDOWS_PATH_CHARS = 32768
 
 /// Represents the json value data used by the minigui module.
 struct JsonValue
@@ -229,14 +254,15 @@ end function
 /// @param value Value consumed or transformed by the operation.
 function intPart(value)
   text = "" + value
-  outv = ""
+  output = sb.StringBuilder.withCapacity(len(text))
   if len(text) > 0 then
     for i = 0 to len(text) - 1
       ch = text[i]
       if ch == "." then break end if
-      outv = outv + ch
+      output.appendString(ch)
     end for
   end if
+  outv = output.toString()
   if outv == "" or outv == "-" then outv = "0" end if
   n = toNumber(outv)
   if typeof(n) == "int" then return n end if
@@ -269,47 +295,47 @@ end function
 /// Performs the charAt operation for the minigui module.
 /// @param text Text consumed by the operation.
 /// @param i i value consumed by this operation.
-function charAt(text, i)
+function inline charAt(text, i)
   if i < 0 or i >= len(text) then return "" end if
   return text[i]
 end function
 
 /// Performs the ord operation for the minigui module.
 /// @param ch ch value consumed by this operation.
-function ord(ch)
+function inline ord(ch)
   if typeof(ch) != "string" or len(ch) == 0 then return -1 end if
   return bytes(ch)[0]
 end function
 
 /// Returns whether digit satisfies the required condition.
 /// @param ch ch value consumed by this operation.
-function isDigit(ch)
+function inline isDigit(ch)
   c = ord(ch)
   return c >= 48 and c <= 57
 end function
 
 /// Returns whether letter satisfies the required condition.
 /// @param ch ch value consumed by this operation.
-function isLetter(ch)
+function inline isLetter(ch)
   c = ord(ch)
   return (c >= 65 and c <= 90) or (c >= 97 and c <= 122)
 end function
 
 /// Returns whether ident start satisfies the required condition.
 /// @param ch ch value consumed by this operation.
-function isIdentStart(ch)
+function inline isIdentStart(ch)
   return isLetter(ch) or ch == "_"
 end function
 
 /// Returns whether ident char satisfies the required condition.
 /// @param ch ch value consumed by this operation.
-function isIdentChar(ch)
+function inline isIdentChar(ch)
   return isLetter(ch) or isDigit(ch) or ch == "_"
 end function
 
 /// Returns whether ws satisfies the required condition.
 /// @param ch ch value consumed by this operation.
-function isWs(ch)
+function inline isWs(ch)
   return ch == " " or ch == "\r" or ch == "\n" or ch == "\t"
 end function
 
@@ -325,7 +351,9 @@ end function
 /// @param p p value consumed by this operation.
 /// @param message Human-readable message associated with the operation.
 function parserError(p, message)
-  p.errors = p.errors + [message + " at offset " + p.pos]
+  // Keep the first failure. Later parser branches often discover consequences
+  // of the same malformed token and would otherwise allocate noisy diagnostics.
+  if len(p.errors) == 0 then p.errors = [message + " at offset " + p.pos] end if
 end function
 
 /// Performs the hexVal operation for the minigui module.
@@ -338,14 +366,15 @@ function hexVal(ch)
   return -1
 end function
 
-/// Appends code unit utf8 to the destination used by the minigui module.
-/// @param outBytes outBytes value consumed by this operation.
-/// @param cp cp value consumed by this operation.
-function appendCodeUnitUtf8(outBytes, cp)
-  if cp < 0 then return outBytes end if
-  if cp < 128 then return outBytes + bytes([cp]) end if
-  if cp < 2048 then return outBytes + bytes([192 | (cp >> 6), 128 | (cp & 63)]) end if
-  return outBytes + bytes([224 | (cp >> 12), 128 | ((cp >> 6) & 63), 128 | (cp & 63)])
+/// Encodes one Unicode scalar value as a UTF-8 string.
+/// @param cp Unicode scalar value to encode.
+function codePointUtf8(cp)
+  if cp < 0 or cp > 1114111 then return end if
+  if cp >= 55296 and cp <= 57343 then return end if
+  if cp < 128 then return decode(bytes([cp])) end if
+  if cp < 2048 then return decode(bytes([192 | (cp >> 6), 128 | (cp & 63)])) end if
+  if cp < 65536 then return decode(bytes([224 | (cp >> 12), 128 | ((cp >> 6) & 63), 128 | (cp & 63)])) end if
+  return decode(bytes([240 | (cp >> 18), 128 | ((cp >> 12) & 63), 128 | ((cp >> 6) & 63), 128 | (cp & 63)]))
 end function
 
 /// Parses json string for the minigui workflow.
@@ -356,26 +385,24 @@ function parseJsonString(p)
     return ""
   end if
   p.pos = p.pos + 1
-  outBytes = bytes(0)
+  output = sb.StringBuilder.new()
   while p.pos < len(p.text)
     ch = charAt(p.text, p.pos)
     if ch == "\"" then
       p.pos = p.pos + 1
-      s0 = decode(outBytes)
-      if typeof(s0) == "string" then return s0 end if
-      return ""
+      return output.toString()
     end if
     if ch == "\\" then
       p.pos = p.pos + 1
       esc = charAt(p.text, p.pos)
-      if esc == "\"" then outBytes = outBytes + bytes("\"")
-      else if esc == "\\" then outBytes = outBytes + bytes("\\")
-      else if esc == "/" then outBytes = outBytes + bytes("/")
-      else if esc == "b" then outBytes = outBytes + bytes([8])
-      else if esc == "f" then outBytes = outBytes + bytes([12])
-      else if esc == "n" then outBytes = outBytes + bytes("\n")
-      else if esc == "r" then outBytes = outBytes + bytes("\r")
-      else if esc == "t" then outBytes = outBytes + bytes("\t")
+      if esc == "\"" then output.appendString("\"")
+      else if esc == "\\" then output.appendString("\\")
+      else if esc == "/" then output.appendString("/")
+      else if esc == "b" then output.appendString(decode(bytes([8])))
+      else if esc == "f" then output.appendString(decode(bytes([12])))
+      else if esc == "n" then output.appendString("\n")
+      else if esc == "r" then output.appendString("\r")
+      else if esc == "t" then output.appendString("\t")
       else if esc == "u" then
         if p.pos + 4 >= len(p.text) then
           parserError(p, "Invalid unicode escape")
@@ -390,14 +417,48 @@ function parseJsonString(p)
           return ""
         end if
         cp = (h1 << 12) | (h2 << 8) | (h3 << 4) | h4
-        outBytes = appendCodeUnitUtf8(outBytes, cp)
         p.pos = p.pos + 4
+        if cp >= 55296 and cp <= 56319 then
+          // JSON represents non-BMP code points as one high/low surrogate pair.
+          if charAt(p.text, p.pos + 1) != "\\" or charAt(p.text, p.pos + 2) != "u" or p.pos + 6 >= len(p.text) then
+            parserError(p, "High surrogate must be followed by a low surrogate")
+            return ""
+          end if
+          l1 = hexVal(charAt(p.text, p.pos + 3))
+          l2 = hexVal(charAt(p.text, p.pos + 4))
+          l3 = hexVal(charAt(p.text, p.pos + 5))
+          l4 = hexVal(charAt(p.text, p.pos + 6))
+          if l1 < 0 or l2 < 0 or l3 < 0 or l4 < 0 then
+            parserError(p, "Invalid low surrogate escape")
+            return ""
+          end if
+          low = (l1 << 12) | (l2 << 8) | (l3 << 4) | l4
+          if low < 56320 or low > 57343 then
+            parserError(p, "High surrogate must be followed by a low surrogate")
+            return ""
+          end if
+          cp = 65536 + ((cp - 55296) << 10) + (low - 56320)
+          p.pos = p.pos + 6
+        else if cp >= 56320 and cp <= 57343 then
+          parserError(p, "Unexpected low surrogate")
+          return ""
+        end if
+        encoded = codePointUtf8(cp)
+        if typeof(encoded) != "string" then
+          parserError(p, "Invalid Unicode scalar value")
+          return ""
+        end if
+        output.appendString(encoded)
       else
         parserError(p, "Invalid escape")
         return ""
       end if
     else
-      outBytes = outBytes + bytes(ch)
+      if ord(ch) >= 0 and ord(ch) < 32 then
+        parserError(p, "Unescaped control character in string")
+        return ""
+      end if
+      output.appendString(ch)
     end if
     p.pos = p.pos + 1
   end while
@@ -409,25 +470,53 @@ end function
 /// @param p p value consumed by this operation.
 function parseNumber(p)
   start = p.pos
+  integerOnly = true
   if charAt(p.text, p.pos) == "-" then p.pos = p.pos + 1 end if
-  while p.pos < len(p.text) and isDigit(charAt(p.text, p.pos))
+  if charAt(p.text, p.pos) == "0" then
     p.pos = p.pos + 1
-  end while
-  // MSON currently needs integer dimensions only. Skip fractional/exponent parts.
+    if isDigit(charAt(p.text, p.pos)) then
+      parserError(p, "Leading zero in number")
+      return 0
+    end if
+  else
+    if isDigit(charAt(p.text, p.pos)) == false then
+      parserError(p, "Expected digit")
+      return 0
+    end if
+    while p.pos < len(p.text) and isDigit(charAt(p.text, p.pos))
+      p.pos = p.pos + 1
+    end while
+  end if
+  // MSON values are integer-backed, but accepting valid JSON fractions and
+  // exponents keeps syntax diagnostics correct before conversion truncates them.
   if p.pos < len(p.text) and charAt(p.text, p.pos) == "." then
+    integerOnly = false
     p.pos = p.pos + 1
+    if isDigit(charAt(p.text, p.pos)) == false then
+      parserError(p, "Expected digit after decimal point")
+      return 0
+    end if
     while p.pos < len(p.text) and isDigit(charAt(p.text, p.pos))
       p.pos = p.pos + 1
     end while
   end if
   if p.pos < len(p.text) and (charAt(p.text, p.pos) == "e" or charAt(p.text, p.pos) == "E") then
+    integerOnly = false
     p.pos = p.pos + 1
     if charAt(p.text, p.pos) == "+" or charAt(p.text, p.pos) == "-" then p.pos = p.pos + 1 end if
+    if isDigit(charAt(p.text, p.pos)) == false then
+      parserError(p, "Expected digit in exponent")
+      return 0
+    end if
     while p.pos < len(p.text) and isDigit(charAt(p.text, p.pos))
       p.pos = p.pos + 1
     end while
   end if
   raw = str.substr(p.text, start, p.pos - start)
+  if integerOnly == false then
+    parserError(p, "MSON supports integer numbers only")
+    return 0
+  end if
   n = toNumber(raw)
   if typeof(n) != "int" then return 0 end if
   return n
@@ -443,12 +532,19 @@ function startsAt(text, pos, needle)
 end function
 
 /// Parses value for the minigui workflow.
-/// @param p p value consumed by this operation.
-function parseValue(p)
+/// @param p Parser state consumed by this operation.
+/// @param depth Current JSON container nesting depth.
+function parseValue(p, depth)
   skipWs(p)
   ch = charAt(p.text, p.pos)
-  if ch == "{" then return parseObject(p) end if
-  if ch == "[" then return parseArray(p) end if
+  if ch == "{" or ch == "[" then
+    if depth >= MAX_MSON_DEPTH then
+      parserError(p, "MSON nesting exceeds limit of " + MAX_MSON_DEPTH)
+      return jNull()
+    end if
+  end if
+  if ch == "{" then return parseObject(p, depth + 1) end if
+  if ch == "[" then return parseArray(p, depth + 1) end if
   if ch == "\"" then return jString(parseJsonString(p)) end if
   if ch == "t" and startsAt(p.text, p.pos, "true") then
     p.pos = p.pos + 4
@@ -468,77 +564,85 @@ function parseValue(p)
 end function
 
 /// Parses object for the minigui workflow.
-/// @param p p value consumed by this operation.
-function parseObject(p)
-  keys = []
-  vals = []
+/// @param p Parser state consumed by this operation.
+/// @param depth Current JSON container nesting depth.
+function parseObject(p, depth)
+  keys = list.List.new()
+  vals = list.List.new()
   p.pos = p.pos + 1
   skipWs(p)
   if charAt(p.text, p.pos) == "}" then
     p.pos = p.pos + 1
-    return jObject(keys, vals)
+    return jObject(keys.toArray(), vals.toArray())
   end if
   while p.pos < len(p.text)
     skipWs(p)
     key = parseJsonString(p)
+    if listContains(keys, key) then
+      parserError(p, "Duplicate object key '" + key + "'")
+      return jObject(keys.toArray(), vals.toArray())
+    end if
     skipWs(p)
     if charAt(p.text, p.pos) != ":" then
       parserError(p, "Expected ':'")
-      return jObject(keys, vals)
+      return jObject(keys.toArray(), vals.toArray())
     end if
     p.pos = p.pos + 1
-    val = parseValue(p)
-    keys = keys + [key]
-    vals = vals + [val]
+    val = parseValue(p, depth)
+    keys.add(key)
+    vals.add(val)
     skipWs(p)
     ch = charAt(p.text, p.pos)
     if ch == "}" then
       p.pos = p.pos + 1
-      return jObject(keys, vals)
+      return jObject(keys.toArray(), vals.toArray())
     end if
     if ch != "," then
       parserError(p, "Expected ',' or '}'")
-      return jObject(keys, vals)
+      return jObject(keys.toArray(), vals.toArray())
     end if
     p.pos = p.pos + 1
   end while
   parserError(p, "Unterminated object")
-  return jObject(keys, vals)
+  return jObject(keys.toArray(), vals.toArray())
 end function
 
 /// Parses array for the minigui workflow.
-/// @param p p value consumed by this operation.
-function parseArray(p)
-  items = []
+/// @param p Parser state consumed by this operation.
+/// @param depth Current JSON container nesting depth.
+function parseArray(p, depth)
+  items = list.List.new()
   p.pos = p.pos + 1
   skipWs(p)
   if charAt(p.text, p.pos) == "]" then
     p.pos = p.pos + 1
-    return jArray(items)
+    return jArray(items.toArray())
   end if
   while p.pos < len(p.text)
-    items = items + [parseValue(p)]
+    items.add(parseValue(p, depth))
     skipWs(p)
     ch = charAt(p.text, p.pos)
     if ch == "]" then
       p.pos = p.pos + 1
-      return jArray(items)
+      return jArray(items.toArray())
     end if
     if ch != "," then
       parserError(p, "Expected ',' or ']'")
-      return jArray(items)
+      return jArray(items.toArray())
     end if
     p.pos = p.pos + 1
   end while
   parserError(p, "Unterminated array")
-  return jArray(items)
+  return jArray(items.toArray())
 end function
 
 /// Parses json for the minigui workflow.
 /// @param text Text consumed by the operation.
 function parseJson(text)
+  if typeof(text) != "string" then return jsonParseError("MSON input must be text") end if
+  if len(text) > MAX_MSON_BYTES then return jsonParseError("MSON document exceeds size limit of " + MAX_MSON_BYTES + " bytes") end if
   p = Parser(text, 0, [])
-  v = parseValue(p)
+  v = parseValue(p, 0)
   skipWs(p)
   if len(p.errors) == 0 and p.pos < len(text) then parserError(p, "Unexpected trailing content") end if
   if len(p.errors) > 0 then return jsonParseError(p.errors[0]) end if
@@ -570,8 +674,9 @@ end function
 /// Returns whether rooted satisfies the required condition.
 /// @param p p value consumed by this operation.
 function isRooted(p)
-  if len(p) >= 3 and p[1] == ":" then return true end if
-  if str.startsWith(p, "\\\\") then return true end if
+  pp = pathSlash(p)
+  if len(pp) >= 3 and pp[1] == ":" and pp[2] == "\\" then return true end if
+  if str.startsWith(pp, "\\\\") then return true end if
   return false
 end function
 
@@ -622,21 +727,28 @@ end function
 /// @param p p value consumed by this operation.
 function normalizePath(p)
   pp = pathSlash(p)
+  unc = str.startsWith(pp, "\\\\")
+  absoluteDrive = len(pp) >= 3 and pp[1] == ":" and pp[2] == "\\"
   parts = str.split(pp, "\\")
-  outv = []
+  output = list.List.withCapacity(len(parts))
   if len(parts) > 0 then
     for i = 0 to len(parts) - 1
       part = parts[i]
       if part == "" or part == "." then continue end if
-      if part == ".." and len(outv) > 0 and outv[len(outv) - 1] != ".." then
-        outv = slice(outv, 0, len(outv) - 1)
+      if part == ".." and output.len() > 0 and output.last() != ".." then
+        output.pop()
+      else if part == ".." and (unc or absoluteDrive) then
+        // Absolute paths cannot traverse above their volume/share root.
+        continue
       else
-        outv = outv + [part]
+        output.add(part)
       end if
     end for
   end if
-  if len(outv) == 0 then return "." end if
-  return str.join(outv, "\\")
+  if output.len() == 0 then return "." end if
+  joined = str.join(output.toArray(), "\\")
+  if unc then return "\\\\" + joined end if
+  return joined
 end function
 
 /// Splits path parts for the minigui workflow.
@@ -657,19 +769,19 @@ function relativePath(fromDir, toPath)
   while i < len(fromParts) and i < len(toParts) and fromParts[i] == toParts[i]
     i = i + 1
   end while
-  outv = []
+  output = list.List.withCapacity((len(fromParts) - i) + (len(toParts) - i))
   if i < len(fromParts) then
     for j = i to len(fromParts) - 1
-      outv = outv + [".."]
+      output.add("..")
     end for
   end if
   if i < len(toParts) then
     for k = i to len(toParts) - 1
-      outv = outv + [toParts[k]]
+      output.add(toParts[k])
     end for
   end if
-  if len(outv) == 0 then return "." end if
-  return str.join(outv, "\\")
+  if output.len() == 0 then return "." end if
+  return str.join(output.toArray(), "\\")
 end function
 
 /// Ensures dir is available to the minigui workflow.
@@ -689,10 +801,112 @@ function ensureDir(path)
   end if
 end function
 
-/// Performs the q operation for the minigui module.
-/// @param s0 s0 value consumed by this operation.
-function q(s0)
-  return "\"" + str.replaceAll(s0, "\"", "\\\"") + "\""
+/// Quotes one argument according to the Windows CRT command-line rules.
+/// CreateProcessW receives a command-line string, so quotes and the
+/// backslashes preceding them must be encoded exactly.
+/// @param value Argument value to quote.
+function quoteProcessArgument(value)
+  if typeof(value) != "string" then return "\"\"" end if
+  output = sb.StringBuilder.withCapacity(len(value) + 8)
+  output.appendString("\"")
+  pendingSlashes = 0
+  raw = bytes(value)
+  if len(raw) > 0 then
+    for i = 0 to len(raw) - 1
+      ch = raw[i]
+      if ch == 92 then
+        pendingSlashes = pendingSlashes + 1
+        continue
+      end if
+      copies = pendingSlashes
+      if ch == 34 then copies = (pendingSlashes * 2) + 1 end if
+      while copies > 0
+        output.appendString("\\")
+        copies = copies - 1
+      end while
+      pendingSlashes = 0
+      output.appendSlice(value, i, 1)
+    end for
+  end if
+  pendingSlashes = pendingSlashes * 2
+  while pendingSlashes > 0
+    output.appendString("\\")
+    pendingSlashes = pendingSlashes - 1
+  end while
+  output.appendString("\"")
+  return output.toString()
+end function
+
+/// Reads an unsigned little-endian 32-bit value.
+/// @param data Byte buffer to inspect.
+/// @param offset Zero-based byte offset.
+function inline readU32(data, offset)
+  return data[offset] | (data[offset + 1] << 8) | (data[offset + 2] << 16) | (data[offset + 3] << 24)
+end function
+
+/// Reads a native 64-bit handle from a PROCESS_INFORMATION buffer.
+/// @param data Byte buffer to inspect.
+/// @param offset Zero-based byte offset.
+function inline readHandle(data, offset)
+  value = 0
+  for i = 0 to 7
+    value = value | (data[offset + i] << (i * 8))
+  end for
+  return value
+end function
+
+/// Runs a child process directly and returns its exit code.
+/// @param executable Executable passed to CreateProcessW.
+/// @param args Exact argv values supplied to the child process.
+function runProcess(executable, args)
+  command = sb.StringBuilder.new()
+  command.appendString(quoteProcessArgument(executable))
+  if len(args) > 0 then
+    for i = 0 to len(args) - 1
+      command.appendString(" ")
+      command.appendString(quoteProcessArgument(args[i]))
+    end for
+  end if
+  startup = bytes(104, 0)
+  startup[0] = 104
+  processInfo = bytes(24, 0)
+  if _CreateProcessW(executable, command.toString(), 0, 0, false, 0, 0, 0, startup, processInfo) == false then return -1 end if
+  processHandle = readHandle(processInfo, 0)
+  threadHandle = readHandle(processInfo, 8)
+  if threadHandle != 0 then _CloseHandle(threadHandle) end if
+  if processHandle == 0 then return -1 end if
+  waited = _WaitForSingleObject(processHandle, INFINITE)
+  exitCode = bytes(4, 0)
+  gotExitCode = _GetExitCodeProcess(processHandle, exitCode)
+  _CloseHandle(processHandle)
+  if waited != 0 or gotExitCode == false then return -1 end if
+  return readU32(exitCode, 0)
+end function
+
+/// Resolves a named executable without invoking a command shell.
+/// @param name Executable name, including its extension.
+function resolveExecutable(name)
+  output = bytes(MAX_WINDOWS_PATH_CHARS * 2, 0)
+  count = _SearchPathW(0, name, 0, MAX_WINDOWS_PATH_CHARS, output, 0)
+  if count == 0 or count >= MAX_WINDOWS_PATH_CHARS then return "" end if
+  resolved = decode16Z(output)
+  if typeof(resolved) != "string" then return "" end if
+  return resolved
+end function
+
+/// Resolves the preferred Python interpreter for the Python MiniLang compiler.
+function resolvePythonInterpreter()
+  localAppData = process.environment("LOCALAPPDATA")
+  if typeof(localAppData) == "string" then
+    preferred = joinPath(localAppData, "Programs\\Python\\Python314\\python.exe")
+    if fs.isFile(preferred) then return preferred end if
+  end if
+  programFiles = process.environment("ProgramFiles")
+  if typeof(programFiles) == "string" then
+    preferredSystem = joinPath(programFiles, "Python314\\python.exe")
+    if fs.isFile(preferredSystem) then return preferredSystem end if
+  end if
+  return resolveExecutable("python.exe")
 end function
 
 /// Returns whether the supplied data contains contains.
@@ -702,6 +916,17 @@ function contains(arr, value)
   if len(arr) == 0 then return false end if
   for i = 0 to len(arr) - 1
     if arr[i] == value then return true end if
+  end for
+  return false
+end function
+
+/// Returns whether a growable list contains the supplied value.
+/// @param values Growable list to inspect.
+/// @param value Value to find.
+function listContains(values, value)
+  if values is void or values.len() == 0 then return false end if
+  for i = 0 to values.len() - 1
+    if values.get(i) == value then return true end if
   end for
   return false
 end function
@@ -716,6 +941,7 @@ function identOk(value)
   for i = 1 to len(value) - 1
     if isIdentChar(value[i]) == false then return false end if
   end for
+  if contains(["print", "if", "then", "else", "end", "while", "loop", "true", "false", "and", "or", "not", "function", "return", "global", "const", "for", "to", "each", "in", "break", "continue", "switch", "case", "default", "struct", "enum", "are", "namespace", "import", "as", "package", "extern", "from", "returns", "symbol", "out", "static", "inline", "synchronized", "void", "is", "defer", "interface", "implements", "iterator", "yield", "async", "await"], value) then return false end if
   return true
 end function
 
@@ -724,15 +950,16 @@ end function
 function miniIdent(value)
   if typeof(value) != "string" then return "_" end if
   if len(value) == 0 then return "_" end if
-  outv = ""
+  output = sb.StringBuilder.withCapacity(len(value) + 1)
   for i = 0 to len(value) - 1
     ch = value[i]
     if isIdentChar(ch) then
-      outv = outv + ch
+      output.appendString(ch)
     else
-      outv = outv + "_"
+      output.appendString("_")
     end if
   end for
+  outv = output.toString()
   if outv == "" then outv = "_" end if
   first = outv[0]
   if isIdentStart(first) then return outv end if
@@ -758,12 +985,13 @@ end function
 /// @param ns ns value consumed by this operation.
 function miniGuiTypeName(ns)
   parts = str.split(ns, ".")
-  outv = ""
+  output = sb.StringBuilder.withCapacity(len(ns))
   for i = 0 to len(parts) - 1
     p = miniIdent(parts[i])
     if p == "_" then continue end if
-    outv = outv + upperFirst(p)
+    output.appendString(upperFirst(p))
   end for
+  outv = output.toString()
   if outv == "" then outv = "MiniGuiApp" end if
   return miniIdent(outv)
 end function
@@ -772,19 +1000,21 @@ end function
 /// @param value Value consumed or transformed by the operation.
 function mlString(value)
   if typeof(value) != "string" then value = "" end if
-  outv = "\""
   if len(value) == 0 then return "\"\"" end if
+  output = sb.StringBuilder.withCapacity(len(value) + 8)
+  output.appendString("\"")
   for i = 0 to len(value) - 1
     ch = value[i]
-    if ch == "\\" then outv = outv + "\\\\"
-    else if ch == "\"" then outv = outv + "\\\""
-    else if ch == "\n" then outv = outv + "\\n"
-    else if ch == "\r" then outv = outv + "\\r"
-    else if ch == "\t" then outv = outv + "\\t"
-    else outv = outv + ch
+    if ch == "\\" then output.appendString("\\\\")
+    else if ch == "\"" then output.appendString("\\\"")
+    else if ch == "\n" then output.appendString("\\n")
+    else if ch == "\r" then output.appendString("\\r")
+    else if ch == "\t" then output.appendString("\\t")
+    else output.appendString(ch)
     end if
   end for
-  return outv + "\""
+  output.appendString("\"")
+  return output.toString()
 end function
 
 /// Performs the jsonScalarToString operation for the minigui module.
@@ -865,7 +1095,18 @@ end function
 function stackHas(stack, path)
   if len(stack) == 0 then return false end if
   for i = 0 to len(stack) - 1
-    if stack[i] == path then return true end if
+    if str.equalsIgnoreCaseAscii(stack[i], path) then return true end if
+  end for
+  return false
+end function
+
+/// Returns whether a normalized MSON path has already been loaded.
+/// @param result Result object whose document graph is inspected.
+/// @param path Normalized path to find.
+function documentLoaded(result, path)
+  if len(result.documents) == 0 then return false end if
+  for i = 0 to len(result.documents) - 1
+    if str.equalsIgnoreCaseAscii(result.documents[i].path, path) then return true end if
   end for
   return false
 end function
@@ -892,6 +1133,12 @@ function loadGraph(result, path, includeDirs, stack)
     addError(result, path, "Cyclic MSON import: " + str.join(stack + [full], " -> "))
     return
   end if
+  // A diamond-shaped import graph must contribute each file only once.
+  if documentLoaded(result, full) then return end if
+  if len(result.documents) >= MAX_MSON_DOCUMENTS then
+    addError(result, path, "MSON import graph exceeds limit of " + MAX_MSON_DOCUMENTS + " documents.")
+    return
+  end if
   doc = readMson(result, full)
   if isNull(doc) then return end if
   result.documents = result.documents + [DocEntry(full, doc)]
@@ -910,7 +1157,16 @@ function loadGraph(result, path, includeDirs, stack)
   resources = prop(doc, "resources")
   if resources.kind == "object" and len(resources.keys) > 0 then
     for r = 0 to len(resources.keys) - 1
-      result.resources = result.resources + [[resources.keys[r], resources.values[r]]]
+      resourceName = resources.keys[r]
+      duplicateResource = false
+      if len(result.resources) > 0 then
+        for existingResource = 0 to len(result.resources) - 1
+          if result.resources[existingResource][0] == resourceName then duplicateResource = true end if
+        end for
+      end if
+      if duplicateResource then addError(result, full, "Duplicate resource '" + resourceName + "'.")
+      else result.resources = result.resources + [[resourceName, resources.values[r]]]
+      end if
     end for
   end if
   comps = arrItems(prop(doc, "components"))
@@ -935,19 +1191,19 @@ end function
 /// @param v v value consumed by this operation.
 function cloneJson(v)
   if v.kind == "object" then
-    vals = []
+    vals = array(len(v.values))
     if len(v.values) > 0 then
       for i = 0 to len(v.values) - 1
-        vals = vals + [cloneJson(v.values[i])]
+        vals[i] = cloneJson(v.values[i])
       end for
     end if
     return jObject(v.keys, vals)
   end if
   if v.kind == "array" then
-    items = []
+    items = array(len(v.items))
     if len(v.items) > 0 then
       for j = 0 to len(v.items) - 1
-        items = items + [cloneJson(v.items[j])]
+        items[j] = cloneJson(v.items[j])
       end for
     end if
     return jArray(items)
@@ -983,9 +1239,9 @@ function copyNodeWithPrefix(node, prefix)
   if id != "" then copy = setProp(copy, "id", jString(prefix + "_" + id)) end if
   children = arrItems(prop(copy, "children"))
   if len(children) > 0 then
-    outv = []
+    outv = array(len(children))
     for i = 0 to len(children) - 1
-      outv = outv + [copyNodeWithPrefix(children[i], prefix)]
+      outv[i] = copyNodeWithPrefix(children[i], prefix)
     end for
     copy = setProp(copy, "children", jArray(outv))
   end if
@@ -1016,9 +1272,9 @@ function expandComponents(result, path, node)
   end if
   children = arrItems(prop(node, "children"))
   if len(children) > 0 then
-    outv = []
+    outv = array(len(children))
     for i = 0 to len(children) - 1
-      outv = outv + [expandComponents(result, path, children[i])]
+      outv[i] = expandComponents(result, path, children[i])
     end for
     node = setProp(node, "children", jArray(outv))
   end if
@@ -1274,6 +1530,7 @@ function validateMson(path, includeDirs, codeBehindOverride)
       wid = asString(prop(w, "id"), "")
       if asString(prop(w, "type"), "") != "Window" then addError(result, wp, "Window '" + wid + "' must have type 'Window'.") end if
       if wid == "" then addError(result, wp, "Window is missing required property 'id'.")
+      else if identOk(wid) == false then addError(result, wp, "Invalid id '" + wid + "'. Use a non-reserved MiniLang identifier.")
       else if idSeen(ids, wid) then addError(result, wp, "Duplicate id '" + wid + "'.")
       else ids = ids + [wid]
       end if
@@ -1308,9 +1565,14 @@ function validateMson(path, includeDirs, codeBehindOverride)
       else
         if len(result.events) > 0 then
           for evx = 0 to len(result.events) - 1
-            ar = findFunctionArity(txt, result.events[evx].handler)
-            if ar < 0 then addError(result, result.events[evx].path, "Event handler '" + result.events[evx].handler + "' was assigned to " + result.events[evx].controlType + " '" + result.events[evx].id + "', but no function was found in " + cbFull + ".")
-            else if ar != 2 then addError(result, result.events[evx].path, "Event handler '" + result.events[evx].handler + "' must accept exactly 2 parameters: ui and event.")
+            handler = result.events[evx].handler
+            if identOk(handler) == false then
+              addError(result, result.events[evx].path, "Invalid event handler name '" + handler + "'. Use a non-reserved MiniLang identifier.")
+            else
+              ar = findFunctionArity(txt, handler)
+              if ar < 0 then addError(result, result.events[evx].path, "Event handler '" + handler + "' was assigned to " + result.events[evx].controlType + " '" + result.events[evx].id + "', but no function was found in " + cbFull + ".")
+              else if ar != 2 then addError(result, result.events[evx].path, "Event handler '" + handler + "' must accept exactly 2 parameters: ui and event.")
+              end if
             end if
           end for
         end if
@@ -1467,11 +1729,11 @@ function stringArrayLiteral(result, path, node, name)
   v = resourceValue(result, path, prop(prop(node, "properties"), name))
   if v.kind != "array" then return "[]" end if
   if len(v.items) == 0 then return "[]" end if
-  parts = []
+  parts = list.List.withCapacity(len(v.items))
   for i = 0 to len(v.items) - 1
-    parts = parts + [mlString(asString(v.items[i], ""))]
+    parts.add(mlString(asString(v.items[i], "")))
   end for
-  return "[" + str.join(parts, ", ") + "]"
+  return "[" + str.join(parts.toArray(), ", ") + "]"
 end function
 
 /// Performs the intArrayLiteral operation for the minigui module.
@@ -1483,12 +1745,12 @@ function intArrayLiteral(result, path, node, name)
   v = resourceValue(result, path, prop(prop(node, "properties"), name))
   if v.kind != "array" then return "[]" end if
   if len(v.items) == 0 then return "[]" end if
-  parts = []
+  parts = list.List.withCapacity(len(v.items))
   for i = 0 to len(v.items) - 1
     item = resourceValue(result, path, v.items[i])
-    if item.kind == "number" then parts = parts + ["" + item.number] end if
+    if item.kind == "number" then parts.add("" + item.number) end if
   end for
-  return "[" + str.join(parts, ", ") + "]"
+  return "[" + str.join(parts.toArray(), ", ") + "]"
 end function
 
 /// Collects tree item literals for the minigui workflow.
@@ -1498,28 +1760,28 @@ end function
 /// @param item item value consumed by this operation.
 /// @param level level value consumed by this operation.
 function collectTreeItemLiterals(result, path, parts, item, level)
-  prefix = ""
+  prefixBuilder = sb.StringBuilder.withCapacity(level * 2)
   if level > 0 then
     for i = 0 to level - 1
-      prefix = prefix + "  "
+      prefixBuilder.appendString("  ")
     end for
   end if
+  prefix = prefixBuilder.toString()
   if item.kind == "string" then
-    parts = parts + [mlString(prefix + item.text)]
-    return parts
+    parts.add(mlString(prefix + item.text))
+    return
   end if
-  if item.kind != "object" then return parts end if
+  if item.kind != "object" then return end if
   label = asString(resourceValue(result, path, prop(item, "text")), "")
   if label == "" then label = asString(resourceValue(result, path, prop(item, "label")), "") end if
-  if label == "" then return parts end if
-  parts = parts + [mlString(prefix + label)]
+  if label == "" then return end if
+  parts.add(mlString(prefix + label))
   children = arrItems(resourceValue(result, path, prop(item, "children")))
   if len(children) > 0 then
     for c = 0 to len(children) - 1
-      parts = collectTreeItemLiterals(result, path, parts, children[c], level + 1)
+      collectTreeItemLiterals(result, path, parts, children[c], level + 1)
     end for
   end if
-  return parts
 end function
 
 /// Performs the treeArrayLiteral operation for the minigui module.
@@ -1530,13 +1792,13 @@ end function
 function treeArrayLiteral(result, path, node, name)
   v = resourceValue(result, path, prop(prop(node, "properties"), name))
   if v.kind != "array" then return "[]" end if
-  parts = []
+  parts = list.List.withCapacity(len(v.items))
   if len(v.items) > 0 then
     for i = 0 to len(v.items) - 1
-      parts = collectTreeItemLiterals(result, path, parts, v.items[i], 0)
+      collectTreeItemLiterals(result, path, parts, v.items[i], 0)
     end for
   end if
-  return "[" + str.join(parts, ", ") + "]"
+  return "[" + str.join(parts.toArray(), ", ") + "]"
 end function
 
 /// Performs the tableArrayLiteral operation for the minigui module.
@@ -1548,22 +1810,22 @@ function tableArrayLiteral(result, path, node, name)
   v = resourceValue(result, path, prop(prop(node, "properties"), name))
   if v.kind != "array" then return "[]" end if
   if len(v.items) == 0 then return "[]" end if
-  parts = []
+  parts = list.List.withCapacity(len(v.items))
   for i = 0 to len(v.items) - 1
     item = resourceValue(result, path, v.items[i])
     if item.kind == "array" then
-      row = []
+      row = list.List.withCapacity(len(item.items))
       if len(item.items) > 0 then
         for c = 0 to len(item.items) - 1
-          row = row + [asString(resourceValue(result, path, item.items[c]), "")]
+          row.add(asString(resourceValue(result, path, item.items[c]), ""))
         end for
       end if
-      parts = parts + [mlString(str.join(row, "\t"))]
+      parts.add(mlString(str.join(row.toArray(), "\t")))
     else
-      parts = parts + [mlString(asString(item, ""))]
+      parts.add(mlString(asString(item, "")))
     end if
   end for
-  return "[" + str.join(parts, ", ") + "]"
+  return "[" + str.join(parts.toArray(), ", ") + "]"
 end function
 
 /// Creates call for for the minigui module.
@@ -1626,7 +1888,7 @@ function addGeneratedNode(lines, fields, result, path, node, parentVar, parentTy
   typ = asString(prop(node, "type"), "")
   if isControl(typ) then
     id = asString(prop(node, "id"), "")
-    if id == "" then id = "__" + typ + "_" + len(lines) end if
+    if id == "" then id = "__" + typ + "_" + lines.len() end if
     var = miniIdent(id)
     w = dimensionProp(result, path, node, "width", width)
     h = dimensionProp(result, path, node, "height", controlDefaultHeight(typ))
@@ -1653,79 +1915,79 @@ function addGeneratedNode(lines, fields, result, path, node, parentVar, parentTy
     if w < 1 then w = 1 end if
     if h < 1 then h = 1 end if
     if typ == "Panel" and parentType == "TabControl" then
-      lines = lines + [var + " = MiniGui.Panel.createTabPage(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ")"]
+      lines.add(var + " = MiniGui.Panel.createTabPage(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ")")
     else if typ == "FilePicker" then
       pickerTitle = stringProp(result, path, node, "title", "Open file")
       pickerFilter = stringProp(result, path, node, "filter", "All files (*.*)|*.*")
-      lines = lines + [var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + mlString(pickerTitle) + ", " + mlString(pickerFilter) + ")"]
+      lines.add(var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + mlString(pickerTitle) + ", " + mlString(pickerFilter) + ")")
     else if typ == "FolderPicker" then
       folderTitle = stringProp(result, path, node, "title", "Choose folder")
-      lines = lines + [var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + mlString(folderTitle) + ")"]
+      lines.add(var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + mlString(folderTitle) + ")")
     else if typ == "ColorPicker" then
       colorTitle = stringProp(result, path, node, "title", "Choose color")
       colorValue = stringProp(result, path, node, "value", "#336699")
-      lines = lines + [var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + mlString(colorTitle) + ", " + mlString(colorValue) + ")"]
+      lines.add(var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + mlString(colorTitle) + ", " + mlString(colorValue) + ")")
     else if typ == "CheckBox" or typ == "RadioButton" or typ == "ToggleSwitch" then
       checked = "false"
       if boolProp(result, path, node, "checked", false) then checked = "true" end if
-      lines = lines + [var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + checked + ")"]
+      lines.add(var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + checked + ")")
     else if typ == "NumberBox" or typ == "SpinBox" then
       numberMin = intProp(result, path, node, "minimum", 0)
       numberMax = intProp(result, path, node, "maximum", 100)
       numberValue = intProp(result, path, node, "value", numberMin)
       numberStep = intProp(result, path, node, "step", 1)
-      lines = lines + [var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + numberMin + ", " + numberMax + ", " + numberValue + ", " + numberStep + ")"]
+      lines.add(var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + numberMin + ", " + numberMax + ", " + numberValue + ", " + numberStep + ")")
     else if typ == "Image" then
       source = stringProp(result, path, node, "source", "")
       stretch = stringProp(result, path, node, "stretch", "none")
-      lines = lines + [var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + mlString(source) + ", " + mlString(stretch) + ")"]
+      lines.add(var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + mlString(source) + ", " + mlString(stretch) + ")")
     else if typ == "Separator" or typ == "Splitter" then
       sepOrientation = stringProp(result, path, node, "orientation", "horizontal")
       if typ == "Splitter" then
         targetBefore = stringProp(result, path, node, "targetBefore", "")
         targetAfter = stringProp(result, path, node, "targetAfter", "")
         if targetBefore != "" or targetAfter != "" then
-          lines = lines + [var + " = MiniGui.Splitter.createPane(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + mlString(sepOrientation) + ", " + mlString(targetBefore) + ", " + mlString(targetAfter) + ")"]
+          lines.add(var + " = MiniGui.Splitter.createPane(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + mlString(sepOrientation) + ", " + mlString(targetBefore) + ", " + mlString(targetAfter) + ")")
         else
-          lines = lines + [var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + mlString(sepOrientation) + ")"]
+          lines.add(var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + mlString(sepOrientation) + ")")
         end if
       else
-        lines = lines + [var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + mlString(sepOrientation) + ")"]
+        lines.add(var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + mlString(sepOrientation) + ")")
       end if
     else if typ == "LinkLabel" then
       url = stringProp(result, path, node, "url", "")
-      lines = lines + [var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + mlString(url) + ")"]
+      lines.add(var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + mlString(url) + ")")
     else if typ == "ScrollViewer" then
       hscroll = "false"
       vscroll = "true"
       if boolProp(result, path, node, "horizontalScroll", false) then hscroll = "true" end if
       if boolProp(result, path, node, "verticalScroll", true) == false then vscroll = "false" end if
-      lines = lines + [var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + hscroll + ", " + vscroll + ")"]
+      lines.add(var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + hscroll + ", " + vscroll + ")")
     else if typ == "ComboBox" or typ == "EditableComboBox" or typ == "ListBox" then
       items = stringArrayLiteral(result, path, node, "items")
       selectedIndex = intProp(result, path, node, "selectedIndex", -1)
-      lines = lines + [var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + items + ", " + selectedIndex + ")"]
+      lines.add(var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + items + ", " + selectedIndex + ")")
     else if typ == "ListView" or typ == "Table" or typ == "DataGrid" then
       items = tableArrayLiteral(result, path, node, "items")
       columns = stringArrayLiteral(result, path, node, "columns")
       selectedIndex = intProp(result, path, node, "selectedIndex", -1)
       if typ == "DataGrid" then
-        lines = lines + [var + " = MiniGui.DataGrid.create(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + columns + ", " + items + ", " + selectedIndex + ")"]
+        lines.add(var + " = MiniGui.DataGrid.create(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + columns + ", " + items + ", " + selectedIndex + ")")
       else if columns == "[]" then
-        lines = lines + [var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + items + ", " + selectedIndex + ")"]
+        lines.add(var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + items + ", " + selectedIndex + ")")
       else
-        lines = lines + [var + " = MiniGui.ListView.createColumns(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + columns + ", " + items + ", " + selectedIndex + ")"]
+        lines.add(var + " = MiniGui.ListView.createColumns(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + columns + ", " + items + ", " + selectedIndex + ")")
       end if
     else if typ == "TabControl" then
       itemsTab = stringArrayLiteral(result, path, node, "items")
       selectedTab = intProp(result, path, node, "selectedIndex", 0)
-      lines = lines + [var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + itemsTab + ", " + selectedTab + ")"]
+      lines.add(var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + itemsTab + ", " + selectedTab + ")")
     else if typ == "TreeView" then
       itemsText = treeArrayLiteral(result, path, node, "items")
-      lines = lines + [var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + itemsText + ")"]
+      lines.add(var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + itemsText + ")")
     else if typ == "MenuBar" or typ == "ToolBar" or typ == "ContextMenu" then
       itemsText = stringArrayLiteral(result, path, node, "items")
-      lines = lines + [var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + itemsText + ")"]
+      lines.add(var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + itemsText + ")")
     else if typ == "ScrollBar" or typ == "Slider" then
       defaultOrientation = "vertical"
       if typ == "Slider" then defaultOrientation = "horizontal" end if
@@ -1735,14 +1997,14 @@ function addGeneratedNode(lines, fields, result, path, node, parentVar, parentTy
       value = intProp(result, path, node, "value", minimum)
       smallStep = intProp(result, path, node, "smallStep", 1)
       largeStep = intProp(result, path, node, "largeStep", 10)
-      lines = lines + [var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + mlString(orientation) + ", " + minimum + ", " + maximum + ", " + value + ", " + smallStep + ", " + largeStep + ")"]
+      lines.add(var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + mlString(orientation) + ", " + minimum + ", " + maximum + ", " + value + ", " + smallStep + ", " + largeStep + ")")
     else if typ == "ProgressBar" then
       progressMin = intProp(result, path, node, "minimum", 0)
       progressMax = intProp(result, path, node, "maximum", 100)
       progressValue = intProp(result, path, node, "value", progressMin)
-      lines = lines + [var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + progressMin + ", " + progressMax + ", " + progressValue + ")"]
+      lines.add(var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + progressMin + ", " + progressMax + ", " + progressValue + ")")
     else
-      lines = lines + [var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ")"]
+      lines.add(var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ")")
     end if
     nodeProps = prop(node, "properties")
     if hasProp(nodeProps, "resizeMode") or hasProp(nodeProps, "anchor") or hasProp(nodeProps, "minWidth") or hasProp(nodeProps, "minHeight") or hasProp(nodeProps, "maxWidth") or hasProp(nodeProps, "maxHeight") then
@@ -1752,34 +2014,34 @@ function addGeneratedNode(lines, fields, result, path, node, parentVar, parentTy
       minHeight = intProp(result, path, node, "minHeight", -1)
       maxWidth = intProp(result, path, node, "maxWidth", -1)
       maxHeight = intProp(result, path, node, "maxHeight", -1)
-      lines = lines + ["MiniGui.Control.setLayout(" + var + ", " + mlString(resizeMode) + ", " + mlString(anchor) + ", " + minWidth + ", " + minHeight + ", " + maxWidth + ", " + maxHeight + ")"]
+      lines.add("MiniGui.Control.setLayout(" + var + ", " + mlString(resizeMode) + ", " + mlString(anchor) + ", " + minWidth + ", " + minHeight + ", " + maxWidth + ", " + maxHeight + ")")
     end if
-    if boolProp(result, path, node, "enabled", true) == false then lines = lines + ["MiniGui.Control.setEnabled(" + var + ", false)"] end if
-    if boolProp(result, path, node, "visible", true) == false then lines = lines + ["MiniGui.Control.setVisible(" + var + ", false)"] end if
+    if boolProp(result, path, node, "enabled", true) == false then lines.add("MiniGui.Control.setEnabled(" + var + ", false)") end if
+    if boolProp(result, path, node, "visible", true) == false then lines.add("MiniGui.Control.setVisible(" + var + ", false)") end if
     tooltip = stringProp(result, path, node, "tooltip", "")
-    if tooltip != "" then lines = lines + ["MiniGui.Control.setTooltip(" + var + ", " + mlString(tooltip) + ")"] end if
+    if tooltip != "" then lines.add("MiniGui.Control.setTooltip(" + var + ", " + mlString(tooltip) + ")") end if
     tabIndex = intProp(result, path, node, "tabIndex", -1)
-    if tabIndex >= 0 then lines = lines + ["MiniGui.Control.setTabIndex(" + var + ", " + tabIndex + ")"] end if
+    if tabIndex >= 0 then lines.add("MiniGui.Control.setTabIndex(" + var + ", " + tabIndex + ")") end if
     foreground = stringProp(result, path, node, "foreground", "")
-    if foreground != "" then lines = lines + ["MiniGui.Control.setForeground(" + var + ", " + mlString(foreground) + ")"] end if
+    if foreground != "" then lines.add("MiniGui.Control.setForeground(" + var + ", " + mlString(foreground) + ")") end if
     background = stringProp(result, path, node, "background", "")
-    if background != "" then lines = lines + ["MiniGui.Control.setBackground(" + var + ", " + mlString(background) + ")"] end if
+    if background != "" then lines.add("MiniGui.Control.setBackground(" + var + ", " + mlString(background) + ")") end if
     borderColor = stringProp(result, path, node, "borderColor", "")
     borderWidth = intProp(result, path, node, "borderWidth", -1)
-    if borderColor != "" or borderWidth >= 0 then lines = lines + ["MiniGui.Control.setBorder(" + var + ", " + mlString(borderColor) + ", " + borderWidth + ")"] end if
+    if borderColor != "" or borderWidth >= 0 then lines.add("MiniGui.Control.setBorder(" + var + ", " + mlString(borderColor) + ", " + borderWidth + ")") end if
     fontFamily = stringProp(result, path, node, "fontFamily", "")
     fontSize = intProp(result, path, node, "fontSize", -1)
     fontWeight = stringProp(result, path, node, "fontWeight", "")
-    if fontFamily != "" or fontSize >= 0 or fontWeight != "" then lines = lines + ["MiniGui.Control.setFont(" + var + ", " + mlString(fontFamily) + ", " + fontSize + ", " + mlString(fontWeight) + ")"] end if
-    if boolProp(result, path, node, "readOnly", false) then lines = lines + ["MiniGui.Control.setReadOnly(" + var + ", true)"] end if
+    if fontFamily != "" or fontSize >= 0 or fontWeight != "" then lines.add("MiniGui.Control.setFont(" + var + ", " + mlString(fontFamily) + ", " + fontSize + ", " + mlString(fontWeight) + ")") end if
+    if boolProp(result, path, node, "readOnly", false) then lines.add("MiniGui.Control.setReadOnly(" + var + ", true)") end if
     maxLength = intProp(result, path, node, "maxLength", -1)
-    if maxLength >= 0 then lines = lines + ["MiniGui.Control.setMaxLength(" + var + ", " + maxLength + ")"] end if
+    if maxLength >= 0 then lines.add("MiniGui.Control.setMaxLength(" + var + ", " + maxLength + ")") end if
     if typ == "ListView" or typ == "Table" or typ == "DataGrid" then
       columnWidths = intArrayLiteral(result, path, node, "columnWidths")
-      if columnWidths != "[]" then lines = lines + ["MiniGui.Control.setColumnWidths(" + var + ", " + columnWidths + ")"] end if
-      if typ == "DataGrid" and boolProp(result, path, node, "editable", false) then lines = lines + ["MiniGui.Control.setEditable(" + var + ", true)"] end if
+      if columnWidths != "[]" then lines.add("MiniGui.Control.setColumnWidths(" + var + ", " + columnWidths + ")") end if
+      if typ == "DataGrid" and boolProp(result, path, node, "editable", false) then lines.add("MiniGui.Control.setEditable(" + var + ", true)") end if
     end if
-    if contains(fields, var) == false then fields = fields + [var] end if
+    if listContains(fields, var) == false then fields.add(var) end if
     if typ == "ContextMenu" then return [lines, fields, 0] end if
     if isContainerControl(typ) then
       childPadding = intProp(result, path, node, "padding", 8)
@@ -1814,6 +2076,13 @@ function addGeneratedNode(lines, fields, result, path, node, parentVar, parentTy
   padding = layoutInt(node, "padding", 0)
   spacing = layoutInt(node, "spacing", 6)
   children = arrItems(prop(node, "children"))
+  // MiniLang's inclusive for-range also descends when the upper bound is -1.
+  // Handle empty layouts before any `0 to len(children) - 1` traversal.
+  if len(children) == 0 then
+    if typ == "DockPanel" then return [lines, fields, height] end if
+    if typ == "Canvas" then return [lines, fields, 0] end if
+    return [lines, fields, padding * 2]
+  end if
   if typ == "HorizontalStack" then
     cx = x + padding
     maxh = 0
@@ -1964,8 +2233,10 @@ function generateCode(result, outputPath)
   outFull = normalizePath(outputPath)
   ensureDir(dirname(outFull))
   cbRel = relativePath(dirname(outFull), result.codeBehindPath)
-  fields = ["app"]
-  body = ["// Generated from " + result.entryPath, "app = MiniGui.Application.create()", "miniguiWindowProcPtr = nativeCallback(miniguiWindowProc, \"wndproc\")", "miniguiTimerProcPtr = nativeCallback(miniguiTimerProc, \"wndproc\")"]
+  fields = list.List.new()
+  fields.add("app")
+  body = list.List.new()
+  body.addAll(["// Generated from " + result.entryPath, "app = MiniGui.Application.create()", "miniguiWindowProcPtr = nativeCallback(miniguiWindowProc, \"wndproc\")", "miniguiTimerProcPtr = nativeCallback(miniguiTimerProc, \"wndproc\")"])
   for i = 0 to len(result.windows) - 1
     w = result.windows[i].window
     path = result.windows[i].path
@@ -1977,55 +2248,61 @@ function generateCode(result, outputPath)
     if title == "" then title = wid end if
     ww = asInt(resourceValue(result, path, prop(props, "width")), 640)
     wh = asInt(resourceValue(result, path, prop(props, "height")), 400)
-    body = body + ["", "// Window '" + wid + "' from " + path, wid + " = MiniGui.Window.create(app, " + mlString(wid) + ", " + mlString(title) + ", " + ww + ", " + wh + ")", "MiniGui.Window.installProc(" + wid + ", miniguiWindowProcPtr)", "MiniGui.Window.startResizeTimer(" + wid + ", miniguiTimerProcPtr)"]
-    if contains(fields, wid) == false then fields = fields + [wid] end if
+    body.addAll(["", "// Window '" + wid + "' from " + path, wid + " = MiniGui.Window.create(app, " + mlString(wid) + ", " + mlString(title) + ", " + ww + ", " + wh + ")", "MiniGui.Window.installProc(" + wid + ", miniguiWindowProcPtr)", "MiniGui.Window.startResizeTimer(" + wid + ", miniguiTimerProcPtr)"])
+    if listContains(fields, wid) == false then fields.add(wid) end if
     r = addGeneratedNode(body, fields, result, path, prop(w, "layout"), wid, "Window", 0, 0, ww - 40, wh - 80)
-    body = r[0]; fields = r[1]
   end for
-  body = body + ["", "ui = " + uiType + "(" + str.join(fields, ", ") + ")"]
-  wrappers = []
-  for e = 0 to len(result.events) - 1
-    ev = result.events[e]
-    cid = miniIdent(ev.id)
-    wrapper = "miniguiEvent" + e
-    wrappers = wrappers + [[wrapper, ev.handler]]
-    if ev.eventName == "load" then body = body + ["MiniGui.Events.bindLoad(app, " + cid + ", " + wrapper + ", ui)"]
-    else if ev.eventName == "close" then body = body + ["MiniGui.Events.bindClose(app, " + cid + ", " + wrapper + ", ui)"]
-    else if ev.eventName == "resized" then body = body + ["MiniGui.Events.bindResized(app, " + cid + ", " + wrapper + ", ui)"]
-    else if ev.eventName == "click" then body = body + ["MiniGui.Events.bindClick(app, " + cid + ", " + wrapper + ", ui)"]
-    else if ev.eventName == "clicked" then body = body + ["MiniGui.Events.bindClicked(app, " + cid + ", " + wrapper + ", ui)"]
-    else if ev.eventName == "focus" then body = body + ["MiniGui.Events.bindFocus(app, " + cid + ", " + wrapper + ", ui)"]
-    else if ev.eventName == "blur" then body = body + ["MiniGui.Events.bindBlur(app, " + cid + ", " + wrapper + ", ui)"]
-    else if ev.eventName == "selectionChanged" then body = body + ["MiniGui.Events.bindSelectionChanged(app, " + cid + ", " + wrapper + ", ui)"]
-    else if ev.eventName == "selected" then body = body + ["MiniGui.Events.bindSelected(app, " + cid + ", " + wrapper + ", ui)"]
-    else if ev.eventName == "scrollChanged" then body = body + ["MiniGui.Events.bindScrollChanged(app, " + cid + ", " + wrapper + ", ui)"]
-    else if ev.eventName == "valueChanged" then body = body + ["MiniGui.Events.bindValueChanged(app, " + cid + ", " + wrapper + ", ui)"]
-    else if ev.eventName == "changed" then body = body + ["MiniGui.Events.bindChanged(app, " + cid + ", " + wrapper + ", ui)"]
-    else if ev.eventName == "change" or ev.eventName == "submit" or ev.eventName == "validating" or ev.eventName == "validated" then body = body + ["MiniGui.Events.bindChange(app, " + cid + ", " + wrapper + ", ui)"]
-    else body = body + ["MiniGui.Events.bindTextChanged(app, " + cid + ", " + wrapper + ", ui)"]
-    end if
-  end for
+  body.addAll(["", "ui = " + uiType + "(" + str.join(fields.toArray(), ", ") + ")"])
+  wrappers = list.List.new()
+  if len(result.events) > 0 then
+    for e = 0 to len(result.events) - 1
+      ev = result.events[e]
+      cid = miniIdent(ev.id)
+      wrapper = "miniguiEvent" + e
+      wrappers.add([wrapper, ev.handler])
+      if ev.eventName == "load" then body.add("MiniGui.Events.bindLoad(app, " + cid + ", " + wrapper + ", ui)")
+      else if ev.eventName == "close" then body.add("MiniGui.Events.bindClose(app, " + cid + ", " + wrapper + ", ui)")
+      else if ev.eventName == "resized" then body.add("MiniGui.Events.bindResized(app, " + cid + ", " + wrapper + ", ui)")
+      else if ev.eventName == "click" then body.add("MiniGui.Events.bindClick(app, " + cid + ", " + wrapper + ", ui)")
+      else if ev.eventName == "clicked" then body.add("MiniGui.Events.bindClicked(app, " + cid + ", " + wrapper + ", ui)")
+      else if ev.eventName == "focus" then body.add("MiniGui.Events.bindFocus(app, " + cid + ", " + wrapper + ", ui)")
+      else if ev.eventName == "blur" then body.add("MiniGui.Events.bindBlur(app, " + cid + ", " + wrapper + ", ui)")
+      else if ev.eventName == "selectionChanged" then body.add("MiniGui.Events.bindSelectionChanged(app, " + cid + ", " + wrapper + ", ui)")
+      else if ev.eventName == "selected" then body.add("MiniGui.Events.bindSelected(app, " + cid + ", " + wrapper + ", ui)")
+      else if ev.eventName == "scrollChanged" then body.add("MiniGui.Events.bindScrollChanged(app, " + cid + ", " + wrapper + ", ui)")
+      else if ev.eventName == "valueChanged" then body.add("MiniGui.Events.bindValueChanged(app, " + cid + ", " + wrapper + ", ui)")
+      else if ev.eventName == "changed" then body.add("MiniGui.Events.bindChanged(app, " + cid + ", " + wrapper + ", ui)")
+      else if ev.eventName == "change" or ev.eventName == "submit" or ev.eventName == "validating" or ev.eventName == "validated" then body.add("MiniGui.Events.bindChange(app, " + cid + ", " + wrapper + ", ui)")
+      else body.add("MiniGui.Events.bindTextChanged(app, " + cid + ", " + wrapper + ", ui)")
+      end if
+    end for
+  end if
   startup = miniIdent(asString(prop(prop(entryDoc, "application"), "startupWindow"), ""))
   if startup == "_" and len(result.windows) > 0 then startup = miniIdent(asString(prop(result.windows[0].window, "id"), "window")) end if
-  body = body + ["MiniGui.Application.setStartupWindow(app, " + startup + ")", "MiniGui.Window.show(" + startup + ")", "return MiniGui.Application.run(app)"]
-  lines = ["// <auto-generated> MiniGui generated code. Do not edit by hand.", "import MiniGuiLib.minigui as MiniGui", "import " + mlString(cbRel) + " as CodeBehind", "", "struct " + uiType]
-  for f = 0 to len(fields) - 1
-    lines = lines + ["  " + fields[f] + ","]
+  body.addAll(["MiniGui.Application.setStartupWindow(app, " + startup + ")", "MiniGui.Window.show(" + startup + ")", "return MiniGui.Application.run(app)"])
+  lines = list.List.new()
+  lines.addAll(["// <auto-generated> MiniGui generated code. Do not edit by hand.", "import MiniGuiLib.minigui as MiniGui", "import " + mlString(cbRel) + " as CodeBehind", "", "struct " + uiType])
+  for f = 0 to fields.len() - 1
+    lines.add("  " + fields.get(f) + ",")
   end for
-  lines = lines + ["end struct", ""]
-  lines = lines + ["function miniguiWindowProc(hwnd, msg, wParam, lParam)", "  return MiniGui.Application.windowProc(hwnd, msg, wParam, lParam)", "end function", ""]
-  lines = lines + ["function miniguiTimerProc(hwnd, msg, wParam, lParam)", "  return MiniGui.Application.timerProc(hwnd, msg, wParam, lParam)", "end function", ""]
-  for widx = 0 to len(wrappers) - 1
-    lines = lines + ["function " + wrappers[widx][0] + "(ui, event)", "  return CodeBehind." + wrappers[widx][1] + "(ui, event)", "end function", ""]
-  end for
-  lines = lines + ["function main(args)"]
-  for b = 0 to len(body) - 1
-    if body[b] == "" then lines = lines + [""]
-    else lines = lines + ["  " + body[b]]
+  lines.addAll(["end struct", ""])
+  lines.addAll(["function miniguiWindowProc(hwnd, msg, wParam, lParam)", "  return MiniGui.Application.windowProc(hwnd, msg, wParam, lParam)", "end function", ""])
+  lines.addAll(["function miniguiTimerProc(hwnd, msg, wParam, lParam)", "  return MiniGui.Application.timerProc(hwnd, msg, wParam, lParam)", "end function", ""])
+  if wrappers.len() > 0 then
+    for widx = 0 to wrappers.len() - 1
+      wrapperEntry = wrappers.get(widx)
+      lines.addAll(["function " + wrapperEntry[0] + "(ui, event)", "  return CodeBehind." + wrapperEntry[1] + "(ui, event)", "end function", ""])
+    end for
+  end if
+  lines.add("function main(args)")
+  for b = 0 to body.len() - 1
+    bodyLine = body.get(b)
+    if bodyLine == "" then lines.add("")
+    else lines.add("  " + bodyLine)
     end if
   end for
-  lines = lines + ["end function"]
-  ok = fs.writeAllText(outFull, str.join(lines, "\n") + "\n")
+  lines.add("end function")
+  ok = fs.writeAllText(outFull, str.join(lines.toArray(), "\n") + "\n")
   if typeof(ok) == "error" then return ok end if
   return outFull
 end function
@@ -2035,16 +2312,20 @@ end function
 /// @param start start value consumed by this operation.
 function parseOptions(args, start)
   opts = [["output", ""], ["codeBehind", ""], ["generatedDir", ""], ["compiler", "..\\MiniLangCompilerML\\build\\mlc_win64.exe"], ["libraryDir", "."], ["noCompile", "false"], ["keepGenerated", "false"]]
-  includes = []
+  includes = list.List.new()
   i = start
   while i < len(args)
     a = args[i]
-    if a == "--output" then i = i + 1; opts[0][1] = args[i]
-    else if a == "--code-behind" then i = i + 1; opts[1][1] = args[i]
-    else if a == "--generated-dir" then i = i + 1; opts[2][1] = args[i]
-    else if a == "--compiler" then i = i + 1; opts[3][1] = args[i]
-    else if a == "--library-dir" then i = i + 1; opts[4][1] = args[i]
-    else if a == "--include-dir" then i = i + 1; includes = includes + [normalizePath(args[i])]
+    if a == "--output" or a == "--code-behind" or a == "--generated-dir" or a == "--compiler" or a == "--library-dir" or a == "--include-dir" then
+      if i + 1 >= len(args) then return error(2, "Missing value for option: " + a) end if
+      i = i + 1
+      if a == "--output" then opts[0][1] = args[i]
+      else if a == "--code-behind" then opts[1][1] = args[i]
+      else if a == "--generated-dir" then opts[2][1] = args[i]
+      else if a == "--compiler" then opts[3][1] = args[i]
+      else if a == "--library-dir" then opts[4][1] = args[i]
+      else includes.add(normalizePath(args[i]))
+      end if
     else if a == "--no-compile" then opts[5][1] = "true"
     else if a == "--keep-generated" then opts[6][1] = "true"
     else if a == "--verbose" or a == "--debug" or a == "--release" then
@@ -2054,7 +2335,7 @@ function parseOptions(args, start)
     end if
     i = i + 1
   end while
-  return [opts, includes]
+  return [opts, includes.toArray()]
 end function
 
 /// Performs the opt operation for the minigui module.
@@ -2075,17 +2356,28 @@ function usage()
   print "  minigui build <app.mson> --output <app.exe> [--no-compile]"
 end function
 
-/// Performs the compilerCommand operation for the minigui module.
+/// Runs the selected MiniLang compiler without involving a command shell.
 /// @param compiler compiler value consumed by this operation.
 /// @param generated generated value consumed by this operation.
 /// @param outExe outExe value consumed by this operation.
 /// @param libraryDir libraryDir value consumed by this operation.
-function compilerCommand(compiler, generated, outExe, libraryDir)
-  base = q(compiler)
-  if str.endsWith(compiler, ".py") or str.endsWith(compiler, ".PY") then
-    base = "py -3.14 " + q(compiler)
+function runCompiler(compiler, generated, outExe, libraryDir)
+  executable = compiler
+  args = [generated, outExe, "-I", libraryDir, "--subsystem", "gui"]
+  compilerDir = dirname(normalizePath(compiler))
+  compilerRoot = compilerDir
+  if fs.isDir(joinPath(compilerRoot, "std")) == false then
+    compilerRoot = dirname(compilerDir)
   end if
-  return base + " " + q(generated) + " " + q(outExe) + " -I " + q(libraryDir) + " --subsystem gui"
+  if fs.isDir(joinPath(compilerRoot, "std")) then
+    args = args + ["-I", compilerRoot]
+  end if
+  if str.endsWith(compiler, ".py") or str.endsWith(compiler, ".PY") then
+    executable = resolvePythonInterpreter()
+    if executable == "" then return -1 end if
+    args = [compiler] + args
+  end if
+  return runProcess(executable, args)
 end function
 
 /// Writes validation for the minigui workflow.
@@ -2132,8 +2424,8 @@ function main(args)
   outExe = opt(opts, "output")
   if outExe == "" then outExe = joinPath(dirname(normalizePath(msonPath)), "build\\app.exe") end if
   ensureDir(dirname(outExe))
-  cmd = compilerCommand(opt(opts, "compiler"), generated, outExe, opt(opts, "libraryDir"))
-  rc = _wsystem(cmd)
+  rc = runCompiler(opt(opts, "compiler"), generated, outExe, opt(opts, "libraryDir"))
+  if rc < 0 then print "Failed to start MiniLang compiler."; return 1 end if
   if rc != 0 then return rc end if
   print "Built: " + normalizePath(outExe)
   return 0

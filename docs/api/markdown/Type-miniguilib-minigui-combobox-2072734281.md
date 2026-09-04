@@ -12,7 +12,7 @@ struct ComboBox
 Represents the combo box data used by the minigui module.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L3202)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L3346)
 
 ## Members
 
@@ -39,4 +39,4 @@ Creates combo box for the minigui combo box module.
 | `selectedIndex` | `dynamic` | — | Zero-based index of selected. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L3214)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L3358)
