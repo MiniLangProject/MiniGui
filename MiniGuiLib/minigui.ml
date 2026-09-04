@@ -1,3 +1,7 @@
+// SPDX-License-Identifier: Apache-2.0
+
+//! Provides minigui facilities for this project.
+
 /*
 Copyright 2026 Nils Kopal
 
@@ -16,6 +20,20 @@ limitations under the License.
 
 package MiniGuiLib.minigui
 
+/// Invokes the native CreateWindowExW entry point used by the minigui module.
+/// @param exStyle exStyle value consumed by this operation.
+/// @param className className value consumed by this operation.
+/// @param windowName windowName value consumed by this operation.
+/// @param style style value consumed by this operation.
+/// @param x Horizontal coordinate used by the operation.
+/// @param y Vertical coordinate used by the operation.
+/// @param width Width in the coordinate or storage units used by the caller.
+/// @param height Height in the coordinate or storage units used by the caller.
+/// @param parent parent value consumed by this operation.
+/// @param menu menu value consumed by this operation.
+/// @param instance instance value consumed by this operation.
+/// @param param param value consumed by this operation.
+/// @returns Native ptr result produced by the call.
 extern function CreateWindowExW(
 exStyle as int,
 className as wstr,
@@ -31,289 +49,723 @@ instance as ptr,
 param as ptr
 ) from "user32.dll" symbol "CreateWindowExW" returns ptr
 
+/// Invokes the native RegisterClassW entry point used by the minigui module.
+/// @param wndClass wndClass value consumed by this operation.
+/// @returns Native u32 result produced by the call.
 extern function RegisterClassW(wndClass as bytes) from "user32.dll" returns u32
+/// Invokes the native GetModuleHandleW entry point used by the minigui module.
+/// @param moduleName moduleName value consumed by this operation.
+/// @returns Native ptr result produced by the call.
 extern function GetModuleHandleW(moduleName as ptr) from "kernel32.dll" returns ptr
+/// Invokes the native LoadCursorW entry point used by the minigui module.
+/// @param instance instance value consumed by this operation.
+/// @param cursorName cursorName value consumed by this operation.
+/// @returns Native ptr result produced by the call.
 extern function LoadCursorW(instance as ptr, cursorName as ptr) from "user32.dll" returns ptr
+/// Invokes the native GetLastError entry point used by the minigui module.
+/// @returns Native u32 result produced by the call.
 extern function GetLastError() from "kernel32.dll" returns u32
+/// Invokes the native ShowWindow entry point used by the minigui module.
+/// @param hwnd hwnd value consumed by this operation.
+/// @param cmd cmd value consumed by this operation.
+/// @returns Native bool result produced by the call.
 extern function ShowWindow(hwnd as ptr, cmd as int) from "user32.dll" returns bool
+/// Invokes the native UpdateWindow entry point used by the minigui module.
+/// @param hwnd hwnd value consumed by this operation.
+/// @returns Native bool result produced by the call.
 extern function UpdateWindow(hwnd as ptr) from "user32.dll" returns bool
+/// Invokes the native DestroyWindow entry point used by the minigui module.
+/// @param hwnd hwnd value consumed by this operation.
+/// @returns Native bool result produced by the call.
 extern function DestroyWindow(hwnd as ptr) from "user32.dll" returns bool
+/// Invokes the native IsWindow entry point used by the minigui module.
+/// @param hwnd hwnd value consumed by this operation.
+/// @returns Native bool result produced by the call.
 extern function IsWindow(hwnd as ptr) from "user32.dll" returns bool
+/// Invokes the native EnableWindow entry point used by the minigui module.
+/// @param hwnd hwnd value consumed by this operation.
+/// @param enable enable value consumed by this operation.
+/// @returns Native bool result produced by the call.
 extern function EnableWindow(hwnd as ptr, enable as bool) from "user32.dll" returns bool
+/// Invokes the native SetWindowTextW entry point used by the minigui module.
+/// @param hwnd hwnd value consumed by this operation.
+/// @param text Text consumed by the operation.
+/// @returns Native bool result produced by the call.
 extern function SetWindowTextW(hwnd as ptr, text as wstr) from "user32.dll" returns bool
+/// Invokes the native GetWindowTextW entry point used by the minigui module.
+/// @param hwnd hwnd value consumed by this operation.
+/// @param text Text consumed by the operation.
+/// @param maxCount Number of max to process.
+/// @returns Native int result produced by the call.
 extern function GetWindowTextW(hwnd as ptr, text as bytes, maxCount as int) from "user32.dll" returns int
+/// Invokes the native GetWindowTextLengthW entry point used by the minigui module.
+/// @param hwnd hwnd value consumed by this operation.
+/// @returns Native int result produced by the call.
 extern function GetWindowTextLengthW(hwnd as ptr) from "user32.dll" returns int
+/// Invokes the native GetClientRect entry point used by the minigui module.
+/// @param hwnd hwnd value consumed by this operation.
+/// @param rect rect value consumed by this operation.
+/// @returns Native bool result produced by the call.
 extern function GetClientRect(hwnd as ptr, rect as bytes) from "user32.dll" returns bool
+/// Invokes the native MoveWindow entry point used by the minigui module.
+/// @param hwnd hwnd value consumed by this operation.
+/// @param x Horizontal coordinate used by the operation.
+/// @param y Vertical coordinate used by the operation.
+/// @param width Width in the coordinate or storage units used by the caller.
+/// @param height Height in the coordinate or storage units used by the caller.
+/// @param repaint repaint value consumed by this operation.
+/// @returns Native bool result produced by the call.
 extern function MoveWindow(hwnd as ptr, x as int, y as int, width as int, height as int, repaint as bool) from "user32.dll" returns bool
+/// Invokes the native RedrawWindow entry point used by the minigui module.
+/// @param hwnd hwnd value consumed by this operation.
+/// @param rect rect value consumed by this operation.
+/// @param region region value consumed by this operation.
+/// @param flags Bit flags controlling the operation.
+/// @returns Native bool result produced by the call.
 extern function RedrawWindow(hwnd as ptr, rect as ptr, region as ptr, flags as u32) from "user32.dll" returns bool
+/// Invokes the native ClientToScreen entry point used by the minigui module.
+/// @param hwnd hwnd value consumed by this operation.
+/// @param point point value consumed by this operation.
+/// @returns Native bool result produced by the call.
 extern function ClientToScreen(hwnd as ptr, point as bytes) from "user32.dll" returns bool
+/// Invokes the native SetCapture entry point used by the minigui module.
+/// @param hwnd hwnd value consumed by this operation.
+/// @returns Native ptr result produced by the call.
 extern function SetCapture(hwnd as ptr) from "user32.dll" returns ptr
+/// Invokes the native ReleaseCapture entry point used by the minigui module.
+/// @returns Native bool result produced by the call.
 extern function ReleaseCapture() from "user32.dll" returns bool
+/// Invokes the native SetFocus entry point used by the minigui module.
+/// @param hwnd hwnd value consumed by this operation.
+/// @returns Native ptr result produced by the call.
 extern function SetFocus(hwnd as ptr) from "user32.dll" returns ptr
+/// Invokes the native SetScrollRange entry point used by the minigui module.
+/// @param hwnd hwnd value consumed by this operation.
+/// @param bar bar value consumed by this operation.
+/// @param minimum minimum value consumed by this operation.
+/// @param maximum maximum value consumed by this operation.
+/// @param redraw redraw value consumed by this operation.
+/// @returns Native bool result produced by the call.
 extern function SetScrollRange(hwnd as ptr, bar as int, minimum as int, maximum as int, redraw as bool) from "user32.dll" returns bool
+/// Invokes the native SetScrollPos entry point used by the minigui module.
+/// @param hwnd hwnd value consumed by this operation.
+/// @param bar bar value consumed by this operation.
+/// @param position position value consumed by this operation.
+/// @param redraw redraw value consumed by this operation.
+/// @returns Native int result produced by the call.
 extern function SetScrollPos(hwnd as ptr, bar as int, position as int, redraw as bool) from "user32.dll" returns int
+/// Invokes the native SetTimer entry point used by the minigui module.
+/// @param hwnd hwnd value consumed by this operation.
+/// @param timerId Identifier of timer.
+/// @param elapsedMs elapsedMs value consumed by this operation.
+/// @param timerProc timerProc value consumed by this operation.
+/// @returns Native ptr result produced by the call.
 extern function SetTimer(hwnd as ptr, timerId as u32, elapsedMs as u32, timerProc as ptr) from "user32.dll" returns ptr
+/// Invokes the native SetWindowLongPtrW entry point used by the minigui module.
+/// @param hwnd hwnd value consumed by this operation.
+/// @param index Zero-based index of the affected item.
+/// @param newLong newLong value consumed by this operation.
+/// @returns Native ptr result produced by the call.
 extern function SetWindowLongPtrW(hwnd as ptr, index as int, newLong as ptr) from "user32.dll" returns ptr
+/// Invokes the native GetWindowLongPtrW entry point used by the minigui module.
+/// @param hwnd hwnd value consumed by this operation.
+/// @param index Zero-based index of the affected item.
+/// @returns Native ptr result produced by the call.
 extern function GetWindowLongPtrW(hwnd as ptr, index as int) from "user32.dll" returns ptr
+/// Invokes the native SendMessageW entry point used by the minigui module.
+/// @param hwnd hwnd value consumed by this operation.
+/// @param msg msg value consumed by this operation.
+/// @param wParam wParam value consumed by this operation.
+/// @param lParam lParam value consumed by this operation.
+/// @returns Native ptr result produced by the call.
 extern function SendMessageW(hwnd as ptr, msg as u32, wParam as ptr, lParam as ptr) from "user32.dll" returns ptr
+/// Invokes the native SendMessageTextW entry point used by the minigui module.
+/// @param hwnd hwnd value consumed by this operation.
+/// @param msg msg value consumed by this operation.
+/// @param wParam wParam value consumed by this operation.
+/// @param lParam lParam value consumed by this operation.
+/// @returns Native ptr result produced by the call.
 extern function SendMessageTextW(hwnd as ptr, msg as u32, wParam as ptr, lParam as wstr) from "user32.dll" symbol "SendMessageW" returns ptr
+/// Invokes the native LoadImageW entry point used by the minigui module.
+/// @param instance instance value consumed by this operation.
+/// @param name Name of the affected item.
+/// @param imageType imageType value consumed by this operation.
+/// @param width Width in the coordinate or storage units used by the caller.
+/// @param height Height in the coordinate or storage units used by the caller.
+/// @param flags Bit flags controlling the operation.
+/// @returns Native ptr result produced by the call.
 extern function LoadImageW(instance as ptr, name as wstr, imageType as u32, width as int, height as int, flags as u32) from "user32.dll" returns ptr
+/// Invokes the native MessageBoxW entry point used by the minigui module.
+/// @param hwnd hwnd value consumed by this operation.
+/// @param text Text consumed by the operation.
+/// @param caption caption value consumed by this operation.
+/// @param flags Bit flags controlling the operation.
+/// @returns Native int result produced by the call.
 extern function MessageBoxW(hwnd as ptr, text as wstr, caption as wstr, flags as u32) from "user32.dll" returns int
+/// Invokes the native CreatePopupMenu entry point used by the minigui module.
+/// @returns Native ptr result produced by the call.
 extern function CreatePopupMenu() from "user32.dll" returns ptr
+/// Invokes the native AppendMenuW entry point used by the minigui module.
+/// @param menu menu value consumed by this operation.
+/// @param flags Bit flags controlling the operation.
+/// @param itemId Identifier of item.
+/// @param text Text consumed by the operation.
+/// @returns Native bool result produced by the call.
 extern function AppendMenuW(menu as ptr, flags as u32, itemId as ptr, text as wstr) from "user32.dll" returns bool
+/// Invokes the native TrackPopupMenuEx entry point used by the minigui module.
+/// @param menu menu value consumed by this operation.
+/// @param flags Bit flags controlling the operation.
+/// @param x Horizontal coordinate used by the operation.
+/// @param y Vertical coordinate used by the operation.
+/// @param owner owner value consumed by this operation.
+/// @param params params value consumed by this operation.
+/// @returns Native int result produced by the call.
 extern function TrackPopupMenuEx(menu as ptr, flags as u32, x as int, y as int, owner as ptr, params as ptr) from "user32.dll" returns int
+/// Invokes the native SetTextColor entry point used by the minigui module.
+/// @param hdc hdc value consumed by this operation.
+/// @param color color value consumed by this operation.
+/// @returns Native u32 result produced by the call.
 extern function SetTextColor(hdc as ptr, color as u32) from "gdi32.dll" returns u32
+/// Invokes the native SetBkColor entry point used by the minigui module.
+/// @param hdc hdc value consumed by this operation.
+/// @param color color value consumed by this operation.
+/// @returns Native u32 result produced by the call.
 extern function SetBkColor(hdc as ptr, color as u32) from "gdi32.dll" returns u32
+/// Invokes the native CreateSolidBrush entry point used by the minigui module.
+/// @param color color value consumed by this operation.
+/// @returns Native ptr result produced by the call.
 extern function CreateSolidBrush(color as u32) from "gdi32.dll" returns ptr
+/// Invokes the native GetOpenFileNameW entry point used by the minigui module.
+/// @param openFileName openFileName value consumed by this operation.
+/// @returns Native bool result produced by the call.
 extern function GetOpenFileNameW(openFileName as bytes) from "comdlg32.dll" returns bool
+/// Invokes the native GetSaveFileNameW entry point used by the minigui module.
+/// @param openFileName openFileName value consumed by this operation.
+/// @returns Native bool result produced by the call.
 extern function GetSaveFileNameW(openFileName as bytes) from "comdlg32.dll" returns bool
+/// Invokes the native ChooseColorW entry point used by the minigui module.
+/// @param chooseColor chooseColor value consumed by this operation.
+/// @returns Native bool result produced by the call.
 extern function ChooseColorW(chooseColor as bytes) from "comdlg32.dll" returns bool
+/// Invokes the native SHBrowseForFolderW entry point used by the minigui module.
+/// @param browseInfo browseInfo value consumed by this operation.
+/// @returns Native ptr result produced by the call.
 extern function SHBrowseForFolderW(browseInfo as bytes) from "shell32.dll" returns ptr
+/// Invokes the native SHGetPathFromIDListW entry point used by the minigui module.
+/// @param itemList itemList value consumed by this operation.
+/// @param path Path of the file or directory used by the operation.
+/// @returns Native bool result produced by the call.
 extern function SHGetPathFromIDListW(itemList as ptr, path as bytes) from "shell32.dll" returns bool
+/// Invokes the native CoTaskMemFree entry point used by the minigui module.
+/// @param value Value consumed or transformed by the operation.
 extern function CoTaskMemFree(value as ptr) from "ole32.dll" returns void
+/// Invokes the native CallWindowProcW entry point used by the minigui module.
+/// @param prev prev value consumed by this operation.
+/// @param hwnd hwnd value consumed by this operation.
+/// @param msg msg value consumed by this operation.
+/// @param wParam wParam value consumed by this operation.
+/// @param lParam lParam value consumed by this operation.
+/// @returns Native ptr result produced by the call.
 extern function CallWindowProcW(prev as ptr, hwnd as ptr, msg as u32, wParam as ptr, lParam as ptr) from "user32.dll" symbol "CallWindowProcW" returns ptr
+/// Invokes the native DefWindowProcW entry point used by the minigui module.
+/// @param hwnd hwnd value consumed by this operation.
+/// @param msg msg value consumed by this operation.
+/// @param wParam wParam value consumed by this operation.
+/// @param lParam lParam value consumed by this operation.
+/// @returns Native ptr result produced by the call.
 extern function DefWindowProcW(hwnd as ptr, msg as u32, wParam as ptr, lParam as ptr) from "user32.dll" returns ptr
+/// Invokes the native RtlMoveMemory entry point used by the minigui module.
+/// @param dest dest value consumed by this operation.
+/// @param src src value consumed by this operation.
+/// @param size Size in the units required by the operation.
 extern function RtlMoveMemory(dest as bytes, src as ptr, size as int) from "kernel32.dll" returns void
+/// Invokes the native PostQuitMessage entry point used by the minigui module.
+/// @param exitCode exitCode value consumed by this operation.
 extern function PostQuitMessage(exitCode as int) from "user32.dll" returns void
+/// Invokes the native GetMessageW entry point used by the minigui module.
+/// @param msg msg value consumed by this operation.
+/// @param hwnd hwnd value consumed by this operation.
+/// @param msgMin msgMin value consumed by this operation.
+/// @param msgMax msgMax value consumed by this operation.
+/// @returns Native int result produced by the call.
 extern function GetMessageW(msg as bytes, hwnd as ptr, msgMin as u32, msgMax as u32) from "user32.dll" returns int
+/// Invokes the native TranslateMessage entry point used by the minigui module.
+/// @param msg msg value consumed by this operation.
+/// @returns Native bool result produced by the call.
 extern function TranslateMessage(msg as bytes) from "user32.dll" returns bool
+/// Invokes the native DispatchMessageW entry point used by the minigui module.
+/// @param msg msg value consumed by this operation.
+/// @returns Native ptr result produced by the call.
 extern function DispatchMessageW(msg as bytes) from "user32.dll" returns ptr
+/// Invokes the native InitCommonControls entry point used by the minigui module.
 extern function InitCommonControls() from "comctl32.dll" returns void
 
+/// Defines the gwlp wndproc constant used by the minigui module.
 const GWLP_WNDPROC = -4
+/// Defines the gwlp userdata constant used by the minigui module.
 const GWLP_USERDATA = -21
+/// Defines the error class already exists constant used by the minigui module.
 const ERROR_CLASS_ALREADY_EXISTS = 1410
+/// Defines the wm setfocus constant used by the minigui module.
 const WM_SETFOCUS = 7
+/// Defines the wm killfocus constant used by the minigui module.
 const WM_KILLFOCUS = 8
+/// Defines the wm size constant used by the minigui module.
 const WM_SIZE = 5
+/// Defines the wm timer constant used by the minigui module.
 const WM_TIMER = 275
+/// Defines the wm destroy constant used by the minigui module.
 const WM_DESTROY = 2
+/// Defines the wm close constant used by the minigui module.
 const WM_CLOSE = 16
+/// Defines the wm command constant used by the minigui module.
 const WM_COMMAND = 273
+/// Defines the wm notify constant used by the minigui module.
 const WM_NOTIFY = 78
+/// Defines the wm ctlcoloredit constant used by the minigui module.
 const WM_CTLCOLOREDIT = 307
+/// Defines the wm ctlcolorlistbox constant used by the minigui module.
 const WM_CTLCOLORLISTBOX = 308
+/// Defines the wm ctlcolorbtn constant used by the minigui module.
 const WM_CTLCOLORBTN = 309
+/// Defines the wm ctlcolorstatic constant used by the minigui module.
 const WM_CTLCOLORSTATIC = 312
+/// Defines the wm hscroll constant used by the minigui module.
 const WM_HSCROLL = 276
+/// Defines the wm vscroll constant used by the minigui module.
 const WM_VSCROLL = 277
+/// Defines the wm mousemove constant used by the minigui module.
 const WM_MOUSEMOVE = 512
+/// Defines the wm lbuttondown constant used by the minigui module.
 const WM_LBUTTONDOWN = 513
+/// Defines the wm mousewheel constant used by the minigui module.
 const WM_MOUSEWHEEL = 522
+/// Defines the wm lbuttonup constant used by the minigui module.
 const WM_LBUTTONUP = 514
+/// Defines the wm lbuttondblclk constant used by the minigui module.
 const WM_LBUTTONDBLCLK = 515
+/// Defines the wm keydown constant used by the minigui module.
 const WM_KEYDOWN = 256
+/// Defines the vk return constant used by the minigui module.
 const VK_RETURN = 13
+/// Defines the vk escape constant used by the minigui module.
 const VK_ESCAPE = 27
+/// Defines the wm rbuttonup constant used by the minigui module.
 const WM_RBUTTONUP = 517
+/// Defines the bn clicked constant used by the minigui module.
 const BN_CLICKED = 0
+/// Defines the en change constant used by the minigui module.
 const EN_CHANGE = 768
+/// Defines the em limittext constant used by the minigui module.
 const EM_LIMITTEXT = 197
+/// Defines the em setreadonly constant used by the minigui module.
 const EM_SETREADONLY = 207
+/// Defines the bm getcheck constant used by the minigui module.
 const BM_GETCHECK = 240
+/// Defines the bm setcheck constant used by the minigui module.
 const BM_SETCHECK = 241
+/// Defines the bst checked constant used by the minigui module.
 const BST_CHECKED = 1
+/// Defines the cb addstring constant used by the minigui module.
 const CB_ADDSTRING = 323
+/// Defines the cb getcursel constant used by the minigui module.
 const CB_GETCURSEL = 327
+/// Defines the cb getlbtext constant used by the minigui module.
 const CB_GETLBTEXT = 328
+/// Defines the cb getlbtextlen constant used by the minigui module.
 const CB_GETLBTEXTLEN = 329
+/// Defines the cb resetcontent constant used by the minigui module.
 const CB_RESETCONTENT = 331
+/// Defines the cb setcursel constant used by the minigui module.
 const CB_SETCURSEL = 334
+/// Defines the cbn selchange constant used by the minigui module.
 const CBN_SELCHANGE = 1
+/// Defines the lb addstring constant used by the minigui module.
 const LB_ADDSTRING = 384
+/// Defines the lb setcursel constant used by the minigui module.
 const LB_SETCURSEL = 390
+/// Defines the lb getcursel constant used by the minigui module.
 const LB_GETCURSEL = 392
+/// Defines the lb gettext constant used by the minigui module.
 const LB_GETTEXT = 393
+/// Defines the lb gettextlen constant used by the minigui module.
 const LB_GETTEXTLEN = 394
+/// Defines the lb resetcontent constant used by the minigui module.
 const LB_RESETCONTENT = 388
+/// Defines the lbn selchange constant used by the minigui module.
 const LBN_SELCHANGE = 1
+/// Defines the lvm getitemcount constant used by the minigui module.
 const LVM_GETITEMCOUNT = 4100
+/// Defines the lvm deleteallitems constant used by the minigui module.
 const LVM_DELETEALLITEMS = 4105
+/// Defines the lvm getnextitem constant used by the minigui module.
 const LVM_GETNEXTITEM = 4108
+/// Defines the lvm setitemstate constant used by the minigui module.
 const LVM_SETITEMSTATE = 4139
+/// Defines the lvm getsubitemrect constant used by the minigui module.
 const LVM_GETSUBITEMRECT = 4152
+/// Defines the lvm subitemhittest constant used by the minigui module.
 const LVM_SUBITEMHITTEST = 4153
+/// Defines the lvm insertitemw constant used by the minigui module.
 const LVM_INSERTITEMW = 4173
+/// Defines the lvm insertcolumnw constant used by the minigui module.
 const LVM_INSERTCOLUMNW = 4193
+/// Defines the lvm setitemtextw constant used by the minigui module.
 const LVM_SETITEMTEXTW = 4212
+/// Defines the lvn itemchanged constant used by the minigui module.
 const LVN_ITEMCHANGED = -101
+/// Defines the lvif text constant used by the minigui module.
 const LVIF_TEXT = 1
+/// Defines the lvcf text constant used by the minigui module.
 const LVCF_TEXT = 4
+/// Defines the lvcf width constant used by the minigui module.
 const LVCF_WIDTH = 2
+/// Defines the lvcf subitem constant used by the minigui module.
 const LVCF_SUBITEM = 8
+/// Defines the lvm setcolumnwidth constant used by the minigui module.
 const LVM_SETCOLUMNWIDTH = 4126
+/// Defines the lvis focused constant used by the minigui module.
 const LVIS_FOCUSED = 1
+/// Defines the lvis selected constant used by the minigui module.
 const LVIS_SELECTED = 2
+/// Defines the lvir bounds constant used by the minigui module.
 const LVIR_BOUNDS = 0
+/// Defines the lvni selected constant used by the minigui module.
 const LVNI_SELECTED = 2
+/// Defines the pbm setpos constant used by the minigui module.
 const PBM_SETPOS = 1026
+/// Defines the pbm setrange32 constant used by the minigui module.
 const PBM_SETRANGE32 = 1030
+/// Defines the sbm setpos constant used by the minigui module.
 const SBM_SETPOS = 224
+/// Defines the sbm getpos constant used by the minigui module.
 const SBM_GETPOS = 225
+/// Defines the sbm setrange constant used by the minigui module.
 const SBM_SETRANGE = 226
+/// Defines the tcm insertitemw constant used by the minigui module.
 const TCM_INSERTITEMW = 4926
+/// Defines the tcm getitemcount constant used by the minigui module.
 const TCM_GETITEMCOUNT = 4868
+/// Defines the tcm getitemrect constant used by the minigui module.
 const TCM_GETITEMRECT = 4874
+/// Defines the tcm getcursel constant used by the minigui module.
 const TCM_GETCURSEL = 4875
+/// Defines the tcm setcursel constant used by the minigui module.
 const TCM_SETCURSEL = 4876
+/// Defines the tcm hittest constant used by the minigui module.
 const TCM_HITTEST = 4877
+/// Defines the tcif text constant used by the minigui module.
 const TCIF_TEXT = 1
+/// Defines the tcn selchange constant used by the minigui module.
 const TCN_SELCHANGE = -551
+/// Defines the tbm getpos constant used by the minigui module.
 const TBM_GETPOS = 1024
+/// Defines the tbm setpos constant used by the minigui module.
 const TBM_SETPOS = 1029
+/// Defines the tbm setrangemin constant used by the minigui module.
 const TBM_SETRANGEMIN = 1031
+/// Defines the tbm setrangemax constant used by the minigui module.
 const TBM_SETRANGEMAX = 1032
+/// Defines the tbm setpagesize constant used by the minigui module.
 const TBM_SETPAGESIZE = 1045
+/// Defines the tbm setlinesize constant used by the minigui module.
 const TBM_SETLINESIZE = 1047
+/// Defines the udm setbuddy constant used by the minigui module.
 const UDM_SETBUDDY = 1129
+/// Defines the udm setrange32 constant used by the minigui module.
 const UDM_SETRANGE32 = 1135
+/// Defines the udm setpos32 constant used by the minigui module.
 const UDM_SETPOS32 = 1137
+/// Defines the udm getpos32 constant used by the minigui module.
 const UDM_GETPOS32 = 1138
+/// Defines the udn deltapos constant used by the minigui module.
 const UDN_DELTAPOS = -722
+/// Defines the tvm deleteitem constant used by the minigui module.
 const TVM_DELETEITEM = 4353
+/// Defines the tvm getnextitem constant used by the minigui module.
 const TVM_GETNEXTITEM = 4362
+/// Defines the tvm getitemw constant used by the minigui module.
 const TVM_GETITEMW = 4414
+/// Defines the tvm insertitemw constant used by the minigui module.
 const TVM_INSERTITEMW = 4402
+/// Defines the tvn selchangedw constant used by the minigui module.
 const TVN_SELCHANGEDW = -451
+/// Defines the tvif text constant used by the minigui module.
 const TVIF_TEXT = 1
+/// Defines the tvgn caret constant used by the minigui module.
 const TVGN_CARET = 9
+/// Defines the tvi root constant used by the minigui module.
 const TVI_ROOT = 4294901760
+/// Defines the tvi last constant used by the minigui module.
 const TVI_LAST = 4294901762
+/// Defines the sb settextw constant used by the minigui module.
 const SB_SETTEXTW = 1035
+/// Defines the sb gettextw constant used by the minigui module.
 const SB_GETTEXTW = 1037
+/// Defines the sb lineup constant used by the minigui module.
 const SB_LINEUP = 0
+/// Defines the sb linedown constant used by the minigui module.
 const SB_LINEDOWN = 1
+/// Defines the sb pageup constant used by the minigui module.
 const SB_PAGEUP = 2
+/// Defines the sb pagedown constant used by the minigui module.
 const SB_PAGEDOWN = 3
+/// Defines the sb thumbposition constant used by the minigui module.
 const SB_THUMBPOSITION = 4
+/// Defines the sb thumbtrack constant used by the minigui module.
 const SB_THUMBTRACK = 5
+/// Defines the sb top constant used by the minigui module.
 const SB_TOP = 6
+/// Defines the sb bottom constant used by the minigui module.
 const SB_BOTTOM = 7
+/// Defines the sb vert constant used by the minigui module.
 const SB_VERT = 1
+/// Defines the idc arrow constant used by the minigui module.
 const IDC_ARROW = 32512
+/// Defines the ws overlappedwindow constant used by the minigui module.
 const WS_OVERLAPPEDWINDOW = 13565952
+/// Defines the ws visible constant used by the minigui module.
 const WS_VISIBLE = 268435456
+/// Defines the ws child constant used by the minigui module.
 const WS_CHILD = 1073741824
+/// Defines the ws clipchildren constant used by the minigui module.
 const WS_CLIPCHILDREN = 33554432
+/// Defines the ws border constant used by the minigui module.
 const WS_BORDER = 8388608
+/// Defines the ws vscroll constant used by the minigui module.
 const WS_VSCROLL = 2097152
+/// Defines the ws hscroll constant used by the minigui module.
 const WS_HSCROLL = 1048576
+/// Defines the ws tabstop constant used by the minigui module.
 const WS_TABSTOP = 65536
+/// Defines the es autohscroll constant used by the minigui module.
 const ES_AUTOHSCROLL = 128
+/// Defines the es multiline constant used by the minigui module.
 const ES_MULTILINE = 4
+/// Defines the es autovscroll constant used by the minigui module.
 const ES_AUTOVSCROLL = 64
+/// Defines the es wantreturn constant used by the minigui module.
 const ES_WANTRETURN = 4096
+/// Defines the es password constant used by the minigui module.
 const ES_PASSWORD = 32
+/// Defines the es number constant used by the minigui module.
 const ES_NUMBER = 8192
+/// Defines the ss left constant used by the minigui module.
 const SS_LEFT = 0
+/// Defines the ss centerimage constant used by the minigui module.
 const SS_CENTERIMAGE = 512
+/// Defines the ss notify constant used by the minigui module.
 const SS_NOTIFY = 256
+/// Defines the ss etchedhorz constant used by the minigui module.
 const SS_ETCHEDHORZ = 16
+/// Defines the ss etchedvert constant used by the minigui module.
 const SS_ETCHEDVERT = 17
+/// Defines the stm setimage constant used by the minigui module.
 const STM_SETIMAGE = 370
+/// Defines the image bitmap constant used by the minigui module.
 const IMAGE_BITMAP = 0
+/// Defines the lr loadfromfile constant used by the minigui module.
 const LR_LOADFROMFILE = 16
+/// Defines the bs pushbutton constant used by the minigui module.
 const BS_PUSHBUTTON = 0
+/// Defines the bs autocheckbox constant used by the minigui module.
 const BS_AUTOCHECKBOX = 3
+/// Defines the bs autoradiobutton constant used by the minigui module.
 const BS_AUTORADIOBUTTON = 9
+/// Defines the bs groupbox constant used by the minigui module.
 const BS_GROUPBOX = 7
+/// Defines the cbs dropdown constant used by the minigui module.
 const CBS_DROPDOWN = 2
+/// Defines the cbs dropdownlist constant used by the minigui module.
 const CBS_DROPDOWNLIST = 3
+/// Defines the cbs hasstrings constant used by the minigui module.
 const CBS_HASSTRINGS = 512
+/// Defines the lbs notify constant used by the minigui module.
 const LBS_NOTIFY = 1
+/// Defines the lvs report constant used by the minigui module.
 const LVS_REPORT = 1
+/// Defines the lvs singlesel constant used by the minigui module.
 const LVS_SINGLESEL = 4
+/// Defines the sbs horz constant used by the minigui module.
 const SBS_HORZ = 0
+/// Defines the sbs vert constant used by the minigui module.
 const SBS_VERT = 1
+/// Defines the tvs haslines constant used by the minigui module.
 const TVS_HASLINES = 2
+/// Defines the tvs linesatroot constant used by the minigui module.
 const TVS_LINESATROOT = 4
+/// Defines the tvs hasbuttons constant used by the minigui module.
 const TVS_HASBUTTONS = 1
+/// Defines the tbs autoticks constant used by the minigui module.
 const TBS_AUTOTICKS = 1
+/// Defines the tbs vert constant used by the minigui module.
 const TBS_VERT = 2
+/// Defines the uds setbuddyint constant used by the minigui module.
 const UDS_SETBUDDYINT = 2
+/// Defines the uds alignright constant used by the minigui module.
 const UDS_ALIGNRIGHT = 4
+/// Defines the uds arrowkeys constant used by the minigui module.
 const UDS_ARROWKEYS = 32
+/// Defines the uds nothousands constant used by the minigui module.
 const UDS_NOTHOUSANDS = 128
+/// Defines the dts shortdateformat constant used by the minigui module.
 const DTS_SHORTDATEFORMAT = 0
+/// Defines the dts updown constant used by the minigui module.
 const DTS_UPDOWN = 1
+/// Defines the dts timeformat constant used by the minigui module.
 const DTS_TIMEFORMAT = 9
+/// Defines the tts alwaystip constant used by the minigui module.
 const TTS_ALWAYSTIP = 1
+/// Defines the ttf idishwnd constant used by the minigui module.
 const TTF_IDISHWND = 1
+/// Defines the ttf subclass constant used by the minigui module.
 const TTF_SUBCLASS = 16
+/// Defines the ttm addtoolw constant used by the minigui module.
 const TTM_ADDTOOLW = 1074
+/// Defines the ttm setmaxtipwidth constant used by the minigui module.
 const TTM_SETMAXTIPWIDTH = 1048
+/// Defines the sw show constant used by the minigui module.
 const SW_SHOW = 5
+/// Defines the color btnface constant used by the minigui module.
 const COLOR_BTNFACE = 15
+/// Defines the rdw invalidate constant used by the minigui module.
 const RDW_INVALIDATE = 1
+/// Defines the rdw erase constant used by the minigui module.
 const RDW_ERASE = 4
+/// Defines the rdw allchildren constant used by the minigui module.
 const RDW_ALLCHILDREN = 128
+/// Defines the rdw updatenow constant used by the minigui module.
 const RDW_UPDATENOW = 256
+/// Defines the mb ok constant used by the minigui module.
 const MB_OK = 0
+/// Defines the mb okcancel constant used by the minigui module.
 const MB_OKCANCEL = 1
+/// Defines the mb abortretryignore constant used by the minigui module.
 const MB_ABORTRETRYIGNORE = 2
+/// Defines the mb yesnocancel constant used by the minigui module.
 const MB_YESNOCANCEL = 3
+/// Defines the mb yesno constant used by the minigui module.
 const MB_YESNO = 4
+/// Defines the mb retrycancel constant used by the minigui module.
 const MB_RETRYCANCEL = 5
+/// Defines the mb iconerror constant used by the minigui module.
 const MB_ICONERROR = 16
+/// Defines the mb iconquestion constant used by the minigui module.
 const MB_ICONQUESTION = 32
+/// Defines the mb iconwarning constant used by the minigui module.
 const MB_ICONWARNING = 48
+/// Defines the mb iconinformation constant used by the minigui module.
 const MB_ICONINFORMATION = 64
+/// Defines the idok constant used by the minigui module.
 const IDOK = 1
+/// Defines the idcancel constant used by the minigui module.
 const IDCANCEL = 2
+/// Defines the idabort constant used by the minigui module.
 const IDABORT = 3
+/// Defines the idretry constant used by the minigui module.
 const IDRETRY = 4
+/// Defines the idignore constant used by the minigui module.
 const IDIGNORE = 5
+/// Defines the idyes constant used by the minigui module.
 const IDYES = 6
+/// Defines the idno constant used by the minigui module.
 const IDNO = 7
+/// Defines the mf string constant used by the minigui module.
 const MF_STRING = 0
+/// Defines the tpm rightbutton constant used by the minigui module.
 const TPM_RIGHTBUTTON = 2
+/// Defines the tpm returncmd constant used by the minigui module.
 const TPM_RETURNCMD = 256
+/// Defines the ofn overwriteprompt constant used by the minigui module.
 const OFN_OVERWRITEPROMPT = 2
+/// Defines the ofn hidereadonly constant used by the minigui module.
 const OFN_HIDEREADONLY = 4
+/// Defines the ofn pathmustexist constant used by the minigui module.
 const OFN_PATHMUSTEXIST = 2048
+/// Defines the ofn filemustexist constant used by the minigui module.
 const OFN_FILEMUSTEXIST = 4096
+/// Defines the ofn explorer constant used by the minigui module.
 const OFN_EXPLORER = 524288
+/// Defines the cc rgbinit constant used by the minigui module.
 const CC_RGBINIT = 1
+/// Defines the cc fullopen constant used by the minigui module.
 const CC_FULLOPEN = 2
+/// Defines the bif returnonlyfsdirs constant used by the minigui module.
 const BIF_RETURNONLYFSDIRS = 1
+/// Defines the bif newdialogstyle constant used by the minigui module.
 const BIF_NEWDIALOGSTYLE = 64
+/// Defines the mk lbutton constant used by the minigui module.
 const MK_LBUTTON = 1
 
+/// Stores module-wide active app state for the minigui module.
 _activeApp = void
+/// Stores module-wide window proc ptr state for the minigui module.
 _windowProcPtr = 0
+/// Stores module-wide timer proc ptr state for the minigui module.
 _timerProcPtr = 0
+/// Stores module-wide old window proc ptr state for the minigui module.
 _oldWindowProcPtr = 0
+/// Stores module-wide subclass handles state for the minigui module.
 _subclassHandles = []
+/// Stores module-wide subclass old procs state for the minigui module.
 _subclassOldProcs = []
+/// Stores module-wide tooltip handles state for the minigui module.
 _tooltipHandles = []
+/// Stores module-wide tooltip text bytes state for the minigui module.
 _tooltipTextBytes = []
+/// Stores module-wide style handles state for the minigui module.
 _styleHandles = []
+/// Stores module-wide style foregrounds state for the minigui module.
 _styleForegrounds = []
+/// Stores module-wide style backgrounds state for the minigui module.
 _styleBackgrounds = []
+/// Stores module-wide style brushes state for the minigui module.
 _styleBrushes = []
-// Optional runtime layout metadata. Controls without entries keep the legacy
-// proportional resize behavior.
+/// Optional runtime layout metadata. Controls without entries keep the legacy
 _layoutHandles = []
+/// Stores module-wide layout resize modes state for the minigui module.
 _layoutResizeModes = []
+/// Stores module-wide layout anchors state for the minigui module.
 _layoutAnchors = []
+/// Stores module-wide layout min widths state for the minigui module.
 _layoutMinWidths = []
+/// Stores module-wide layout min heights state for the minigui module.
 _layoutMinHeights = []
+/// Stores module-wide layout max widths state for the minigui module.
 _layoutMaxWidths = []
+/// Stores module-wide layout max heights state for the minigui module.
 _layoutMaxHeights = []
+/// Stores module-wide resize initialized windows state for the minigui module.
 _resizeInitializedWindows = []
+/// Stores module-wide drag splitter state for the minigui module.
 _dragSplitter = void
+/// Stores module-wide drag splitter start x state for the minigui module.
 _dragSplitterStartX = 0
+/// Stores module-wide drag splitter start y state for the minigui module.
 _dragSplitterStartY = 0
+/// Stores module-wide drag splitter origin x state for the minigui module.
 _dragSplitterOriginX = 0
+/// Stores module-wide drag splitter origin y state for the minigui module.
 _dragSplitterOriginY = 0
+/// Stores module-wide data grid editor state for the minigui module.
 _dataGridEditor = 0
+/// Stores module-wide data grid edit grid state for the minigui module.
 _dataGridEditGrid = void
+/// Stores module-wide data grid edit row state for the minigui module.
 _dataGridEditRow = -1
+/// Stores module-wide data grid edit column state for the minigui module.
 _dataGridEditColumn = -1
+/// Stores module-wide data grid edit original state for the minigui module.
 _dataGridEditOriginal = ""
+/// Stores module-wide window class registered state for the minigui module.
 _windowClassRegistered = false
+/// Stores module-wide window class name bytes state for the minigui module.
 _windowClassNameBytes = void
 
+/// Writes u32 le for the minigui workflow.
+/// @param buf buf value consumed by this operation.
+/// @param off off value consumed by this operation.
+/// @param value Value consumed or transformed by the operation.
 function _writeU32LE(buf, off, value)
   buf[off] = value & 255
   buf[off + 1] = (value >> 8) & 255
@@ -322,6 +774,10 @@ function _writeU32LE(buf, off, value)
   return buf
 end function
 
+/// Writes ptr le for the minigui workflow.
+/// @param buf buf value consumed by this operation.
+/// @param off off value consumed by this operation.
+/// @param value Value consumed or transformed by the operation.
 function _writePtrLE(buf, off, value)
   buf[off] = value & 255
   buf[off + 1] = (value >> 8) & 255
@@ -334,23 +790,34 @@ function _writePtrLE(buf, off, value)
   return buf
 end function
 
+/// Reads i32 le for the minigui workflow.
+/// @param buf buf value consumed by this operation.
+/// @param off off value consumed by this operation.
 function _readI32LE(buf, off)
   value = buf[off] | (buf[off + 1] << 8) | (buf[off + 2] << 16) | (buf[off + 3] << 24)
   return value
 end function
 
+/// Reads s32 le for the minigui workflow.
+/// @param buf buf value consumed by this operation.
+/// @param off off value consumed by this operation.
 function _readS32LE(buf, off)
   value = _readI32LE(buf, off)
   if value >= 2147483648 then return value - 4294967296 end if
   return value
 end function
 
+/// Reads ptr le for the minigui workflow.
+/// @param buf buf value consumed by this operation.
+/// @param off off value consumed by this operation.
 function _readPtrLE(buf, off)
   value = buf[off] | (buf[off + 1] << 8) | (buf[off + 2] << 16) | (buf[off + 3] << 24)
   value = value | (buf[off + 4] << 32) | (buf[off + 5] << 40) | (buf[off + 6] << 48) | (buf[off + 7] << 56)
   return value
 end function
 
+/// Performs the _asInt operation for the minigui module.
+/// @param value Value consumed or transformed by the operation.
 function _asInt(value)
   text = "" + value
   intText = ""
@@ -367,6 +834,9 @@ function _asInt(value)
   return 0
 end function
 
+/// Joins text for the minigui workflow.
+/// @param items Items consumed or updated by the operation.
+/// @param separator separator value consumed by this operation.
 function _joinText(items, separator)
   outv = ""
   if len(items) > 0 then
@@ -378,6 +848,8 @@ function _joinText(items, separator)
   return outv
 end function
 
+/// Performs the _asciiUtf16Z operation for the minigui module.
+/// @param text Text consumed by the operation.
 function _asciiUtf16Z(text)
   outv = bytes((len(text) + 1) * 2, 0)
   for i = 0 to len(text) - 1
@@ -389,12 +861,17 @@ function _asciiUtf16Z(text)
   return outv
 end function
 
+/// Performs the _ord operation for the minigui module.
+/// @param text Text consumed by the operation.
 function _ord(text)
   b = bytes(text)
   if len(b) > 0 then return b[0] end if
   return 0
 end function
 
+/// Performs the _itemTextAt operation for the minigui module.
+/// @param itemsText itemsText value consumed by this operation.
+/// @param index Zero-based index of the affected item.
 function _itemTextAt(itemsText, index)
   current = ""
   currentIndex = 0
@@ -414,6 +891,8 @@ function _itemTextAt(itemsText, index)
   return ""
 end function
 
+/// Performs the _itemCount operation for the minigui module.
+/// @param itemsText itemsText value consumed by this operation.
 function _itemCount(itemsText)
   if itemsText == "" then return 0 end if
   count = 1
@@ -423,6 +902,9 @@ function _itemCount(itemsText)
   return count
 end function
 
+/// Performs the _textContains operation for the minigui module.
+/// @param text Text consumed by the operation.
+/// @param needle needle value consumed by this operation.
 function _textContains(text, needle)
   if needle == "" then return true end if
   if len(text) < len(needle) then return false end if
@@ -437,6 +919,8 @@ function _textContains(text, needle)
   return false
 end function
 
+/// Normalizes edit text for the minigui workflow.
+/// @param text Text consumed by the operation.
 function _normalizeEditText(text)
   outv = ""
   prev = ""
@@ -452,6 +936,8 @@ function _normalizeEditText(text)
   return outv
 end function
 
+/// Returns window text maintained by the minigui module.
+/// @param hwnd hwnd value consumed by this operation.
 function _getWindowText(hwnd)
   if hwnd == 0 then return "" end if
   n = GetWindowTextLengthW(hwnd)
@@ -463,6 +949,11 @@ function _getWindowText(hwnd)
   return ""
 end function
 
+/// Performs the _defaultWndProc operation for the minigui module.
+/// @param hwnd hwnd value consumed by this operation.
+/// @param msg msg value consumed by this operation.
+/// @param wParam wParam value consumed by this operation.
+/// @param lParam lParam value consumed by this operation.
 function _defaultWndProc(hwnd, msg, wParam, lParam)
   global _subclassHandles
   global _subclassOldProcs
@@ -481,12 +972,19 @@ function _defaultWndProc(hwnd, msg, wParam, lParam)
   return DefWindowProcW(hwnd, msg, wParam, lParam)
 end function
 
+/// Performs the _appForWindow operation for the minigui module.
+/// @param hwnd hwnd value consumed by this operation.
 function _appForWindow(hwnd)
   raw = GetWindowLongPtrW(hwnd, GWLP_USERDATA)
   if raw == 0 then return void end if
   return nativeValueFromRaw(raw)
 end function
 
+/// Performs the _miniGuiWndProc operation for the minigui module.
+/// @param hwnd hwnd value consumed by this operation.
+/// @param msg msg value consumed by this operation.
+/// @param wParam wParam value consumed by this operation.
+/// @param lParam lParam value consumed by this operation.
 function _miniGuiWndProc(hwnd, msg, wParam, lParam)
   global _activeApp
   if msg == WM_CTLCOLOREDIT or msg == WM_CTLCOLORSTATIC or msg == WM_CTLCOLORBTN or msg == WM_CTLCOLORLISTBOX then
@@ -709,6 +1207,7 @@ function _miniGuiWndProc(hwnd, msg, wParam, lParam)
   return _defaultWndProc(hwnd, msg, wParam, lParam)
 end function
 
+/// Performs the _registerWindowClass operation for the minigui module.
 function _registerWindowClass()
   global _windowClassRegistered
   global _windowClassNameBytes
@@ -740,6 +1239,7 @@ function _registerWindowClass()
   return _windowClassRegistered
 end function
 
+/// Ensures window proc is available to the minigui workflow.
 function _ensureWindowProc()
   global _windowProcPtr
   if _windowProcPtr == 0 then
@@ -748,6 +1248,11 @@ function _ensureWindowProc()
   return _windowProcPtr
 end function
 
+/// Performs the _miniGuiTimerProc operation for the minigui module.
+/// @param hwnd hwnd value consumed by this operation.
+/// @param msg msg value consumed by this operation.
+/// @param wParam wParam value consumed by this operation.
+/// @param lParam lParam value consumed by this operation.
 function _miniGuiTimerProc(hwnd, msg, wParam, lParam)
   global _activeApp
   if _activeApp is void == false then
@@ -756,6 +1261,7 @@ function _miniGuiTimerProc(hwnd, msg, wParam, lParam)
   return 0
 end function
 
+/// Ensures timer proc is available to the minigui workflow.
 function _ensureTimerProc()
   global _timerProcPtr
   if _timerProcPtr == 0 then
@@ -764,11 +1270,16 @@ function _ensureTimerProc()
   return _timerProcPtr
 end function
 
+/// Performs the _installWindowProc operation for the minigui module.
+/// @param hwnd hwnd value consumed by this operation.
 function _installWindowProc(hwnd)
   cb = _ensureWindowProc()
   return _installSpecificWindowProc(hwnd, cb)
 end function
 
+/// Performs the _installSpecificWindowProc operation for the minigui module.
+/// @param hwnd hwnd value consumed by this operation.
+/// @param cb cb value consumed by this operation.
 function _installSpecificWindowProc(hwnd, cb)
   global _oldWindowProcPtr
   global _subclassHandles
@@ -793,79 +1304,145 @@ function _installSpecificWindowProc(hwnd, cb)
   return true
 end function
 
+/// Represents the event data used by the minigui module.
 struct Event
+  /// Stores the sender value associated with event.
   sender,
+  /// Stores the event type value associated with event.
   eventType,
+  /// Stores the old value value associated with event.
   oldValue,
+  /// Stores the new value value associated with event.
   newValue,
+  /// Stores the cancel value associated with event.
   cancel,
 end struct
 
+/// Represents the binding data used by the minigui module.
 struct Binding
+  /// Stores the control value associated with binding.
   control,
+  /// Stores the callback value associated with binding.
   callback,
+  /// Stores the context value associated with binding.
   context,
+  /// Stores the event type value associated with binding.
   eventType,
 end struct
 
+/// Represents the native control data used by the minigui module.
 struct NativeControl
+  /// Stores the id value associated with native control.
   id,
+  /// Stores the kind value associated with native control.
   kind,
+  /// Stores the handle value associated with native control.
   handle,
+  /// Stores the native id value associated with native control.
   nativeId,
+  /// Stores the text value associated with native control.
   text,
+  /// Stores the x value associated with native control.
   x,
+  /// Stores the y value associated with native control.
   y,
+  /// Stores the width value associated with native control.
   width,
+  /// Stores the height value associated with native control.
   height,
+  /// Stores the visible value associated with native control.
   visible,
+  /// Stores the enabled value associated with native control.
   enabled,
+  /// Stores the last text value associated with native control.
   lastText,
+  /// Stores the last selection value associated with native control.
   lastSelection,
+  /// Stores the scroll min value associated with native control.
   scrollMin,
+  /// Stores the scroll max value associated with native control.
   scrollMax,
+  /// Stores the scroll value value associated with native control.
   scrollValue,
+  /// Stores the small step value associated with native control.
   smallStep,
+  /// Stores the large step value associated with native control.
   largeStep,
+  /// Stores the base x value associated with native control.
   baseX,
+  /// Stores the base y value associated with native control.
   baseY,
+  /// Stores the base width value associated with native control.
   baseWidth,
+  /// Stores the base height value associated with native control.
   baseHeight,
+  /// Stores the base client width value associated with native control.
   baseClientWidth,
+  /// Stores the base client height value associated with native control.
   baseClientHeight,
+  /// Stores the parent value associated with native control.
   parent,
+  /// Stores the base parent width value associated with native control.
   baseParentWidth,
+  /// Stores the base parent height value associated with native control.
   baseParentHeight,
 end struct
 
+/// Represents the application state data used by the minigui module.
 struct ApplicationState
+  /// Stores the windows value associated with application state.
   windows,
+  /// Stores the controls value associated with application state.
   controls,
+  /// Stores the click bindings value associated with application state.
   clickBindings,
+  /// Stores the text bindings value associated with application state.
   textBindings,
+  /// Stores the selection bindings value associated with application state.
   selectionBindings,
+  /// Stores the scroll bindings value associated with application state.
   scrollBindings,
+  /// Stores the load bindings value associated with application state.
   loadBindings,
+  /// Stores the close bindings value associated with application state.
   closeBindings,
+  /// Stores the resize bindings value associated with application state.
   resizeBindings,
+  /// Stores the focus bindings value associated with application state.
   focusBindings,
+  /// Stores the blur bindings value associated with application state.
   blurBindings,
+  /// Stores the startup window value associated with application state.
   startupWindow,
+  /// Stores the next native id value associated with application state.
   nextNativeId,
+  /// Stores the running value associated with application state.
   running,
 end struct
 
+/// Represents the dialog window data used by the minigui module.
 struct DialogWindow
+  /// Stores the app value associated with dialog window.
   app,
+  /// Stores the window value associated with dialog window.
   window,
+  /// Stores the prompt label value associated with dialog window.
   promptLabel,
+  /// Stores the input box value associated with dialog window.
   inputBox,
+  /// Stores the ok button value associated with dialog window.
   okButton,
+  /// Stores the cancel button value associated with dialog window.
   cancelButton,
+  /// Stores the result value associated with dialog window.
   result,
+  /// Stores the value value associated with dialog window.
   value,
 end struct
 
+/// Performs the _dialogInputOk operation for the minigui module.
+/// @param context Context that carries state for the operation.
+/// @param event event value consumed by this operation.
 function _dialogInputOk(context, event)
   if context is void then return 0 end if
   context.result = "ok"
@@ -874,6 +1451,9 @@ function _dialogInputOk(context, event)
   return 0
 end function
 
+/// Performs the _dialogInputCancel operation for the minigui module.
+/// @param context Context that carries state for the operation.
+/// @param event event value consumed by this operation.
 function _dialogInputCancel(context, event)
   if context is void then return 0 end if
   context.result = "cancel"
@@ -881,11 +1461,16 @@ function _dialogInputCancel(context, event)
   return 0
 end function
 
+/// Represents the application data used by the minigui module.
 struct Application
+  /// Creates application for the minigui application module.
   static function create()
     return ApplicationState([], [], [], [], [], [], [], [], [], [], [], void, 1000, false)
   end function
 
+  /// Adds window to the state managed by the minigui module.
+  /// @param app Application instance operated on by this call.
+  /// @param window window value consumed by this operation.
   static function addWindow(app, window)
     global _activeApp
     _activeApp = app
@@ -896,6 +1481,9 @@ struct Application
     return window
   end function
 
+  /// Adds control to the state managed by the minigui module.
+  /// @param app Application instance operated on by this call.
+  /// @param control control value consumed by this operation.
   static function addControl(app, control)
     app.controls = app.controls + [control]
     if control is void == false then
@@ -911,19 +1499,37 @@ struct Application
     return control
   end function
 
+  /// Updates startup window maintained by the minigui module.
+  /// @param app Application instance operated on by this call.
+  /// @param window window value consumed by this operation.
   static function setStartupWindow(app, window)
     app.startupWindow = window
     return window
   end function
 
+  /// Performs the windowProc operation for the minigui application module.
+  /// @param hwnd hwnd value consumed by this operation.
+  /// @param msg msg value consumed by this operation.
+  /// @param wParam wParam value consumed by this operation.
+  /// @param lParam lParam value consumed by this operation.
   static function windowProc(hwnd, msg, wParam, lParam)
     return _miniGuiWndProc(hwnd, msg, wParam, lParam)
   end function
 
+  /// Performs the timerProc operation for the minigui application module.
+  /// @param hwnd hwnd value consumed by this operation.
+  /// @param msg msg value consumed by this operation.
+  /// @param wParam wParam value consumed by this operation.
+  /// @param lParam lParam value consumed by this operation.
   static function timerProc(hwnd, msg, wParam, lParam)
     return _miniGuiTimerProc(hwnd, msg, wParam, lParam)
   end function
 
+  /// Performs the resizeWindow operation for the minigui application module.
+  /// @param app Application instance operated on by this call.
+  /// @param window window value consumed by this operation.
+  /// @param clientWidth clientWidth value consumed by this operation.
+  /// @param clientHeight clientHeight value consumed by this operation.
   static function resizeWindow(app, window, clientWidth, clientHeight)
     if app is void then return false end if
     if window is void then return false end if
@@ -1003,6 +1609,8 @@ struct Application
     return true
   end function
 
+  /// Performs the pollResize operation for the minigui application module.
+  /// @param app Application instance operated on by this call.
   static function pollResize(app)
     if app is void then return false end if
     if len(app.windows) == 0 then return false end if
@@ -1028,6 +1636,8 @@ struct Application
     return true
   end function
 
+  /// Performs the syncDynamicControls operation for the minigui application module.
+  /// @param app Application instance operated on by this call.
   static function syncDynamicControls(app)
     if app is void then return false end if
     if len(app.controls) == 0 then return false end if
@@ -1041,6 +1651,8 @@ struct Application
     return true
   end function
 
+  /// Performs the redrawAll operation for the minigui application module.
+  /// @param app Application instance operated on by this call.
   static function redrawAll(app)
     if app is void then return false end if
     if len(app.controls) > 0 then
@@ -1066,6 +1678,8 @@ struct Application
     return true
   end function
 
+  /// Runs run for the minigui workflow.
+  /// @param app Application instance operated on by this call.
   static function run(app)
     global _activeApp
     if app is void then return 1 end if
@@ -1093,7 +1707,14 @@ struct Application
   end function
 end struct
 
+/// Represents the window data used by the minigui module.
 struct Window
+  /// Creates window for the minigui window module.
+  /// @param app Application instance operated on by this call.
+  /// @param id Stable identifier of the affected item.
+  /// @param title Human-readable title presented to the user.
+  /// @param width Width in the coordinate or storage units used by the caller.
+  /// @param height Height in the coordinate or storage units used by the caller.
   static function create(app, id, title, width, height)
     if width <= 0 then width = 640 end if
     if height <= 0 then height = 400 end if
@@ -1123,6 +1744,8 @@ struct Window
     return win
   end function
 
+  /// Performs the show operation for the minigui window module.
+  /// @param window window value consumed by this operation.
   static function show(window)
     if window is void then return false end if
     if window.handle is void then return false end if
@@ -1136,6 +1759,9 @@ struct Window
     return true
   end function
 
+  /// Performs the installProc operation for the minigui window module.
+  /// @param window window value consumed by this operation.
+  /// @param callback Callback invoked when the operation completes or the event occurs.
   static function installProc(window, callback)
     global _oldWindowProcPtr
     if window is void then return false end if
@@ -1146,22 +1772,32 @@ struct Window
     return true
   end function
 
+  /// Starts resize timer for the minigui workflow.
+  /// @param window window value consumed by this operation.
+  /// @param callback Callback invoked when the operation completes or the event occurs.
   static function startResizeTimer(window, callback)
     if window is void then return false end if
     if window.handle is void then return false end if
     return SetTimer(window.handle, 1, 100, callback) != 0
   end function
 
+  /// Closes close owned by the minigui module.
+  /// @param window window value consumed by this operation.
   static function close(window)
     if window is void then return false end if
     if window.handle is void then return false end if
     return DestroyWindow(window.handle)
   end function
 
+  /// Updates title maintained by the minigui module.
+  /// @param window window value consumed by this operation.
+  /// @param title Human-readable title presented to the user.
   static function setTitle(window, title)
     return Control.setText(window, title)
   end function
 
+  /// Returns client width maintained by the minigui module.
+  /// @param window window value consumed by this operation.
   static function getClientWidth(window)
     if window is void then return 0 end if
     if window.handle is void then return 0 end if
@@ -1170,6 +1806,8 @@ struct Window
     return _readI32LE(rect, 8) - _readI32LE(rect, 0)
   end function
 
+  /// Returns client height maintained by the minigui module.
+  /// @param window window value consumed by this operation.
   static function getClientHeight(window)
     if window is void then return 0 end if
     if window.handle is void then return 0 end if
@@ -1179,13 +1817,18 @@ struct Window
   end function
 end struct
 
+/// Represents the dialog data used by the minigui module.
 struct Dialog
+  /// Performs the _owner operation for the minigui dialog module.
+  /// @param app Application instance operated on by this call.
   static function _owner(app)
     if app is void then return void end if
     if app.startupWindow is void then return void end if
     return app.startupWindow.handle
   end function
 
+  /// Performs the _buttonFlags operation for the minigui dialog module.
+  /// @param buttons buttons value consumed by this operation.
   static function _buttonFlags(buttons)
     if buttons == "okCancel" then return MB_OKCANCEL end if
     if buttons == "yesNo" then return MB_YESNO end if
@@ -1195,6 +1838,8 @@ struct Dialog
     return MB_OK
   end function
 
+  /// Performs the _iconFlags operation for the minigui dialog module.
+  /// @param icon icon value consumed by this operation.
   static function _iconFlags(icon)
     if icon == "info" or icon == "information" then return MB_ICONINFORMATION end if
     if icon == "warning" then return MB_ICONWARNING end if
@@ -1203,6 +1848,8 @@ struct Dialog
     return 0
   end function
 
+  /// Performs the resultName operation for the minigui dialog module.
+  /// @param code code value consumed by this operation.
   static function resultName(code)
     if code == IDOK then return "ok" end if
     if code == IDCANCEL then return "cancel" end if
@@ -1214,11 +1861,19 @@ struct Dialog
     return "unknown"
   end function
 
+  /// Performs the showMessage operation for the minigui dialog module.
+  /// @param app Application instance operated on by this call.
+  /// @param title Human-readable title presented to the user.
+  /// @param message Human-readable message associated with the operation.
+  /// @param buttons buttons value consumed by this operation.
+  /// @param icon icon value consumed by this operation.
   static function showMessage(app, title, message, buttons, icon)
     code = MessageBoxW(Dialog._owner(app), message, title, Dialog._buttonFlags(buttons) | Dialog._iconFlags(icon))
     return Dialog.resultName(code)
   end function
 
+  /// Performs the _filterBytes operation for the minigui dialog module.
+  /// @param filter filter value consumed by this operation.
   static function _filterBytes(filter)
     raw = filter
     if raw == "" then raw = "All files (*.*)|*.*" end if
@@ -1239,6 +1894,11 @@ struct Dialog
     return outv
   end function
 
+  /// Performs the _fileDialog operation for the minigui dialog module.
+  /// @param app Application instance operated on by this call.
+  /// @param title Human-readable title presented to the user.
+  /// @param filter filter value consumed by this operation.
+  /// @param saveDialog saveDialog value consumed by this operation.
   static function _fileDialog(app, title, filter, saveDialog)
     fileBytes = bytes(4096, 0)
     filterBytes = Dialog._filterBytes(filter)
@@ -1264,16 +1924,23 @@ struct Dialog
     return decode16Z(fileBytes)
   end function
 
+  /// Performs the _hexDigit operation for the minigui dialog module.
+  /// @param value Value consumed or transformed by the operation.
   static function _hexDigit(value)
     digits = "0123456789ABCDEF"
     v = value & 15
     return digits[v]
   end function
 
+  /// Performs the _hexByte operation for the minigui dialog module.
+  /// @param value Value consumed or transformed by the operation.
   static function _hexByte(value)
     return Dialog._hexDigit(value >> 4) + Dialog._hexDigit(value)
   end function
 
+  /// Performs the _hexValueAt operation for the minigui dialog module.
+  /// @param text Text consumed by the operation.
+  /// @param pos pos value consumed by this operation.
   static function _hexValueAt(text, pos)
     if pos >= len(text) then return 0 end if
     c = _ord(text[pos])
@@ -1283,6 +1950,8 @@ struct Dialog
     return 0
   end function
 
+  /// Performs the _colorFromHex operation for the minigui dialog module.
+  /// @param text Text consumed by the operation.
   static function _colorFromHex(text)
     if len(text) < 7 then return 0 end if
     r = (Dialog._hexValueAt(text, 1) << 4) | Dialog._hexValueAt(text, 2)
@@ -1291,6 +1960,8 @@ struct Dialog
     return r | (g << 8) | (b << 16)
   end function
 
+  /// Performs the _colorToHex operation for the minigui dialog module.
+  /// @param color color value consumed by this operation.
   static function _colorToHex(color)
     r = color & 255
     g = (color >> 8) & 255
@@ -1298,59 +1969,116 @@ struct Dialog
     return "#" + Dialog._hexByte(r) + Dialog._hexByte(g) + Dialog._hexByte(b)
   end function
 
+  /// Performs the showInfo operation for the minigui dialog module.
+  /// @param app Application instance operated on by this call.
+  /// @param title Human-readable title presented to the user.
+  /// @param message Human-readable message associated with the operation.
   static function showInfo(app, title, message)
     return MessageBoxW(Dialog._owner(app), message, title, MB_OK | MB_ICONINFORMATION)
   end function
 
+  /// Performs the info operation for the minigui dialog module.
+  /// @param app Application instance operated on by this call.
+  /// @param title Human-readable title presented to the user.
+  /// @param message Human-readable message associated with the operation.
   static function info(app, title, message)
     return Dialog.showMessage(app, title, message, "ok", "info")
   end function
 
+  /// Performs the showWarning operation for the minigui dialog module.
+  /// @param app Application instance operated on by this call.
+  /// @param title Human-readable title presented to the user.
+  /// @param message Human-readable message associated with the operation.
   static function showWarning(app, title, message)
     return MessageBoxW(Dialog._owner(app), message, title, MB_OK | MB_ICONWARNING)
   end function
 
+  /// Performs the warning operation for the minigui dialog module.
+  /// @param app Application instance operated on by this call.
+  /// @param title Human-readable title presented to the user.
+  /// @param message Human-readable message associated with the operation.
   static function warning(app, title, message)
     return Dialog.showMessage(app, title, message, "ok", "warning")
   end function
 
+  /// Performs the showError operation for the minigui dialog module.
+  /// @param app Application instance operated on by this call.
+  /// @param title Human-readable title presented to the user.
+  /// @param message Human-readable message associated with the operation.
   static function showError(app, title, message)
     return MessageBoxW(Dialog._owner(app), message, title, MB_OK | MB_ICONERROR)
   end function
 
+  /// Performs the errorMessage operation for the minigui dialog module.
+  /// @param app Application instance operated on by this call.
+  /// @param title Human-readable title presented to the user.
+  /// @param message Human-readable message associated with the operation.
   static function errorMessage(app, title, message)
     return Dialog.showMessage(app, title, message, "ok", "error")
   end function
 
+  /// Performs the confirm operation for the minigui dialog module.
+  /// @param app Application instance operated on by this call.
+  /// @param title Human-readable title presented to the user.
+  /// @param message Human-readable message associated with the operation.
   static function confirm(app, title, message)
     return MessageBoxW(Dialog._owner(app), message, title, MB_OKCANCEL | MB_ICONQUESTION) == IDOK
   end function
 
+  /// Performs the question operation for the minigui dialog module.
+  /// @param app Application instance operated on by this call.
+  /// @param title Human-readable title presented to the user.
+  /// @param message Human-readable message associated with the operation.
   static function question(app, title, message)
     return Dialog.showMessage(app, title, message, "yesNo", "question")
   end function
 
+  /// Performs the yesNo operation for the minigui dialog module.
+  /// @param app Application instance operated on by this call.
+  /// @param title Human-readable title presented to the user.
+  /// @param message Human-readable message associated with the operation.
   static function yesNo(app, title, message)
     return Dialog.showMessage(app, title, message, "yesNo", "question")
   end function
 
+  /// Performs the yesNoCancel operation for the minigui dialog module.
+  /// @param app Application instance operated on by this call.
+  /// @param title Human-readable title presented to the user.
+  /// @param message Human-readable message associated with the operation.
   static function yesNoCancel(app, title, message)
     return Dialog.showMessage(app, title, message, "yesNoCancel", "question")
   end function
 
+  /// Performs the retryCancel operation for the minigui dialog module.
+  /// @param app Application instance operated on by this call.
+  /// @param title Human-readable title presented to the user.
+  /// @param message Human-readable message associated with the operation.
   static function retryCancel(app, title, message)
     return Dialog.showMessage(app, title, message, "retryCancel", "warning")
   end function
 
+  /// Performs the abortRetryIgnore operation for the minigui dialog module.
+  /// @param app Application instance operated on by this call.
+  /// @param title Human-readable title presented to the user.
+  /// @param message Human-readable message associated with the operation.
   static function abortRetryIgnore(app, title, message)
     return Dialog.showMessage(app, title, message, "abortRetryIgnore", "warning")
   end function
 
+  /// Creates custom for the minigui dialog module.
+  /// @param app Application instance operated on by this call.
+  /// @param id Stable identifier of the affected item.
+  /// @param title Human-readable title presented to the user.
+  /// @param width Width in the coordinate or storage units used by the caller.
+  /// @param height Height in the coordinate or storage units used by the caller.
   static function createCustom(app, id, title, width, height)
     win = Window.create(app, id, title, width, height)
     return DialogWindow(app, win, void, void, void, void, "", "")
   end function
 
+  /// Closes close owned by the minigui module.
+  /// @param dialog dialog value consumed by this operation.
+  /// @param result Result object populated or inspected by the operation.
   static function close(dialog, result)
     if dialog is void then return false end if
     dialog.result = result
@@ -1361,17 +2089,24 @@ struct Dialog
     return false
   end function
 
+  /// Returns result maintained by the minigui module.
+  /// @param dialog dialog value consumed by this operation.
   static function getResult(dialog)
     if dialog is void then return "" end if
     return dialog.result
   end function
 
+  /// Returns value maintained by the minigui module.
+  /// @param dialog dialog value consumed by this operation.
   static function getValue(dialog)
     if dialog is void then return "" end if
     if dialog.inputBox is void == false then dialog.value = Control.getText(dialog.inputBox) end if
     return dialog.value
   end function
 
+  /// Updates value maintained by the minigui module.
+  /// @param dialog dialog value consumed by this operation.
+  /// @param value Value consumed or transformed by the operation.
   static function setValue(dialog, value)
     if dialog is void then return false end if
     dialog.value = value
@@ -1379,6 +2114,8 @@ struct Dialog
     return true
   end function
 
+  /// Performs the showModal operation for the minigui dialog module.
+  /// @param dialog dialog value consumed by this operation.
   static function showModal(dialog)
     if dialog is void then return "cancel" end if
     if dialog.window is void then return "cancel" end if
@@ -1399,6 +2136,13 @@ struct Dialog
     return dialog.result
   end function
 
+  /// Creates input for the minigui dialog module.
+  /// @param app Application instance operated on by this call.
+  /// @param id Stable identifier of the affected item.
+  /// @param title Human-readable title presented to the user.
+  /// @param prompt prompt value consumed by this operation.
+  /// @param defaultValue defaultValue value consumed by this operation.
+  /// @param width Width in the coordinate or storage units used by the caller.
   static function createInput(app, id, title, prompt, defaultValue, width)
     if width <= 0 then width = 420 end if
     win = Window.create(app, id, title, width, 160)
@@ -1412,6 +2156,11 @@ struct Dialog
     return dialog
   end function
 
+  /// Performs the showInput operation for the minigui dialog module.
+  /// @param app Application instance operated on by this call.
+  /// @param title Human-readable title presented to the user.
+  /// @param prompt prompt value consumed by this operation.
+  /// @param defaultValue defaultValue value consumed by this operation.
   static function showInput(app, title, prompt, defaultValue)
     dialog = Dialog.createInput(app, "__inputDialog", title, prompt, defaultValue, 420)
     result = Dialog.showModal(dialog)
@@ -1419,14 +2168,25 @@ struct Dialog
     return ""
   end function
 
+  /// Performs the pickOpenFile operation for the minigui dialog module.
+  /// @param app Application instance operated on by this call.
+  /// @param title Human-readable title presented to the user.
+  /// @param filter filter value consumed by this operation.
   static function pickOpenFile(app, title, filter)
     return Dialog._fileDialog(app, title, filter, false)
   end function
 
+  /// Performs the pickSaveFile operation for the minigui dialog module.
+  /// @param app Application instance operated on by this call.
+  /// @param title Human-readable title presented to the user.
+  /// @param filter filter value consumed by this operation.
   static function pickSaveFile(app, title, filter)
     return Dialog._fileDialog(app, title, filter, true)
   end function
 
+  /// Performs the pickFolder operation for the minigui dialog module.
+  /// @param app Application instance operated on by this call.
+  /// @param title Human-readable title presented to the user.
   static function pickFolder(app, title)
     pathBytes = bytes(4096, 0)
     titleBytes = _asciiUtf16Z(title)
@@ -1444,6 +2204,10 @@ struct Dialog
     return decode16Z(pathBytes)
   end function
 
+  /// Performs the pickColor operation for the minigui dialog module.
+  /// @param app Application instance operated on by this call.
+  /// @param title Human-readable title presented to the user.
+  /// @param fallback Value returned when no explicit result is available.
   static function pickColor(app, title, fallback)
     customColors = bytes(64, 0)
     cc = bytes(72, 0)
@@ -1457,7 +2221,17 @@ struct Dialog
   end function
 end struct
 
+/// Represents the label data used by the minigui module.
 struct Label
+  /// Creates label for the minigui label module.
+  /// @param app Application instance operated on by this call.
+  /// @param parent parent value consumed by this operation.
+  /// @param id Stable identifier of the affected item.
+  /// @param text Text consumed by the operation.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
+  /// @param width Width in the coordinate or storage units used by the caller.
+  /// @param height Height in the coordinate or storage units used by the caller.
   static function create(app, parent, id, text, x, y, width, height)
     hwnd = CreateWindowExW(0, "STATIC", text, WS_CHILD | WS_VISIBLE | SS_LEFT, x, y, width, height, parent.handle, void, void, void)
     c = NativeControl(id, "Label", hwnd, 0, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
@@ -1465,7 +2239,17 @@ struct Label
   end function
 end struct
 
+/// Represents the button data used by the minigui module.
 struct Button
+  /// Creates button for the minigui button module.
+  /// @param app Application instance operated on by this call.
+  /// @param parent parent value consumed by this operation.
+  /// @param id Stable identifier of the affected item.
+  /// @param text Text consumed by the operation.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
+  /// @param width Width in the coordinate or storage units used by the caller.
+  /// @param height Height in the coordinate or storage units used by the caller.
   static function create(app, parent, id, text, x, y, width, height)
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
@@ -1476,7 +2260,17 @@ struct Button
   end function
 end struct
 
+/// Represents the text box data used by the minigui module.
 struct TextBox
+  /// Creates text box for the minigui text box module.
+  /// @param app Application instance operated on by this call.
+  /// @param parent parent value consumed by this operation.
+  /// @param id Stable identifier of the affected item.
+  /// @param text Text consumed by the operation.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
+  /// @param width Width in the coordinate or storage units used by the caller.
+  /// @param height Height in the coordinate or storage units used by the caller.
   static function create(app, parent, id, text, x, y, width, height)
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
@@ -1488,7 +2282,19 @@ struct TextBox
   end function
 end struct
 
+/// Represents the file picker data used by the minigui module.
 struct FilePicker
+  /// Creates file picker for the minigui file picker module.
+  /// @param app Application instance operated on by this call.
+  /// @param parent parent value consumed by this operation.
+  /// @param id Stable identifier of the affected item.
+  /// @param text Text consumed by the operation.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
+  /// @param width Width in the coordinate or storage units used by the caller.
+  /// @param height Height in the coordinate or storage units used by the caller.
+  /// @param title Human-readable title presented to the user.
+  /// @param filter filter value consumed by this operation.
   static function create(app, parent, id, text, x, y, width, height, title, filter)
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
@@ -1501,7 +2307,18 @@ struct FilePicker
   end function
 end struct
 
+/// Represents the folder picker data used by the minigui module.
 struct FolderPicker
+  /// Creates folder picker for the minigui folder picker module.
+  /// @param app Application instance operated on by this call.
+  /// @param parent parent value consumed by this operation.
+  /// @param id Stable identifier of the affected item.
+  /// @param text Text consumed by the operation.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
+  /// @param width Width in the coordinate or storage units used by the caller.
+  /// @param height Height in the coordinate or storage units used by the caller.
+  /// @param title Human-readable title presented to the user.
   static function create(app, parent, id, text, x, y, width, height, title)
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
@@ -1514,7 +2331,19 @@ struct FolderPicker
   end function
 end struct
 
+/// Represents the color picker data used by the minigui module.
 struct ColorPicker
+  /// Creates color picker for the minigui color picker module.
+  /// @param app Application instance operated on by this call.
+  /// @param parent parent value consumed by this operation.
+  /// @param id Stable identifier of the affected item.
+  /// @param text Text consumed by the operation.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
+  /// @param width Width in the coordinate or storage units used by the caller.
+  /// @param height Height in the coordinate or storage units used by the caller.
+  /// @param title Human-readable title presented to the user.
+  /// @param value Value consumed or transformed by the operation.
   static function create(app, parent, id, text, x, y, width, height, title, value)
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
@@ -1527,7 +2356,17 @@ struct ColorPicker
   end function
 end struct
 
+/// Represents the search box data used by the minigui module.
 struct SearchBox
+  /// Creates search box for the minigui search box module.
+  /// @param app Application instance operated on by this call.
+  /// @param parent parent value consumed by this operation.
+  /// @param id Stable identifier of the affected item.
+  /// @param text Text consumed by the operation.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
+  /// @param width Width in the coordinate or storage units used by the caller.
+  /// @param height Height in the coordinate or storage units used by the caller.
   static function create(app, parent, id, text, x, y, width, height)
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
@@ -1539,7 +2378,17 @@ struct SearchBox
   end function
 end struct
 
+/// Represents the text area data used by the minigui module.
 struct TextArea
+  /// Creates text area for the minigui text area module.
+  /// @param app Application instance operated on by this call.
+  /// @param parent parent value consumed by this operation.
+  /// @param id Stable identifier of the affected item.
+  /// @param text Text consumed by the operation.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
+  /// @param width Width in the coordinate or storage units used by the caller.
+  /// @param height Height in the coordinate or storage units used by the caller.
   static function create(app, parent, id, text, x, y, width, height)
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
@@ -1552,7 +2401,17 @@ struct TextArea
   end function
 end struct
 
+/// Represents the password box data used by the minigui module.
 struct PasswordBox
+  /// Creates password box for the minigui password box module.
+  /// @param app Application instance operated on by this call.
+  /// @param parent parent value consumed by this operation.
+  /// @param id Stable identifier of the affected item.
+  /// @param text Text consumed by the operation.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
+  /// @param width Width in the coordinate or storage units used by the caller.
+  /// @param height Height in the coordinate or storage units used by the caller.
   static function create(app, parent, id, text, x, y, width, height)
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
@@ -1564,7 +2423,21 @@ struct PasswordBox
   end function
 end struct
 
+/// Represents the number box data used by the minigui module.
 struct NumberBox
+  /// Creates number box for the minigui number box module.
+  /// @param app Application instance operated on by this call.
+  /// @param parent parent value consumed by this operation.
+  /// @param id Stable identifier of the affected item.
+  /// @param text Text consumed by the operation.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
+  /// @param width Width in the coordinate or storage units used by the caller.
+  /// @param height Height in the coordinate or storage units used by the caller.
+  /// @param minimum minimum value consumed by this operation.
+  /// @param maximum maximum value consumed by this operation.
+  /// @param value Value consumed or transformed by the operation.
+  /// @param step step value consumed by this operation.
   static function create(app, parent, id, text, x, y, width, height, minimum, maximum, value, step)
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
@@ -1578,7 +2451,21 @@ struct NumberBox
   end function
 end struct
 
+/// Represents the spin box data used by the minigui module.
 struct SpinBox
+  /// Creates spin box for the minigui spin box module.
+  /// @param app Application instance operated on by this call.
+  /// @param parent parent value consumed by this operation.
+  /// @param id Stable identifier of the affected item.
+  /// @param text Text consumed by the operation.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
+  /// @param width Width in the coordinate or storage units used by the caller.
+  /// @param height Height in the coordinate or storage units used by the caller.
+  /// @param minimum minimum value consumed by this operation.
+  /// @param maximum maximum value consumed by this operation.
+  /// @param value Value consumed or transformed by the operation.
+  /// @param step step value consumed by this operation.
   static function create(app, parent, id, text, x, y, width, height, minimum, maximum, value, step)
     InitCommonControls()
     nid = app.nextNativeId
@@ -1601,7 +2488,18 @@ struct SpinBox
   end function
 end struct
 
+/// Represents the check box data used by the minigui module.
 struct CheckBox
+  /// Creates check box for the minigui check box module.
+  /// @param app Application instance operated on by this call.
+  /// @param parent parent value consumed by this operation.
+  /// @param id Stable identifier of the affected item.
+  /// @param text Text consumed by the operation.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
+  /// @param width Width in the coordinate or storage units used by the caller.
+  /// @param height Height in the coordinate or storage units used by the caller.
+  /// @param checked checked value consumed by this operation.
   static function create(app, parent, id, text, x, y, width, height, checked)
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
@@ -1613,7 +2511,18 @@ struct CheckBox
   end function
 end struct
 
+/// Represents the toggle switch data used by the minigui module.
 struct ToggleSwitch
+  /// Creates toggle switch for the minigui toggle switch module.
+  /// @param app Application instance operated on by this call.
+  /// @param parent parent value consumed by this operation.
+  /// @param id Stable identifier of the affected item.
+  /// @param text Text consumed by the operation.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
+  /// @param width Width in the coordinate or storage units used by the caller.
+  /// @param height Height in the coordinate or storage units used by the caller.
+  /// @param checked checked value consumed by this operation.
   static function create(app, parent, id, text, x, y, width, height, checked)
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
@@ -1625,7 +2534,18 @@ struct ToggleSwitch
   end function
 end struct
 
+/// Represents the radio button data used by the minigui module.
 struct RadioButton
+  /// Creates radio button for the minigui radio button module.
+  /// @param app Application instance operated on by this call.
+  /// @param parent parent value consumed by this operation.
+  /// @param id Stable identifier of the affected item.
+  /// @param text Text consumed by the operation.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
+  /// @param width Width in the coordinate or storage units used by the caller.
+  /// @param height Height in the coordinate or storage units used by the caller.
+  /// @param checked checked value consumed by this operation.
   static function create(app, parent, id, text, x, y, width, height, checked)
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
@@ -1637,7 +2557,19 @@ struct RadioButton
   end function
 end struct
 
+/// Represents the image data used by the minigui module.
 struct Image
+  /// Creates image for the minigui image module.
+  /// @param app Application instance operated on by this call.
+  /// @param parent parent value consumed by this operation.
+  /// @param id Stable identifier of the affected item.
+  /// @param text Text consumed by the operation.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
+  /// @param width Width in the coordinate or storage units used by the caller.
+  /// @param height Height in the coordinate or storage units used by the caller.
+  /// @param source source value consumed by this operation.
+  /// @param stretch stretch value consumed by this operation.
   static function create(app, parent, id, text, x, y, width, height, source, stretch)
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
@@ -1654,7 +2586,18 @@ struct Image
   end function
 end struct
 
+/// Represents the separator data used by the minigui module.
 struct Separator
+  /// Creates separator for the minigui separator module.
+  /// @param app Application instance operated on by this call.
+  /// @param parent parent value consumed by this operation.
+  /// @param id Stable identifier of the affected item.
+  /// @param text Text consumed by the operation.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
+  /// @param width Width in the coordinate or storage units used by the caller.
+  /// @param height Height in the coordinate or storage units used by the caller.
+  /// @param orientation orientation value consumed by this operation.
   static function create(app, parent, id, text, x, y, width, height, orientation)
     style = WS_CHILD | WS_VISIBLE | SS_ETCHEDHORZ
     if orientation == "vertical" then style = WS_CHILD | WS_VISIBLE | SS_ETCHEDVERT end if
@@ -1664,11 +2607,34 @@ struct Separator
   end function
 end struct
 
+/// Represents the splitter data used by the minigui module.
 struct Splitter
+  /// Creates splitter for the minigui splitter module.
+  /// @param app Application instance operated on by this call.
+  /// @param parent parent value consumed by this operation.
+  /// @param id Stable identifier of the affected item.
+  /// @param text Text consumed by the operation.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
+  /// @param width Width in the coordinate or storage units used by the caller.
+  /// @param height Height in the coordinate or storage units used by the caller.
+  /// @param orientation orientation value consumed by this operation.
   static function create(app, parent, id, text, x, y, width, height, orientation)
     return Splitter.createPane(app, parent, id, text, x, y, width, height, orientation, "", "")
   end function
 
+  /// Creates pane for the minigui splitter module.
+  /// @param app Application instance operated on by this call.
+  /// @param parent parent value consumed by this operation.
+  /// @param id Stable identifier of the affected item.
+  /// @param text Text consumed by the operation.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
+  /// @param width Width in the coordinate or storage units used by the caller.
+  /// @param height Height in the coordinate or storage units used by the caller.
+  /// @param orientation orientation value consumed by this operation.
+  /// @param targetBefore targetBefore value consumed by this operation.
+  /// @param targetAfter targetAfter value consumed by this operation.
   static function createPane(app, parent, id, text, x, y, width, height, orientation, targetBefore, targetAfter)
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
@@ -1682,7 +2648,18 @@ struct Splitter
   end function
 end struct
 
+/// Represents the link label data used by the minigui module.
 struct LinkLabel
+  /// Creates link label for the minigui link label module.
+  /// @param app Application instance operated on by this call.
+  /// @param parent parent value consumed by this operation.
+  /// @param id Stable identifier of the affected item.
+  /// @param text Text consumed by the operation.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
+  /// @param width Width in the coordinate or storage units used by the caller.
+  /// @param height Height in the coordinate or storage units used by the caller.
+  /// @param url url value consumed by this operation.
   static function create(app, parent, id, text, x, y, width, height, url)
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
@@ -1695,7 +2672,17 @@ struct LinkLabel
   end function
 end struct
 
+/// Represents the panel data used by the minigui module.
 struct Panel
+  /// Creates panel for the minigui panel module.
+  /// @param app Application instance operated on by this call.
+  /// @param parent parent value consumed by this operation.
+  /// @param id Stable identifier of the affected item.
+  /// @param text Text consumed by the operation.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
+  /// @param width Width in the coordinate or storage units used by the caller.
+  /// @param height Height in the coordinate or storage units used by the caller.
   static function create(app, parent, id, text, x, y, width, height)
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
@@ -1705,6 +2692,15 @@ struct Panel
     return Application.addControl(app, c)
   end function
 
+  /// Creates tab page for the minigui panel module.
+  /// @param app Application instance operated on by this call.
+  /// @param tabControl tabControl value consumed by this operation.
+  /// @param id Stable identifier of the affected item.
+  /// @param text Text consumed by the operation.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
+  /// @param width Width in the coordinate or storage units used by the caller.
+  /// @param height Height in the coordinate or storage units used by the caller.
   static function createTabPage(app, tabControl, id, text, x, y, width, height)
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
@@ -1725,7 +2721,19 @@ struct Panel
   end function
 end struct
 
+/// Represents the scroll viewer data used by the minigui module.
 struct ScrollViewer
+  /// Creates scroll viewer for the minigui scroll viewer module.
+  /// @param app Application instance operated on by this call.
+  /// @param parent parent value consumed by this operation.
+  /// @param id Stable identifier of the affected item.
+  /// @param text Text consumed by the operation.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
+  /// @param width Width in the coordinate or storage units used by the caller.
+  /// @param height Height in the coordinate or storage units used by the caller.
+  /// @param horizontalScroll horizontalScroll value consumed by this operation.
+  /// @param verticalScroll verticalScroll value consumed by this operation.
   static function create(app, parent, id, text, x, y, width, height, horizontalScroll, verticalScroll)
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
@@ -1740,7 +2748,17 @@ struct ScrollViewer
   end function
 end struct
 
+/// Represents the group box data used by the minigui module.
 struct GroupBox
+  /// Creates group box for the minigui group box module.
+  /// @param app Application instance operated on by this call.
+  /// @param parent parent value consumed by this operation.
+  /// @param id Stable identifier of the affected item.
+  /// @param text Text consumed by the operation.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
+  /// @param width Width in the coordinate or storage units used by the caller.
+  /// @param height Height in the coordinate or storage units used by the caller.
   static function create(app, parent, id, text, x, y, width, height)
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
@@ -1751,7 +2769,23 @@ struct GroupBox
   end function
 end struct
 
+/// Represents the scroll bar data used by the minigui module.
 struct ScrollBar
+  /// Creates scroll bar for the minigui scroll bar module.
+  /// @param app Application instance operated on by this call.
+  /// @param parent parent value consumed by this operation.
+  /// @param id Stable identifier of the affected item.
+  /// @param text Text consumed by the operation.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
+  /// @param width Width in the coordinate or storage units used by the caller.
+  /// @param height Height in the coordinate or storage units used by the caller.
+  /// @param orientation orientation value consumed by this operation.
+  /// @param minimum minimum value consumed by this operation.
+  /// @param maximum maximum value consumed by this operation.
+  /// @param value Value consumed or transformed by the operation.
+  /// @param smallStep smallStep value consumed by this operation.
+  /// @param largeStep largeStep value consumed by this operation.
   static function create(app, parent, id, text, x, y, width, height, orientation, minimum, maximum, value, smallStep, largeStep)
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
@@ -1766,7 +2800,23 @@ struct ScrollBar
   end function
 end struct
 
+/// Represents the slider data used by the minigui module.
 struct Slider
+  /// Creates slider for the minigui slider module.
+  /// @param app Application instance operated on by this call.
+  /// @param parent parent value consumed by this operation.
+  /// @param id Stable identifier of the affected item.
+  /// @param text Text consumed by the operation.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
+  /// @param width Width in the coordinate or storage units used by the caller.
+  /// @param height Height in the coordinate or storage units used by the caller.
+  /// @param orientation orientation value consumed by this operation.
+  /// @param minimum minimum value consumed by this operation.
+  /// @param maximum maximum value consumed by this operation.
+  /// @param value Value consumed or transformed by the operation.
+  /// @param smallStep smallStep value consumed by this operation.
+  /// @param largeStep largeStep value consumed by this operation.
   static function create(app, parent, id, text, x, y, width, height, orientation, minimum, maximum, value, smallStep, largeStep)
     InitCommonControls()
     nid = app.nextNativeId
@@ -1783,7 +2833,20 @@ struct Slider
   end function
 end struct
 
+/// Represents the progress bar data used by the minigui module.
 struct ProgressBar
+  /// Creates progress bar for the minigui progress bar module.
+  /// @param app Application instance operated on by this call.
+  /// @param parent parent value consumed by this operation.
+  /// @param id Stable identifier of the affected item.
+  /// @param text Text consumed by the operation.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
+  /// @param width Width in the coordinate or storage units used by the caller.
+  /// @param height Height in the coordinate or storage units used by the caller.
+  /// @param minimum minimum value consumed by this operation.
+  /// @param maximum maximum value consumed by this operation.
+  /// @param value Value consumed or transformed by the operation.
   static function create(app, parent, id, text, x, y, width, height, minimum, maximum, value)
     InitCommonControls()
     nid = app.nextNativeId
@@ -1797,7 +2860,19 @@ struct ProgressBar
   end function
 end struct
 
+/// Represents the tab control data used by the minigui module.
 struct TabControl
+  /// Creates tab control for the minigui tab control module.
+  /// @param app Application instance operated on by this call.
+  /// @param parent parent value consumed by this operation.
+  /// @param id Stable identifier of the affected item.
+  /// @param text Text consumed by the operation.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
+  /// @param width Width in the coordinate or storage units used by the caller.
+  /// @param height Height in the coordinate or storage units used by the caller.
+  /// @param items Items consumed or updated by the operation.
+  /// @param selectedIndex Zero-based index of selected.
   static function create(app, parent, id, text, x, y, width, height, items, selectedIndex)
     InitCommonControls()
     nid = app.nextNativeId
@@ -1813,6 +2888,10 @@ struct TabControl
     return Application.addControl(app, c)
   end function
 
+  /// Adds tab to the state managed by the minigui module.
+  /// @param control control value consumed by this operation.
+  /// @param index Zero-based index of the affected item.
+  /// @param text Text consumed by the operation.
   static function addTab(control, index, text)
     if control is void then return false end if
     if control.handle is void then return false end if
@@ -1826,7 +2905,18 @@ struct TabControl
   end function
 end struct
 
+/// Represents the menu bar data used by the minigui module.
 struct MenuBar
+  /// Creates menu bar for the minigui menu bar module.
+  /// @param app Application instance operated on by this call.
+  /// @param parent parent value consumed by this operation.
+  /// @param id Stable identifier of the affected item.
+  /// @param text Text consumed by the operation.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
+  /// @param width Width in the coordinate or storage units used by the caller.
+  /// @param height Height in the coordinate or storage units used by the caller.
+  /// @param items Items consumed or updated by the operation.
   static function create(app, parent, id, text, x, y, width, height, items)
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
@@ -1840,7 +2930,18 @@ struct MenuBar
   end function
 end struct
 
+/// Represents the context menu data used by the minigui module.
 struct ContextMenu
+  /// Creates context menu for the minigui context menu module.
+  /// @param app Application instance operated on by this call.
+  /// @param parent parent value consumed by this operation.
+  /// @param id Stable identifier of the affected item.
+  /// @param text Text consumed by the operation.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
+  /// @param width Width in the coordinate or storage units used by the caller.
+  /// @param height Height in the coordinate or storage units used by the caller.
+  /// @param items Items consumed or updated by the operation.
   static function create(app, parent, id, text, x, y, width, height, items)
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
@@ -1855,7 +2956,17 @@ struct ContextMenu
   end function
 end struct
 
+/// Represents the status bar data used by the minigui module.
 struct StatusBar
+  /// Creates status bar for the minigui status bar module.
+  /// @param app Application instance operated on by this call.
+  /// @param parent parent value consumed by this operation.
+  /// @param id Stable identifier of the affected item.
+  /// @param text Text consumed by the operation.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
+  /// @param width Width in the coordinate or storage units used by the caller.
+  /// @param height Height in the coordinate or storage units used by the caller.
   static function create(app, parent, id, text, x, y, width, height)
     InitCommonControls()
     nid = app.nextNativeId
@@ -1867,7 +2978,18 @@ struct StatusBar
   end function
 end struct
 
+/// Represents the tool bar data used by the minigui module.
 struct ToolBar
+  /// Creates tool bar for the minigui tool bar module.
+  /// @param app Application instance operated on by this call.
+  /// @param parent parent value consumed by this operation.
+  /// @param id Stable identifier of the affected item.
+  /// @param text Text consumed by the operation.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
+  /// @param width Width in the coordinate or storage units used by the caller.
+  /// @param height Height in the coordinate or storage units used by the caller.
+  /// @param items Items consumed or updated by the operation.
   static function create(app, parent, id, text, x, y, width, height, items)
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
@@ -1881,7 +3003,18 @@ struct ToolBar
   end function
 end struct
 
+/// Represents the tree view data used by the minigui module.
 struct TreeView
+  /// Creates tree view for the minigui tree view module.
+  /// @param app Application instance operated on by this call.
+  /// @param parent parent value consumed by this operation.
+  /// @param id Stable identifier of the affected item.
+  /// @param text Text consumed by the operation.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
+  /// @param width Width in the coordinate or storage units used by the caller.
+  /// @param height Height in the coordinate or storage units used by the caller.
+  /// @param items Items consumed or updated by the operation.
   static function create(app, parent, id, text, x, y, width, height, items)
     InitCommonControls()
     nid = app.nextNativeId
@@ -1894,7 +3027,19 @@ struct TreeView
   end function
 end struct
 
+/// Represents the list view data used by the minigui module.
 struct ListView
+  /// Creates list view for the minigui list view module.
+  /// @param app Application instance operated on by this call.
+  /// @param parent parent value consumed by this operation.
+  /// @param id Stable identifier of the affected item.
+  /// @param text Text consumed by the operation.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
+  /// @param width Width in the coordinate or storage units used by the caller.
+  /// @param height Height in the coordinate or storage units used by the caller.
+  /// @param items Items consumed or updated by the operation.
+  /// @param selectedIndex Zero-based index of selected.
   static function create(app, parent, id, text, x, y, width, height, items, selectedIndex)
     InitCommonControls()
     nid = app.nextNativeId
@@ -1909,6 +3054,18 @@ struct ListView
     return Application.addControl(app, c)
   end function
 
+  /// Creates columns for the minigui list view module.
+  /// @param app Application instance operated on by this call.
+  /// @param parent parent value consumed by this operation.
+  /// @param id Stable identifier of the affected item.
+  /// @param text Text consumed by the operation.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
+  /// @param width Width in the coordinate or storage units used by the caller.
+  /// @param height Height in the coordinate or storage units used by the caller.
+  /// @param columns columns value consumed by this operation.
+  /// @param items Items consumed or updated by the operation.
+  /// @param selectedIndex Zero-based index of selected.
   static function createColumns(app, parent, id, text, x, y, width, height, columns, items, selectedIndex)
     InitCommonControls()
     nid = app.nextNativeId
@@ -1924,7 +3081,20 @@ struct ListView
   end function
 end struct
 
+/// Represents the data grid data used by the minigui module.
 struct DataGrid
+  /// Creates data grid for the minigui data grid module.
+  /// @param app Application instance operated on by this call.
+  /// @param parent parent value consumed by this operation.
+  /// @param id Stable identifier of the affected item.
+  /// @param text Text consumed by the operation.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
+  /// @param width Width in the coordinate or storage units used by the caller.
+  /// @param height Height in the coordinate or storage units used by the caller.
+  /// @param columns columns value consumed by this operation.
+  /// @param items Items consumed or updated by the operation.
+  /// @param selectedIndex Zero-based index of selected.
   static function create(app, parent, id, text, x, y, width, height, columns, items, selectedIndex)
     InitCommonControls()
     nid = app.nextNativeId
@@ -1940,7 +3110,17 @@ struct DataGrid
   end function
 end struct
 
+/// Represents the date picker data used by the minigui module.
 struct DatePicker
+  /// Creates date picker for the minigui date picker module.
+  /// @param app Application instance operated on by this call.
+  /// @param parent parent value consumed by this operation.
+  /// @param id Stable identifier of the affected item.
+  /// @param text Text consumed by the operation.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
+  /// @param width Width in the coordinate or storage units used by the caller.
+  /// @param height Height in the coordinate or storage units used by the caller.
   static function create(app, parent, id, text, x, y, width, height)
     InitCommonControls()
     nid = app.nextNativeId
@@ -1952,7 +3132,17 @@ struct DatePicker
   end function
 end struct
 
+/// Represents the date time picker data used by the minigui module.
 struct DateTimePicker
+  /// Creates date time picker for the minigui date time picker module.
+  /// @param app Application instance operated on by this call.
+  /// @param parent parent value consumed by this operation.
+  /// @param id Stable identifier of the affected item.
+  /// @param text Text consumed by the operation.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
+  /// @param width Width in the coordinate or storage units used by the caller.
+  /// @param height Height in the coordinate or storage units used by the caller.
   static function create(app, parent, id, text, x, y, width, height)
     InitCommonControls()
     nid = app.nextNativeId
@@ -1964,7 +3154,17 @@ struct DateTimePicker
   end function
 end struct
 
+/// Represents the time picker data used by the minigui module.
 struct TimePicker
+  /// Creates time picker for the minigui time picker module.
+  /// @param app Application instance operated on by this call.
+  /// @param parent parent value consumed by this operation.
+  /// @param id Stable identifier of the affected item.
+  /// @param text Text consumed by the operation.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
+  /// @param width Width in the coordinate or storage units used by the caller.
+  /// @param height Height in the coordinate or storage units used by the caller.
   static function create(app, parent, id, text, x, y, width, height)
     InitCommonControls()
     nid = app.nextNativeId
@@ -1976,7 +3176,17 @@ struct TimePicker
   end function
 end struct
 
+/// Represents the calendar data used by the minigui module.
 struct Calendar
+  /// Creates calendar for the minigui calendar module.
+  /// @param app Application instance operated on by this call.
+  /// @param parent parent value consumed by this operation.
+  /// @param id Stable identifier of the affected item.
+  /// @param text Text consumed by the operation.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
+  /// @param width Width in the coordinate or storage units used by the caller.
+  /// @param height Height in the coordinate or storage units used by the caller.
   static function create(app, parent, id, text, x, y, width, height)
     InitCommonControls()
     nid = app.nextNativeId
@@ -1988,7 +3198,19 @@ struct Calendar
   end function
 end struct
 
+/// Represents the combo box data used by the minigui module.
 struct ComboBox
+  /// Creates combo box for the minigui combo box module.
+  /// @param app Application instance operated on by this call.
+  /// @param parent parent value consumed by this operation.
+  /// @param id Stable identifier of the affected item.
+  /// @param text Text consumed by the operation.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
+  /// @param width Width in the coordinate or storage units used by the caller.
+  /// @param height Height in the coordinate or storage units used by the caller.
+  /// @param items Items consumed or updated by the operation.
+  /// @param selectedIndex Zero-based index of selected.
   static function create(app, parent, id, text, x, y, width, height, items, selectedIndex)
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
@@ -2003,7 +3225,19 @@ struct ComboBox
   end function
 end struct
 
+/// Represents the editable combo box data used by the minigui module.
 struct EditableComboBox
+  /// Creates editable combo box for the minigui editable combo box module.
+  /// @param app Application instance operated on by this call.
+  /// @param parent parent value consumed by this operation.
+  /// @param id Stable identifier of the affected item.
+  /// @param text Text consumed by the operation.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
+  /// @param width Width in the coordinate or storage units used by the caller.
+  /// @param height Height in the coordinate or storage units used by the caller.
+  /// @param items Items consumed or updated by the operation.
+  /// @param selectedIndex Zero-based index of selected.
   static function create(app, parent, id, text, x, y, width, height, items, selectedIndex)
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
@@ -2018,7 +3252,19 @@ struct EditableComboBox
   end function
 end struct
 
+/// Represents the list box data used by the minigui module.
 struct ListBox
+  /// Creates list box for the minigui list box module.
+  /// @param app Application instance operated on by this call.
+  /// @param parent parent value consumed by this operation.
+  /// @param id Stable identifier of the affected item.
+  /// @param text Text consumed by the operation.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
+  /// @param width Width in the coordinate or storage units used by the caller.
+  /// @param height Height in the coordinate or storage units used by the caller.
+  /// @param items Items consumed or updated by the operation.
+  /// @param selectedIndex Zero-based index of selected.
   static function create(app, parent, id, text, x, y, width, height, items, selectedIndex)
     nid = app.nextNativeId
     app.nextNativeId = app.nextNativeId + 1
@@ -2033,7 +3279,11 @@ struct ListBox
   end function
 end struct
 
+/// Represents the control data used by the minigui module.
 struct Control
+  /// Updates text maintained by the minigui module.
+  /// @param control control value consumed by this operation.
+  /// @param text Text consumed by the operation.
   static function setText(control, text)
     if control is void then return false end if
     if control.kind == "TextArea" then text = _normalizeEditText(text) end if
@@ -2047,6 +3297,8 @@ struct Control
     return SetWindowTextW(control.handle, text)
   end function
 
+  /// Returns text maintained by the minigui module.
+  /// @param control control value consumed by this operation.
   static function getText(control)
     if control is void then return "" end if
     if control.handle is void then return control.text end if
@@ -2072,6 +3324,9 @@ struct Control
     return control.text
   end function
 
+  /// Updates enabled maintained by the minigui module.
+  /// @param control control value consumed by this operation.
+  /// @param enabled enabled value consumed by this operation.
   static function setEnabled(control, enabled)
     if control is void then return false end if
     control.enabled = enabled
@@ -2079,6 +3334,9 @@ struct Control
     return EnableWindow(control.handle, enabled)
   end function
 
+  /// Updates visible maintained by the minigui module.
+  /// @param control control value consumed by this operation.
+  /// @param visible visible value consumed by this operation.
   static function setVisible(control, visible)
     if control is void then return false end if
     control.visible = visible
@@ -2089,6 +3347,9 @@ struct Control
     return ShowWindow(control.handle, 0)
   end function
 
+  /// Updates tooltip maintained by the minigui module.
+  /// @param control control value consumed by this operation.
+  /// @param text Text consumed by the operation.
   static function setTooltip(control, text)
     if control is void then return false end if
     if control.handle is void then return false end if
@@ -2114,11 +3375,16 @@ struct Control
     return true
   end function
 
+  /// Updates tab index maintained by the minigui module.
+  /// @param control control value consumed by this operation.
+  /// @param tabIndex Zero-based index of tab.
   static function setTabIndex(control, tabIndex)
     if control is void then return false end if
     return tabIndex >= 0
   end function
 
+  /// Performs the _styleIndex operation for the minigui control module.
+  /// @param handle Native or runtime handle used by the operation.
   static function _styleIndex(handle)
     global _styleHandles
     if len(_styleHandles) > 0 then
@@ -2129,6 +3395,8 @@ struct Control
     return -1
   end function
 
+  /// Ensures style is available to the minigui workflow.
+  /// @param control control value consumed by this operation.
   static function _ensureStyle(control)
     if control is void then return -1 end if
     if control.handle is void then return -1 end if
@@ -2145,6 +3413,9 @@ struct Control
     return len(_styleHandles) - 1
   end function
 
+  /// Updates foreground maintained by the minigui module.
+  /// @param control control value consumed by this operation.
+  /// @param color color value consumed by this operation.
   static function setForeground(control, color)
     index = Control._ensureStyle(control)
     if index < 0 then return false end if
@@ -2154,6 +3425,9 @@ struct Control
     return true
   end function
 
+  /// Updates background maintained by the minigui module.
+  /// @param control control value consumed by this operation.
+  /// @param color color value consumed by this operation.
   static function setBackground(control, color)
     index = Control._ensureStyle(control)
     if index < 0 then return false end if
@@ -2166,16 +3440,29 @@ struct Control
     return true
   end function
 
+  /// Updates border maintained by the minigui module.
+  /// @param control control value consumed by this operation.
+  /// @param color color value consumed by this operation.
+  /// @param width Width in the coordinate or storage units used by the caller.
   static function setBorder(control, color, width)
     if control is void then return false end if
     return width >= 0
   end function
 
+  /// Updates font maintained by the minigui module.
+  /// @param control control value consumed by this operation.
+  /// @param family family value consumed by this operation.
+  /// @param size Size in the units required by the operation.
+  /// @param weight weight value consumed by this operation.
   static function setFont(control, family, size, weight)
     if control is void then return false end if
     return true
   end function
 
+  /// Performs the applyCtlColor operation for the minigui control module.
+  /// @param app Application instance operated on by this call.
+  /// @param hwndControl hwndControl value consumed by this operation.
+  /// @param hdc hdc value consumed by this operation.
   static function applyCtlColor(app, hwndControl, hdc)
     index = Control._styleIndex(hwndControl)
     if index < 0 then return 0 end if
@@ -2193,6 +3480,9 @@ struct Control
     return 0
   end function
 
+  /// Updates read only maintained by the minigui module.
+  /// @param control control value consumed by this operation.
+  /// @param readOnly readOnly value consumed by this operation.
   static function setReadOnly(control, readOnly)
     if control is void then return false end if
     if control.handle is void then return false end if
@@ -2205,6 +3495,9 @@ struct Control
     return false
   end function
 
+  /// Updates max length maintained by the minigui module.
+  /// @param control control value consumed by this operation.
+  /// @param maxLength maxLength value consumed by this operation.
   static function setMaxLength(control, maxLength)
     if control is void then return false end if
     if control.handle is void then return false end if
@@ -2216,6 +3509,8 @@ struct Control
     return false
   end function
 
+  /// Performs the _layoutIndex operation for the minigui control module.
+  /// @param control control value consumed by this operation.
   static function _layoutIndex(control)
     if control is void then return -1 end if
     if control.handle is void then return -1 end if
@@ -2228,6 +3523,14 @@ struct Control
     return -1
   end function
 
+  /// Updates layout maintained by the minigui module.
+  /// @param control control value consumed by this operation.
+  /// @param resizeMode resizeMode value consumed by this operation.
+  /// @param anchor anchor value consumed by this operation.
+  /// @param minWidth minWidth value consumed by this operation.
+  /// @param minHeight minHeight value consumed by this operation.
+  /// @param maxWidth maxWidth value consumed by this operation.
+  /// @param maxHeight maxHeight value consumed by this operation.
   static function setLayout(control, resizeMode, anchor, minWidth, minHeight, maxWidth, maxHeight)
     if control is void then return false end if
     if control.handle is void then return false end if
@@ -2261,6 +3564,10 @@ struct Control
     return true
   end function
 
+  /// Performs the layoutValue operation for the minigui control module.
+  /// @param control control value consumed by this operation.
+  /// @param slot slot value consumed by this operation.
+  /// @param fallback Value returned when no explicit result is available.
   static function layoutValue(control, slot, fallback)
     index = Control._layoutIndex(control)
     if index < 0 then return fallback end if
@@ -2279,6 +3586,9 @@ struct Control
     return fallback
   end function
 
+  /// Performs the clampLayoutWidth operation for the minigui control module.
+  /// @param control control value consumed by this operation.
+  /// @param width Width in the coordinate or storage units used by the caller.
   static function clampLayoutWidth(control, width)
     minWidth = Control.layoutValue(control, "minWidth", -1)
     maxWidth = Control.layoutValue(control, "maxWidth", -1)
@@ -2288,6 +3598,9 @@ struct Control
     return width
   end function
 
+  /// Performs the clampLayoutHeight operation for the minigui control module.
+  /// @param control control value consumed by this operation.
+  /// @param height Height in the coordinate or storage units used by the caller.
   static function clampLayoutHeight(control, height)
     minHeight = Control.layoutValue(control, "minHeight", -1)
     maxHeight = Control.layoutValue(control, "maxHeight", -1)
@@ -2297,6 +3610,12 @@ struct Control
     return height
   end function
 
+  /// Performs the layoutBounds operation for the minigui control module.
+  /// @param control control value consumed by this operation.
+  /// @param parentWidth parentWidth value consumed by this operation.
+  /// @param parentHeight parentHeight value consumed by this operation.
+  /// @param baseParentWidth baseParentWidth value consumed by this operation.
+  /// @param baseParentHeight baseParentHeight value consumed by this operation.
   static function layoutBounds(control, parentWidth, parentHeight, baseParentWidth, baseParentHeight)
     if control is void then return [0, 0, 1, 1] end if
     if baseParentWidth <= 0 then baseParentWidth = parentWidth end if
@@ -2334,6 +3653,12 @@ struct Control
     return [_asInt(nx), _asInt(ny), _asInt(nw), _asInt(nh)]
   end function
 
+  /// Updates bounds maintained by the minigui module.
+  /// @param control control value consumed by this operation.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
+  /// @param width Width in the coordinate or storage units used by the caller.
+  /// @param height Height in the coordinate or storage units used by the caller.
   static function setBounds(control, x, y, width, height)
     if control is void then return false end if
     control.baseX = x
@@ -2343,6 +3668,12 @@ struct Control
     return Control.moveCurrent(control, x, y, width, height)
   end function
 
+  /// Performs the moveCurrent operation for the minigui control module.
+  /// @param control control value consumed by this operation.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
+  /// @param width Width in the coordinate or storage units used by the caller.
+  /// @param height Height in the coordinate or storage units used by the caller.
   static function moveCurrent(control, x, y, width, height)
     if control is void then return false end if
     x = _asInt(x)
@@ -2373,6 +3704,9 @@ struct Control
     return moved
   end function
 
+  /// Finds by id used by the minigui module.
+  /// @param app Application instance operated on by this call.
+  /// @param id Stable identifier of the affected item.
   static function findById(app, id)
     if app is void then return void end if
     if len(app.controls) > 0 then
@@ -2386,6 +3720,8 @@ struct Control
     return void
   end function
 
+  /// Performs the splitterOrientation operation for the minigui control module.
+  /// @param splitter splitter value consumed by this operation.
   static function splitterOrientation(splitter)
     if splitter is void then return "horizontal" end if
     value = _itemTextAt(splitter.lastText, 0)
@@ -2393,16 +3729,27 @@ struct Control
     return value
   end function
 
+  /// Performs the splitterTargetBeforeId operation for the minigui control module.
+  /// @param splitter splitter value consumed by this operation.
   static function splitterTargetBeforeId(splitter)
     if splitter is void then return "" end if
     return _itemTextAt(splitter.lastText, 1)
   end function
 
+  /// Performs the splitterTargetAfterId operation for the minigui control module.
+  /// @param splitter splitter value consumed by this operation.
   static function splitterTargetAfterId(splitter)
     if splitter is void then return "" end if
     return _itemTextAt(splitter.lastText, 2)
   end function
 
+  /// Performs the resizeSplitterTargets operation for the minigui control module.
+  /// @param app Application instance operated on by this call.
+  /// @param splitter splitter value consumed by this operation.
+  /// @param oldX oldX value consumed by this operation.
+  /// @param oldY oldY value consumed by this operation.
+  /// @param newX newX value consumed by this operation.
+  /// @param newY newY value consumed by this operation.
   static function resizeSplitterTargets(app, splitter, oldX, oldY, newX, newY)
     if app is void then return false end if
     if splitter is void then return false end if
@@ -2436,22 +3783,35 @@ struct Control
     return true
   end function
 
+  /// Updates position maintained by the minigui module.
+  /// @param control control value consumed by this operation.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
   static function setPosition(control, x, y)
     if control is void then return false end if
     return Control.setBounds(control, x, y, control.width, control.height)
   end function
 
+  /// Updates size maintained by the minigui module.
+  /// @param control control value consumed by this operation.
+  /// @param width Width in the coordinate or storage units used by the caller.
+  /// @param height Height in the coordinate or storage units used by the caller.
   static function setSize(control, width, height)
     if control is void then return false end if
     return Control.setBounds(control, control.x, control.y, width, height)
   end function
 
+  /// Returns whether checked satisfies the required condition.
+  /// @param control control value consumed by this operation.
   static function isChecked(control)
     if control is void then return false end if
     if control.handle is void then return false end if
     return SendMessageW(control.handle, BM_GETCHECK, 0, 0) == BST_CHECKED
   end function
 
+  /// Updates checked maintained by the minigui module.
+  /// @param control control value consumed by this operation.
+  /// @param checked checked value consumed by this operation.
   static function setChecked(control, checked)
     if control is void then return false end if
     if control.handle is void then return false end if
@@ -2461,6 +3821,8 @@ struct Control
     return true
   end function
 
+  /// Clears items maintained by the minigui module.
+  /// @param control control value consumed by this operation.
   static function clearItems(control)
     if control is void then return false end if
     if control.handle is void then return false end if
@@ -2487,6 +3849,9 @@ struct Control
     return false
   end function
 
+  /// Adds item to the state managed by the minigui module.
+  /// @param control control value consumed by this operation.
+  /// @param text Text consumed by the operation.
   static function addItem(control, text)
     if control is void then return -1 end if
     if control.handle is void then return -1 end if
@@ -2497,6 +3862,8 @@ struct Control
     return -1
   end function
 
+  /// Ensures list view column is available to the minigui workflow.
+  /// @param control control value consumed by this operation.
   static function ensureListViewColumn(control)
     if control is void then return false end if
     if control.handle is void then return false end if
@@ -2513,6 +3880,9 @@ struct Control
     return true
   end function
 
+  /// Updates list view columns maintained by the minigui module.
+  /// @param control control value consumed by this operation.
+  /// @param columns columns value consumed by this operation.
   static function setListViewColumns(control, columns)
     if control is void then return false end if
     if control.handle is void then return false end if
@@ -2536,6 +3906,8 @@ struct Control
     return true
   end function
 
+  /// Updates list view column widths for the minigui workflow.
+  /// @param control control value consumed by this operation.
   static function updateListViewColumnWidths(control)
     if control is void then return false end if
     if control.handle is void then return false end if
@@ -2551,6 +3923,10 @@ struct Control
     return true
   end function
 
+  /// Updates column width maintained by the minigui module.
+  /// @param control control value consumed by this operation.
+  /// @param index Zero-based index of the affected item.
+  /// @param width Width in the coordinate or storage units used by the caller.
   static function setColumnWidth(control, index, width)
     if control is void then return false end if
     if control.handle is void then return false end if
@@ -2561,6 +3937,9 @@ struct Control
     return true
   end function
 
+  /// Updates column widths maintained by the minigui module.
+  /// @param control control value consumed by this operation.
+  /// @param widths widths value consumed by this operation.
   static function setColumnWidths(control, widths)
     if control is void then return false end if
     if len(widths) <= 0 then return false end if
@@ -2570,6 +3949,9 @@ struct Control
     return true
   end function
 
+  /// Updates editable maintained by the minigui module.
+  /// @param control control value consumed by this operation.
+  /// @param editable editable value consumed by this operation.
   static function setEditable(control, editable)
     if control is void then return false end if
     if control.kind != "DataGrid" then return false end if
@@ -2578,12 +3960,16 @@ struct Control
     return true
   end function
 
+  /// Returns whether editable satisfies the required condition.
+  /// @param control control value consumed by this operation.
   static function isEditable(control)
     if control is void then return false end if
     if control.kind != "DataGrid" then return false end if
     return control.largeStep == 1
   end function
 
+  /// Performs the listViewColumnCount operation for the minigui control module.
+  /// @param control control value consumed by this operation.
   static function listViewColumnCount(control)
     if control is void then return 1 end if
     count = Control.listViewFieldCount(control.lastText)
@@ -2591,6 +3977,9 @@ struct Control
     return count
   end function
 
+  /// Performs the listViewColumnAtX operation for the minigui control module.
+  /// @param control control value consumed by this operation.
+  /// @param x Horizontal coordinate used by the operation.
   static function listViewColumnAtX(control, x)
     count = Control.listViewColumnCount(control)
     columnWidth = control.width
@@ -2602,6 +3991,10 @@ struct Control
     return column
   end function
 
+  /// Performs the listViewHitTest operation for the minigui control module.
+  /// @param control control value consumed by this operation.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
   static function listViewHitTest(control, x, y)
     if control is void then return [-1, -1] end if
     if control.handle is void then return [-1, -1] end if
@@ -2618,6 +4011,10 @@ struct Control
     return [row, column]
   end function
 
+  /// Performs the listViewCellRect operation for the minigui control module.
+  /// @param control control value consumed by this operation.
+  /// @param row row value consumed by this operation.
+  /// @param column column value consumed by this operation.
   static function listViewCellRect(control, row, column)
     if control is void then return [0, 0, 0, 0] end if
     if control.handle is void then return [0, 0, 0, 0] end if
@@ -2640,6 +4037,8 @@ struct Control
     return [column * columnWidth, 20 + row * 16, columnWidth, 20]
   end function
 
+  /// Performs the listViewFieldCount operation for the minigui control module.
+  /// @param text Text consumed by the operation.
   static function listViewFieldCount(text)
     count = 1
     if len(text) > 0 then
@@ -2650,6 +4049,9 @@ struct Control
     return count
   end function
 
+  /// Performs the listViewFieldAt operation for the minigui control module.
+  /// @param text Text consumed by the operation.
+  /// @param index Zero-based index of the affected item.
   static function listViewFieldAt(text, index)
     current = ""
     currentIndex = 0
@@ -2669,6 +4071,10 @@ struct Control
     return ""
   end function
 
+  /// Performs the replaceListViewField operation for the minigui control module.
+  /// @param text Text consumed by the operation.
+  /// @param index Zero-based index of the affected item.
+  /// @param value Value consumed or transformed by the operation.
   static function replaceListViewField(text, index, value)
     fieldCount = Control.listViewFieldCount(text)
     if index >= fieldCount then fieldCount = index + 1 end if
@@ -2683,6 +4089,10 @@ struct Control
     return _joinText(parts, "\t")
   end function
 
+  /// Performs the replaceListViewRowText operation for the minigui control module.
+  /// @param text Text consumed by the operation.
+  /// @param row row value consumed by this operation.
+  /// @param rowText rowText value consumed by this operation.
   static function replaceListViewRowText(text, row, rowText)
     rowCount = _itemCount(text)
     if row >= rowCount then rowCount = row + 1 end if
@@ -2697,6 +4107,11 @@ struct Control
     return _joinText(rows, "\n")
   end function
 
+  /// Updates list view cell native maintained by the minigui module.
+  /// @param control control value consumed by this operation.
+  /// @param row row value consumed by this operation.
+  /// @param column column value consumed by this operation.
+  /// @param value Value consumed or transformed by the operation.
   static function setListViewCellNative(control, row, column, value)
     if control is void then return false end if
     if control.handle is void then return false end if
@@ -2713,6 +4128,11 @@ struct Control
     return true
   end function
 
+  /// Updates cell text maintained by the minigui module.
+  /// @param control control value consumed by this operation.
+  /// @param row row value consumed by this operation.
+  /// @param column column value consumed by this operation.
+  /// @param value Value consumed or transformed by the operation.
   static function setCellText(control, row, column, value)
     if control is void then return false end if
     if control.kind != "ListView" and control.kind != "DataGrid" then return false end if
@@ -2723,6 +4143,10 @@ struct Control
     return Control.setListViewCellNative(control, row, column, value)
   end function
 
+  /// Returns cell text maintained by the minigui module.
+  /// @param control control value consumed by this operation.
+  /// @param row row value consumed by this operation.
+  /// @param column column value consumed by this operation.
   static function getCellText(control, row, column)
     if control is void then return "" end if
     if control.kind != "ListView" and control.kind != "DataGrid" then return "" end if
@@ -2730,6 +4154,9 @@ struct Control
     return Control.listViewFieldAt(_itemTextAt(control.text, row), column)
   end function
 
+  /// Adds list view item to the state managed by the minigui module.
+  /// @param control control value consumed by this operation.
+  /// @param text Text consumed by the operation.
   static function addListViewItem(control, text)
     firstText = Control.listViewFieldAt(text, 0)
     textBytes = _asciiUtf16Z(firstText)
@@ -2758,10 +4185,17 @@ struct Control
     return inserted
   end function
 
+  /// Adds tree view item to the state managed by the minigui module.
+  /// @param control control value consumed by this operation.
+  /// @param text Text consumed by the operation.
   static function addTreeViewItem(control, text)
     return Control.addTreeViewItemWithParent(control, text, 0)
   end function
 
+  /// Adds tree view item with parent to the state managed by the minigui module.
+  /// @param control control value consumed by this operation.
+  /// @param text Text consumed by the operation.
+  /// @param parentItem parentItem value consumed by this operation.
   static function addTreeViewItemWithParent(control, text, parentItem)
     textBytes = _asciiUtf16Z(text)
     item = bytes(80, 0)
@@ -2773,6 +4207,8 @@ struct Control
     return SendMessageW(control.handle, TVM_INSERTITEMW, 0, nativeBytesPtr(item))
   end function
 
+  /// Performs the treeItemLevel operation for the minigui control module.
+  /// @param text Text consumed by the operation.
   static function treeItemLevel(text)
     level = 0
     pos = 0
@@ -2783,6 +4219,8 @@ struct Control
     return level
   end function
 
+  /// Performs the treeItemText operation for the minigui control module.
+  /// @param text Text consumed by the operation.
   static function treeItemText(text)
     pos = 0
     while pos + 1 < len(text) and text[pos] == " " and text[pos + 1] == " "
@@ -2797,6 +4235,9 @@ struct Control
     return outv
   end function
 
+  /// Updates tree items maintained by the minigui module.
+  /// @param control control value consumed by this operation.
+  /// @param items Items consumed or updated by the operation.
   static function setTreeItems(control, items)
     if control is void then return false end if
     if control.handle is void then return false end if
@@ -2823,6 +4264,9 @@ struct Control
     return true
   end function
 
+  /// Returns item text at click maintained by the minigui module.
+  /// @param control control value consumed by this operation.
+  /// @param x Horizontal coordinate used by the operation.
   static function getItemTextAtClick(control, x)
     if control is void then return "" end if
     itemsText = control.lastText
@@ -2839,6 +4283,8 @@ struct Control
     return ""
   end function
 
+  /// Returns tree view selected text maintained by the minigui module.
+  /// @param control control value consumed by this operation.
   static function getTreeViewSelectedText(control)
     if control is void then return "" end if
     if control.handle is void then return "" end if
@@ -2857,6 +4303,8 @@ struct Control
     return ""
   end function
 
+  /// Returns list view selected text maintained by the minigui module.
+  /// @param control control value consumed by this operation.
   static function getListViewSelectedText(control)
     if control is void then return "" end if
     if control.kind != "ListView" and control.kind != "DataGrid" then return "" end if
@@ -2865,6 +4313,9 @@ struct Control
     return _itemTextAt(control.text, index)
   end function
 
+  /// Updates items maintained by the minigui module.
+  /// @param control control value consumed by this operation.
+  /// @param items Items consumed or updated by the operation.
   static function setItems(control, items)
     if Control.clearItems(control) == false then return false end if
     if control.kind == "TreeView" then return Control.setTreeItems(control, items) end if
@@ -2877,6 +4328,8 @@ struct Control
     return true
   end function
 
+  /// Returns selected index maintained by the minigui module.
+  /// @param control control value consumed by this operation.
   static function getSelectedIndex(control)
     if control is void then return -1 end if
     if control.handle is void then return -1 end if
@@ -2887,6 +4340,9 @@ struct Control
     return -1
   end function
 
+  /// Updates selected index maintained by the minigui module.
+  /// @param control control value consumed by this operation.
+  /// @param index Zero-based index of the affected item.
   static function setSelectedIndex(control, index)
     if control is void then return false end if
     if control.handle is void then return false end if
@@ -2920,6 +4376,9 @@ struct Control
     return false
   end function
 
+  /// Updates tab pages for the minigui workflow.
+  /// @param app Application instance operated on by this call.
+  /// @param tabControl tabControl value consumed by this operation.
   static function updateTabPages(app, tabControl)
     if app is void then return false end if
     if tabControl is void then return false end if
@@ -2976,6 +4435,9 @@ struct Control
     return true
   end function
 
+  /// Performs the applyEffectiveVisible operation for the minigui control module.
+  /// @param control control value consumed by this operation.
+  /// @param parentVisible parentVisible value consumed by this operation.
   static function applyEffectiveVisible(control, parentVisible)
     if control is void then return false end if
     if control.handle is void then return false end if
@@ -2985,6 +4447,10 @@ struct Control
     return ShowWindow(control.handle, 0)
   end function
 
+  /// Returns whether descendant of satisfies the required condition.
+  /// @param app Application instance operated on by this call.
+  /// @param control control value consumed by this operation.
+  /// @param ancestor ancestor value consumed by this operation.
   static function isDescendantOf(app, control, ancestor)
     if app is void then return false end if
     if control is void then return false end if
@@ -3010,6 +4476,9 @@ struct Control
     return false
   end function
 
+  /// Updates scroll viewer for the minigui workflow.
+  /// @param app Application instance operated on by this call.
+  /// @param scrollViewer scrollViewer value consumed by this operation.
   static function updateScrollViewer(app, scrollViewer)
     if app is void then return false end if
     if scrollViewer is void then return false end if
@@ -3039,6 +4508,10 @@ struct Control
     return Control.scrollViewerTo(app, scrollViewer, scrollViewer.scrollValue)
   end function
 
+  /// Performs the scrollViewerTo operation for the minigui control module.
+  /// @param app Application instance operated on by this call.
+  /// @param scrollViewer scrollViewer value consumed by this operation.
+  /// @param value Value consumed or transformed by the operation.
   static function scrollViewerTo(app, scrollViewer, value)
     if app is void then return false end if
     if scrollViewer is void then return false end if
@@ -3066,6 +4539,8 @@ struct Control
     return true
   end function
 
+  /// Returns selected text maintained by the minigui module.
+  /// @param control control value consumed by this operation.
   static function getSelectedText(control)
     if control is void then return "" end if
     if control.handle is void then return "" end if
@@ -3088,6 +4563,10 @@ struct Control
     return ""
   end function
 
+  /// Updates value range maintained by the minigui module.
+  /// @param control control value consumed by this operation.
+  /// @param minimum minimum value consumed by this operation.
+  /// @param maximum maximum value consumed by this operation.
   static function setValueRange(control, minimum, maximum)
     if control is void then return false end if
     if control.kind == "NumberBox" or control.kind == "SpinBox" then
@@ -3111,6 +4590,9 @@ struct Control
     return Control.setScrollRange(control, minimum, maximum)
   end function
 
+  /// Updates value maintained by the minigui module.
+  /// @param control control value consumed by this operation.
+  /// @param value Value consumed or transformed by the operation.
   static function setValue(control, value)
     if control is void then return false end if
     if control.kind == "NumberBox" or control.kind == "SpinBox" then
@@ -3133,6 +4615,8 @@ struct Control
     return Control.setScrollValue(control, value)
   end function
 
+  /// Returns value maintained by the minigui module.
+  /// @param control control value consumed by this operation.
   static function getValue(control)
     if control is void then return 0 end if
     if control.kind == "NumberBox" or control.kind == "SpinBox" then
@@ -3142,6 +4626,10 @@ struct Control
     return Control.getScrollValue(control)
   end function
 
+  /// Updates scroll range maintained by the minigui module.
+  /// @param control control value consumed by this operation.
+  /// @param minimum minimum value consumed by this operation.
+  /// @param maximum maximum value consumed by this operation.
   static function setScrollRange(control, minimum, maximum)
     if control is void then return false end if
     control.scrollMin = minimum
@@ -3163,6 +4651,10 @@ struct Control
     return false
   end function
 
+  /// Updates scroll steps maintained by the minigui module.
+  /// @param control control value consumed by this operation.
+  /// @param smallStep smallStep value consumed by this operation.
+  /// @param largeStep largeStep value consumed by this operation.
   static function setScrollSteps(control, smallStep, largeStep)
     if control is void then return false end if
     if smallStep <= 0 then smallStep = 1 end if
@@ -3177,6 +4669,9 @@ struct Control
     return true
   end function
 
+  /// Updates scroll value maintained by the minigui module.
+  /// @param control control value consumed by this operation.
+  /// @param value Value consumed or transformed by the operation.
   static function setScrollValue(control, value)
     if control is void then return false end if
     if value < control.scrollMin then value = control.scrollMin end if
@@ -3194,6 +4689,8 @@ struct Control
     return false
   end function
 
+  /// Returns scroll value maintained by the minigui module.
+  /// @param control control value consumed by this operation.
   static function getScrollValue(control)
     if control is void then return 0 end if
     if control.handle is void then return control.scrollValue end if
@@ -3209,32 +4706,64 @@ struct Control
   end function
 end struct
 
+/// Represents the events data used by the minigui module.
 struct Events
+  /// Performs the bindLoad operation for the minigui events module.
+  /// @param app Application instance operated on by this call.
+  /// @param window window value consumed by this operation.
+  /// @param callback Callback invoked when the operation completes or the event occurs.
+  /// @param context Context that carries state for the operation.
   static function bindLoad(app, window, callback, context)
     app.loadBindings = app.loadBindings + [Binding(window, callback, context, "load")]
     return window
   end function
 
+  /// Performs the bindClose operation for the minigui events module.
+  /// @param app Application instance operated on by this call.
+  /// @param window window value consumed by this operation.
+  /// @param callback Callback invoked when the operation completes or the event occurs.
+  /// @param context Context that carries state for the operation.
   static function bindClose(app, window, callback, context)
     app.closeBindings = app.closeBindings + [Binding(window, callback, context, "close")]
     return window
   end function
 
+  /// Performs the bindResized operation for the minigui events module.
+  /// @param app Application instance operated on by this call.
+  /// @param window window value consumed by this operation.
+  /// @param callback Callback invoked when the operation completes or the event occurs.
+  /// @param context Context that carries state for the operation.
   static function bindResized(app, window, callback, context)
     app.resizeBindings = app.resizeBindings + [Binding(window, callback, context, "resized")]
     return window
   end function
 
+  /// Performs the bindClick operation for the minigui events module.
+  /// @param app Application instance operated on by this call.
+  /// @param control control value consumed by this operation.
+  /// @param callback Callback invoked when the operation completes or the event occurs.
+  /// @param context Context that carries state for the operation.
   static function bindClick(app, control, callback, context)
     app.clickBindings = app.clickBindings + [Binding(control, callback, context, "click")]
     return control
   end function
 
+  /// Performs the bindClicked operation for the minigui events module.
+  /// @param app Application instance operated on by this call.
+  /// @param control control value consumed by this operation.
+  /// @param callback Callback invoked when the operation completes or the event occurs.
+  /// @param context Context that carries state for the operation.
   static function bindClicked(app, control, callback, context)
     app.clickBindings = app.clickBindings + [Binding(control, callback, context, "clicked")]
     return control
   end function
 
+  /// Performs the bindTextEvent operation for the minigui events module.
+  /// @param app Application instance operated on by this call.
+  /// @param control control value consumed by this operation.
+  /// @param callback Callback invoked when the operation completes or the event occurs.
+  /// @param context Context that carries state for the operation.
+  /// @param eventType eventType value consumed by this operation.
   static function bindTextEvent(app, control, callback, context, eventType)
     app.textBindings = app.textBindings + [Binding(control, callback, context, eventType)]
     if control is void == false then
@@ -3243,10 +4772,21 @@ struct Events
     return control
   end function
 
+  /// Performs the bindTextChanged operation for the minigui events module.
+  /// @param app Application instance operated on by this call.
+  /// @param control control value consumed by this operation.
+  /// @param callback Callback invoked when the operation completes or the event occurs.
+  /// @param context Context that carries state for the operation.
   static function bindTextChanged(app, control, callback, context)
     return Events.bindTextEvent(app, control, callback, context, "textChanged")
   end function
 
+  /// Performs the bindSelectionEvent operation for the minigui events module.
+  /// @param app Application instance operated on by this call.
+  /// @param control control value consumed by this operation.
+  /// @param callback Callback invoked when the operation completes or the event occurs.
+  /// @param context Context that carries state for the operation.
+  /// @param eventType eventType value consumed by this operation.
   static function bindSelectionEvent(app, control, callback, context, eventType)
     app.selectionBindings = app.selectionBindings + [Binding(control, callback, context, eventType)]
     if control is void == false then
@@ -3255,14 +4795,30 @@ struct Events
     return control
   end function
 
+  /// Performs the bindSelectionChanged operation for the minigui events module.
+  /// @param app Application instance operated on by this call.
+  /// @param control control value consumed by this operation.
+  /// @param callback Callback invoked when the operation completes or the event occurs.
+  /// @param context Context that carries state for the operation.
   static function bindSelectionChanged(app, control, callback, context)
     return Events.bindSelectionEvent(app, control, callback, context, "selectionChanged")
   end function
 
+  /// Performs the bindSelected operation for the minigui events module.
+  /// @param app Application instance operated on by this call.
+  /// @param control control value consumed by this operation.
+  /// @param callback Callback invoked when the operation completes or the event occurs.
+  /// @param context Context that carries state for the operation.
   static function bindSelected(app, control, callback, context)
     return Events.bindSelectionEvent(app, control, callback, context, "selected")
   end function
 
+  /// Performs the bindScrollEvent operation for the minigui events module.
+  /// @param app Application instance operated on by this call.
+  /// @param control control value consumed by this operation.
+  /// @param callback Callback invoked when the operation completes or the event occurs.
+  /// @param context Context that carries state for the operation.
+  /// @param eventType eventType value consumed by this operation.
   static function bindScrollEvent(app, control, callback, context, eventType)
     app.scrollBindings = app.scrollBindings + [Binding(control, callback, context, eventType)]
     if control is void == false then
@@ -3271,10 +4827,20 @@ struct Events
     return control
   end function
 
+  /// Performs the bindScrollChanged operation for the minigui events module.
+  /// @param app Application instance operated on by this call.
+  /// @param control control value consumed by this operation.
+  /// @param callback Callback invoked when the operation completes or the event occurs.
+  /// @param context Context that carries state for the operation.
   static function bindScrollChanged(app, control, callback, context)
     return Events.bindScrollEvent(app, control, callback, context, "scrollChanged")
   end function
 
+  /// Performs the bindValueChanged operation for the minigui events module.
+  /// @param app Application instance operated on by this call.
+  /// @param control control value consumed by this operation.
+  /// @param callback Callback invoked when the operation completes or the event occurs.
+  /// @param context Context that carries state for the operation.
   static function bindValueChanged(app, control, callback, context)
     if control is void == false then
       if control.kind == "ComboBox" or control.kind == "EditableComboBox" or control.kind == "ListBox" or control.kind == "TabControl" or control.kind == "TreeView" or control.kind == "ListView" or control.kind == "DataGrid" then
@@ -3287,6 +4853,11 @@ struct Events
     return Events.bindTextEvent(app, control, callback, context, "valueChanged")
   end function
 
+  /// Performs the bindChanged operation for the minigui events module.
+  /// @param app Application instance operated on by this call.
+  /// @param control control value consumed by this operation.
+  /// @param callback Callback invoked when the operation completes or the event occurs.
+  /// @param context Context that carries state for the operation.
   static function bindChanged(app, control, callback, context)
     if control is void == false then
       if control.kind == "ComboBox" or control.kind == "EditableComboBox" or control.kind == "ListBox" or control.kind == "TabControl" or control.kind == "TreeView" or control.kind == "ListView" or control.kind == "DataGrid" then
@@ -3299,6 +4870,11 @@ struct Events
     return Events.bindTextEvent(app, control, callback, context, "changed")
   end function
 
+  /// Performs the bindChange operation for the minigui events module.
+  /// @param app Application instance operated on by this call.
+  /// @param control control value consumed by this operation.
+  /// @param callback Callback invoked when the operation completes or the event occurs.
+  /// @param context Context that carries state for the operation.
   static function bindChange(app, control, callback, context)
     if control is void == false then
       if control.kind == "ComboBox" or control.kind == "EditableComboBox" or control.kind == "ListBox" or control.kind == "TabControl" or control.kind == "TreeView" or control.kind == "ListView" or control.kind == "DataGrid" then
@@ -3311,22 +4887,40 @@ struct Events
     return Events.bindTextEvent(app, control, callback, context, "change")
   end function
 
+  /// Performs the bindFocus operation for the minigui events module.
+  /// @param app Application instance operated on by this call.
+  /// @param control control value consumed by this operation.
+  /// @param callback Callback invoked when the operation completes or the event occurs.
+  /// @param context Context that carries state for the operation.
   static function bindFocus(app, control, callback, context)
     app.focusBindings = app.focusBindings + [Binding(control, callback, context, "focus")]
     return control
   end function
 
+  /// Performs the bindBlur operation for the minigui events module.
+  /// @param app Application instance operated on by this call.
+  /// @param control control value consumed by this operation.
+  /// @param callback Callback invoked when the operation completes or the event occurs.
+  /// @param context Context that carries state for the operation.
   static function bindBlur(app, control, callback, context)
     app.blurBindings = app.blurBindings + [Binding(control, callback, context, "blur")]
     return control
   end function
 
+  /// Performs the dispatch operation for the minigui events module.
+  /// @param binding binding value consumed by this operation.
+  /// @param eventType eventType value consumed by this operation.
+  /// @param oldValue oldValue value consumed by this operation.
+  /// @param newValue newValue value consumed by this operation.
   static function dispatch(binding, eventType, oldValue, newValue)
     if binding is void then return void end if
     ev = Event(binding.control, eventType, oldValue, newValue, false)
     return binding.callback(binding.context, ev)
   end function
 
+  /// Finds window by handle used by the minigui module.
+  /// @param app Application instance operated on by this call.
+  /// @param hwnd hwnd value consumed by this operation.
   static function findWindowByHandle(app, hwnd)
     if app is void then return void end if
     for i = 0 to len(app.windows) - 1
@@ -3336,6 +4930,8 @@ struct Events
     return void
   end function
 
+  /// Performs the dispatchLoad operation for the minigui events module.
+  /// @param window window value consumed by this operation.
   static function dispatchLoad(window)
     global _activeApp
     if _activeApp is void then return false end if
@@ -3349,6 +4945,9 @@ struct Events
     return false
   end function
 
+  /// Performs the dispatchClose operation for the minigui events module.
+  /// @param app Application instance operated on by this call.
+  /// @param window window value consumed by this operation.
   static function dispatchClose(app, window)
     if app is void then return false end if
     handled = false
@@ -3364,6 +4963,11 @@ struct Events
     return false
   end function
 
+  /// Performs the dispatchResize operation for the minigui events module.
+  /// @param app Application instance operated on by this call.
+  /// @param window window value consumed by this operation.
+  /// @param oldValue oldValue value consumed by this operation.
+  /// @param newValue newValue value consumed by this operation.
   static function dispatchResize(app, window, oldValue, newValue)
     if app is void then return false end if
     for i = 0 to len(app.resizeBindings) - 1
@@ -3375,6 +4979,9 @@ struct Events
     return false
   end function
 
+  /// Performs the controlByHandle operation for the minigui events module.
+  /// @param app Application instance operated on by this call.
+  /// @param hwndControl hwndControl value consumed by this operation.
   static function controlByHandle(app, hwndControl)
     if app is void then return void end if
     if len(app.controls) > 0 then
@@ -3388,6 +4995,12 @@ struct Events
     return void
   end function
 
+  /// Performs the dispatchControlTextBindings operation for the minigui events module.
+  /// @param app Application instance operated on by this call.
+  /// @param control control value consumed by this operation.
+  /// @param eventType eventType value consumed by this operation.
+  /// @param oldValue oldValue value consumed by this operation.
+  /// @param newValue newValue value consumed by this operation.
   static function dispatchControlTextBindings(app, control, eventType, oldValue, newValue)
     if app is void then return false end if
     handled = false
@@ -3401,6 +5014,11 @@ struct Events
     return handled
   end function
 
+  /// Performs the beginSplitterDrag operation for the minigui events module.
+  /// @param app Application instance operated on by this call.
+  /// @param hwndControl hwndControl value consumed by this operation.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
   static function beginSplitterDrag(app, hwndControl, x, y)
     c = Events.controlByHandle(app, hwndControl)
     if c is void then return false end if
@@ -3419,6 +5037,12 @@ struct Events
     return true
   end function
 
+  /// Performs the dragSplitter operation for the minigui events module.
+  /// @param app Application instance operated on by this call.
+  /// @param hwndControl hwndControl value consumed by this operation.
+  /// @param flags Bit flags controlling the operation.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
   static function dragSplitter(app, hwndControl, flags, x, y)
     global _dragSplitter
     if _dragSplitter is void then return false end if
@@ -3454,6 +5078,9 @@ struct Events
     return true
   end function
 
+  /// Performs the endSplitterDrag operation for the minigui events module.
+  /// @param app Application instance operated on by this call.
+  /// @param hwndControl hwndControl value consumed by this operation.
   static function endSplitterDrag(app, hwndControl)
     global _dragSplitter
     if _dragSplitter is void then return false end if
@@ -3463,6 +5090,11 @@ struct Events
     return true
   end function
 
+  /// Performs the beginDataGridEdit operation for the minigui events module.
+  /// @param app Application instance operated on by this call.
+  /// @param hwndControl hwndControl value consumed by this operation.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
   static function beginDataGridEdit(app, hwndControl, x, y)
     grid = Events.controlByHandle(app, hwndControl)
     if grid is void then return false end if
@@ -3504,6 +5136,10 @@ struct Events
     return true
   end function
 
+  /// Performs the commitDataGridEdit operation for the minigui events module.
+  /// @param app Application instance operated on by this call.
+  /// @param hwndControl hwndControl value consumed by this operation.
+  /// @param cancel cancel value consumed by this operation.
   static function commitDataGridEdit(app, hwndControl, cancel)
     global _dataGridEditor
     if _dataGridEditor == 0 then return false end if
@@ -3532,6 +5168,10 @@ struct Events
     return true
   end function
 
+  /// Performs the dispatchFocusByHandle operation for the minigui events module.
+  /// @param app Application instance operated on by this call.
+  /// @param hwndControl hwndControl value consumed by this operation.
+  /// @param focused focused value consumed by this operation.
   static function dispatchFocusByHandle(app, hwndControl, focused)
     if app is void then return false end if
     bindings = app.blurBindings
@@ -3556,6 +5196,12 @@ struct Events
     return handled
   end function
 
+  /// Performs the dispatchNotify operation for the minigui events module.
+  /// @param app Application instance operated on by this call.
+  /// @param hwndControl hwndControl value consumed by this operation.
+  /// @param nativeId Identifier of native.
+  /// @param code code value consumed by this operation.
+  /// @param lParam lParam value consumed by this operation.
   static function dispatchNotify(app, hwndControl, nativeId, code, lParam)
     if app is void then return false end if
     if code == UDN_DELTAPOS then
@@ -3628,6 +5274,10 @@ struct Events
     return false
   end function
 
+  /// Performs the dispatchClickByHandle operation for the minigui events module.
+  /// @param app Application instance operated on by this call.
+  /// @param hwndControl hwndControl value consumed by this operation.
+  /// @param x Horizontal coordinate used by the operation.
   static function dispatchClickByHandle(app, hwndControl, x)
     if app is void then return false end if
     for i = 0 to len(app.clickBindings) - 1
@@ -3654,6 +5304,11 @@ struct Events
     return false
   end function
 
+  /// Performs the dispatchContextMenu operation for the minigui events module.
+  /// @param app Application instance operated on by this call.
+  /// @param hwndControl hwndControl value consumed by this operation.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
   static function dispatchContextMenu(app, hwndControl, x, y)
     if app is void then return false end if
     if len(app.controls) == 0 then return false end if
@@ -3685,6 +5340,10 @@ struct Events
     return false
   end function
 
+  /// Returns whether control kind satisfies the required condition.
+  /// @param app Application instance operated on by this call.
+  /// @param hwndControl hwndControl value consumed by this operation.
+  /// @param kind kind value consumed by this operation.
   static function isControlKind(app, hwndControl, kind)
     if app is void then return false end if
     if len(app.controls) > 0 then
@@ -3698,6 +5357,9 @@ struct Events
     return false
   end function
 
+  /// Performs the dispatchTabChangedByHandle operation for the minigui events module.
+  /// @param app Application instance operated on by this call.
+  /// @param hwndControl hwndControl value consumed by this operation.
   static function dispatchTabChangedByHandle(app, hwndControl)
     if app is void then return false end if
     for s = 0 to len(app.selectionBindings) - 1
@@ -3720,6 +5382,11 @@ struct Events
     return false
   end function
 
+  /// Performs the dispatchTabClickedByHandle operation for the minigui events module.
+  /// @param app Application instance operated on by this call.
+  /// @param hwndControl hwndControl value consumed by this operation.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
   static function dispatchTabClickedByHandle(app, hwndControl, x, y)
     if app is void then return false end if
     if len(app.selectionBindings) == 0 then return false end if
@@ -3747,6 +5414,11 @@ struct Events
     return false
   end function
 
+  /// Performs the dispatchSelectionClickedByHandle operation for the minigui events module.
+  /// @param app Application instance operated on by this call.
+  /// @param hwndControl hwndControl value consumed by this operation.
+  /// @param x Horizontal coordinate used by the operation.
+  /// @param y Vertical coordinate used by the operation.
   static function dispatchSelectionClickedByHandle(app, hwndControl, x, y)
     if app is void then return false end if
     if len(app.selectionBindings) == 0 then return false end if
@@ -3788,6 +5460,11 @@ struct Events
     return false
   end function
 
+  /// Performs the dispatchScrollViewer operation for the minigui events module.
+  /// @param app Application instance operated on by this call.
+  /// @param hwndControl hwndControl value consumed by this operation.
+  /// @param code code value consumed by this operation.
+  /// @param pos pos value consumed by this operation.
   static function dispatchScrollViewer(app, hwndControl, code, pos)
     if app is void then return false end if
     if len(app.controls) > 0 then
@@ -3819,6 +5496,11 @@ struct Events
     return false
   end function
 
+  /// Performs the dispatchScroll operation for the minigui events module.
+  /// @param app Application instance operated on by this call.
+  /// @param code code value consumed by this operation.
+  /// @param pos pos value consumed by this operation.
+  /// @param hwndControl hwndControl value consumed by this operation.
   static function dispatchScroll(app, code, pos, hwndControl)
     if app is void then return false end if
     for s = 0 to len(app.scrollBindings) - 1
@@ -3847,6 +5529,11 @@ struct Events
     return false
   end function
 
+  /// Performs the dispatchCommand operation for the minigui events module.
+  /// @param app Application instance operated on by this call.
+  /// @param code code value consumed by this operation.
+  /// @param nativeId Identifier of native.
+  /// @param hwndControl hwndControl value consumed by this operation.
   static function dispatchCommand(app, code, nativeId, hwndControl)
     if app is void then return false end if
 

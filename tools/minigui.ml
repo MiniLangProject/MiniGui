@@ -1,112 +1,191 @@
+// SPDX-License-Identifier: Apache-2.0
+
+//! Provides minigui facilities for this project.
+
 import std.fs as fs
 import std.string as str
 
+/// Invokes the native _wsystem entry point used by the minigui module.
+/// @param cmd cmd value consumed by this operation.
+/// @returns Native int result produced by the call.
 extern function _wsystem(cmd as wstr) from "msvcrt.dll" returns int
+/// Invokes the native _wmkdir entry point used by the minigui module.
+/// @param path Path of the file or directory used by the operation.
+/// @returns Native int result produced by the call.
 extern function _wmkdir(path as wstr) from "msvcrt.dll" returns int
 
+/// Represents the json value data used by the minigui module.
 struct JsonValue
+  /// Stores the kind value associated with json value.
   kind,
+  /// Stores the text value associated with json value.
   text,
+  /// Stores the number value associated with json value.
   number,
+  /// Stores the flag value associated with json value.
   flag,
+  /// Stores the keys value associated with json value.
   keys,
+  /// Stores the values value associated with json value.
   values,
+  /// Stores the items value associated with json value.
   items,
 end struct
 
+/// Represents the parser data used by the minigui module.
 struct Parser
+  /// Stores the text value associated with parser.
   text,
+  /// Stores the pos value associated with parser.
   pos,
+  /// Stores the errors value associated with parser.
   errors,
 end struct
 
+/// Represents the json parse result data used by the minigui module.
 struct JsonParseResult
+  /// Stores the ok value associated with json parse result.
   ok,
+  /// Stores the value value associated with json parse result.
   value,
+  /// Stores the message value associated with json parse result.
   message,
 end struct
 
+/// Represents the result data used by the minigui module.
 struct Result
+  /// Stores the errors value associated with result.
   errors,
+  /// Stores the warnings value associated with result.
   warnings,
+  /// Stores the documents value associated with result.
   documents,
+  /// Stores the resources value associated with result.
   resources,
+  /// Stores the components value associated with result.
   components,
+  /// Stores the windows value associated with result.
   windows,
+  /// Stores the events value associated with result.
   events,
+  /// Stores the entry path value associated with result.
   entryPath,
+  /// Stores the entry document value associated with result.
   entryDocument,
+  /// Stores the code behind path value associated with result.
   codeBehindPath,
 end struct
 
+/// Represents the doc entry data used by the minigui module.
 struct DocEntry
+  /// Stores the path value associated with doc entry.
   path,
+  /// Stores the document value associated with doc entry.
   document,
 end struct
 
+/// Represents the window entry data used by the minigui module.
 struct WindowEntry
+  /// Stores the path value associated with window entry.
   path,
+  /// Stores the window value associated with window entry.
   window,
 end struct
 
+/// Represents the component entry data used by the minigui module.
 struct ComponentEntry
+  /// Stores the name value associated with component entry.
   name,
+  /// Stores the definition value associated with component entry.
   definition,
+  /// Stores the path value associated with component entry.
   path,
 end struct
 
+/// Represents the event entry data used by the minigui module.
 struct EventEntry
+  /// Stores the id value associated with event entry.
   id,
+  /// Stores the control type value associated with event entry.
   controlType,
+  /// Stores the event name value associated with event entry.
   eventName,
+  /// Stores the handler value associated with event entry.
   handler,
+  /// Stores the path value associated with event entry.
   path,
 end struct
 
+/// Performs the jNull operation for the minigui module.
 function jNull()
   return JsonValue("null", "", 0, false, [], [], [])
 end function
 
+/// Performs the jString operation for the minigui module.
+/// @param v v value consumed by this operation.
 function jString(v)
   return JsonValue("string", v, 0, false, [], [], [])
 end function
 
+/// Performs the jNumber operation for the minigui module.
+/// @param v v value consumed by this operation.
 function jNumber(v)
   return JsonValue("number", "", v, false, [], [], [])
 end function
 
+/// Performs the jBool operation for the minigui module.
+/// @param v v value consumed by this operation.
 function jBool(v)
   return JsonValue("bool", "", 0, v, [], [], [])
 end function
 
+/// Performs the jObject operation for the minigui module.
+/// @param keys keys value consumed by this operation.
+/// @param values values value consumed by this operation.
 function jObject(keys, values)
   return JsonValue("object", "", 0, false, keys, values, [])
 end function
 
+/// Performs the jArray operation for the minigui module.
+/// @param items Items consumed or updated by the operation.
 function jArray(items)
   return JsonValue("array", "", 0, false, [], [], items)
 end function
 
+/// Performs the jsonParseOk operation for the minigui module.
+/// @param value Value consumed or transformed by the operation.
 function jsonParseOk(value)
   return JsonParseResult(true, value, "")
 end function
 
+/// Performs the jsonParseError operation for the minigui module.
+/// @param message Human-readable message associated with the operation.
 function jsonParseError(message)
   return JsonParseResult(false, jNull(), message)
 end function
 
+/// Creates result for the minigui module.
 function newResult()
   return Result([], [], [], [], [], [], [], "", jNull(), "")
 end function
 
+/// Adds error to the state managed by the minigui module.
+/// @param result Result object populated or inspected by the operation.
+/// @param path Path of the file or directory used by the operation.
+/// @param message Human-readable message associated with the operation.
 function addError(result, path, message)
   result.errors = result.errors + [path + ": " + message]
 end function
 
+/// Returns whether value is available.
+/// @param v v value consumed by this operation.
 function hasValue(v)
   return typeof(v) == "struct" and v is JsonValue
 end function
 
+/// Performs the prop operation for the minigui module.
+/// @param obj obj value consumed by this operation.
+/// @param name Name of the affected item.
 function prop(obj, name)
   if hasValue(obj) == false then return jNull() end if
   if obj.kind != "object" then return jNull() end if
@@ -117,6 +196,9 @@ function prop(obj, name)
   return jNull()
 end function
 
+/// Returns whether prop is available.
+/// @param obj obj value consumed by this operation.
+/// @param name Name of the affected item.
 function hasProp(obj, name)
   if hasValue(obj) == false then return false end if
   if obj.kind != "object" then return false end if
@@ -127,16 +209,24 @@ function hasProp(obj, name)
   return false
 end function
 
+/// Performs the asString operation for the minigui module.
+/// @param v v value consumed by this operation.
+/// @param fallback Value returned when no explicit result is available.
 function asString(v, fallback)
   if hasValue(v) and v.kind == "string" then return v.text end if
   return fallback
 end function
 
+/// Performs the asInt operation for the minigui module.
+/// @param v v value consumed by this operation.
+/// @param fallback Value returned when no explicit result is available.
 function asInt(v, fallback)
   if hasValue(v) and v.kind == "number" then return v.number end if
   return fallback
 end function
 
+/// Performs the intPart operation for the minigui module.
+/// @param value Value consumed or transformed by the operation.
 function intPart(value)
   text = "" + value
   outv = ""
@@ -153,64 +243,93 @@ function intPart(value)
   return 0
 end function
 
+/// Performs the asBool operation for the minigui module.
+/// @param v v value consumed by this operation.
+/// @param fallback Value returned when no explicit result is available.
 function asBool(v, fallback)
   if hasValue(v) and v.kind == "bool" then return v.flag end if
   return fallback
 end function
 
+/// Returns whether null satisfies the required condition.
+/// @param v v value consumed by this operation.
 function isNull(v)
   if hasValue(v) == false then return true end if
   return v.kind == "null"
 end function
 
+/// Performs the arrItems operation for the minigui module.
+/// @param v v value consumed by this operation.
 function arrItems(v)
   if hasValue(v) and v.kind == "array" then return v.items end if
   if isNull(v) then return [] end if
   return [v]
 end function
 
+/// Performs the charAt operation for the minigui module.
+/// @param text Text consumed by the operation.
+/// @param i i value consumed by this operation.
 function charAt(text, i)
   if i < 0 or i >= len(text) then return "" end if
   return text[i]
 end function
 
+/// Performs the ord operation for the minigui module.
+/// @param ch ch value consumed by this operation.
 function ord(ch)
   if typeof(ch) != "string" or len(ch) == 0 then return -1 end if
   return bytes(ch)[0]
 end function
 
+/// Returns whether digit satisfies the required condition.
+/// @param ch ch value consumed by this operation.
 function isDigit(ch)
   c = ord(ch)
   return c >= 48 and c <= 57
 end function
 
+/// Returns whether letter satisfies the required condition.
+/// @param ch ch value consumed by this operation.
 function isLetter(ch)
   c = ord(ch)
   return (c >= 65 and c <= 90) or (c >= 97 and c <= 122)
 end function
 
+/// Returns whether ident start satisfies the required condition.
+/// @param ch ch value consumed by this operation.
 function isIdentStart(ch)
   return isLetter(ch) or ch == "_"
 end function
 
+/// Returns whether ident char satisfies the required condition.
+/// @param ch ch value consumed by this operation.
 function isIdentChar(ch)
   return isLetter(ch) or isDigit(ch) or ch == "_"
 end function
 
+/// Returns whether ws satisfies the required condition.
+/// @param ch ch value consumed by this operation.
 function isWs(ch)
   return ch == " " or ch == "\r" or ch == "\n" or ch == "\t"
 end function
 
+/// Performs the skipWs operation for the minigui module.
+/// @param p p value consumed by this operation.
 function skipWs(p)
   while p.pos < len(p.text) and isWs(charAt(p.text, p.pos))
     p.pos = p.pos + 1
   end while
 end function
 
+/// Performs the parserError operation for the minigui module.
+/// @param p p value consumed by this operation.
+/// @param message Human-readable message associated with the operation.
 function parserError(p, message)
   p.errors = p.errors + [message + " at offset " + p.pos]
 end function
 
+/// Performs the hexVal operation for the minigui module.
+/// @param ch ch value consumed by this operation.
 function hexVal(ch)
   c = ord(ch)
   if c >= 48 and c <= 57 then return c - 48 end if
@@ -219,6 +338,9 @@ function hexVal(ch)
   return -1
 end function
 
+/// Appends code unit utf8 to the destination used by the minigui module.
+/// @param outBytes outBytes value consumed by this operation.
+/// @param cp cp value consumed by this operation.
 function appendCodeUnitUtf8(outBytes, cp)
   if cp < 0 then return outBytes end if
   if cp < 128 then return outBytes + bytes([cp]) end if
@@ -226,6 +348,8 @@ function appendCodeUnitUtf8(outBytes, cp)
   return outBytes + bytes([224 | (cp >> 12), 128 | ((cp >> 6) & 63), 128 | (cp & 63)])
 end function
 
+/// Parses json string for the minigui workflow.
+/// @param p p value consumed by this operation.
 function parseJsonString(p)
   if charAt(p.text, p.pos) != "\"" then
     parserError(p, "Expected string")
@@ -281,6 +405,8 @@ function parseJsonString(p)
   return ""
 end function
 
+/// Parses number for the minigui workflow.
+/// @param p p value consumed by this operation.
 function parseNumber(p)
   start = p.pos
   if charAt(p.text, p.pos) == "-" then p.pos = p.pos + 1 end if
@@ -307,11 +433,17 @@ function parseNumber(p)
   return n
 end function
 
+/// Performs the startsAt operation for the minigui module.
+/// @param text Text consumed by the operation.
+/// @param pos pos value consumed by this operation.
+/// @param needle needle value consumed by this operation.
 function startsAt(text, pos, needle)
   if pos + len(needle) > len(text) then return false end if
   return str.substr(text, pos, len(needle)) == needle
 end function
 
+/// Parses value for the minigui workflow.
+/// @param p p value consumed by this operation.
 function parseValue(p)
   skipWs(p)
   ch = charAt(p.text, p.pos)
@@ -335,6 +467,8 @@ function parseValue(p)
   return jNull()
 end function
 
+/// Parses object for the minigui workflow.
+/// @param p p value consumed by this operation.
 function parseObject(p)
   keys = []
   vals = []
@@ -372,6 +506,8 @@ function parseObject(p)
   return jObject(keys, vals)
 end function
 
+/// Parses array for the minigui workflow.
+/// @param p p value consumed by this operation.
 function parseArray(p)
   items = []
   p.pos = p.pos + 1
@@ -398,6 +534,8 @@ function parseArray(p)
   return jArray(items)
 end function
 
+/// Parses json for the minigui workflow.
+/// @param text Text consumed by the operation.
 function parseJson(text)
   p = Parser(text, 0, [])
   v = parseValue(p)
@@ -407,14 +545,20 @@ function parseJson(text)
   return jsonParseOk(v)
 end function
 
+/// Performs the pathSlash operation for the minigui module.
+/// @param p p value consumed by this operation.
 function pathSlash(p)
   return str.replaceAll(p, "/", "\\")
 end function
 
+/// Performs the pathUnslash operation for the minigui module.
+/// @param p p value consumed by this operation.
 function pathUnslash(p)
   return str.replaceAll(p, "\\", "/")
 end function
 
+/// Performs the trimDotSlash operation for the minigui module.
+/// @param p p value consumed by this operation.
 function trimDotSlash(p)
   r = pathSlash(p)
   while str.startsWith(r, ".\\")
@@ -423,12 +567,16 @@ function trimDotSlash(p)
   return r
 end function
 
+/// Returns whether rooted satisfies the required condition.
+/// @param p p value consumed by this operation.
 function isRooted(p)
   if len(p) >= 3 and p[1] == ":" then return true end if
   if str.startsWith(p, "\\\\") then return true end if
   return false
 end function
 
+/// Performs the dirname operation for the minigui module.
+/// @param path Path of the file or directory used by the operation.
 function dirname(path)
   p = pathSlash(path)
   last = -1
@@ -440,6 +588,8 @@ function dirname(path)
   return str.substr(p, 0, last)
 end function
 
+/// Performs the basenameNoExt operation for the minigui module.
+/// @param path Path of the file or directory used by the operation.
 function basenameNoExt(path)
   p = pathSlash(path)
   start = 0
@@ -456,6 +606,9 @@ function basenameNoExt(path)
   return name
 end function
 
+/// Joins path for the minigui workflow.
+/// @param a a value consumed by this operation.
+/// @param b b value consumed by this operation.
 function joinPath(a, b)
   if b == "" then return pathSlash(a) end if
   if isRooted(b) then return pathSlash(b) end if
@@ -465,6 +618,8 @@ function joinPath(a, b)
   return aa + "\\" + pathSlash(b)
 end function
 
+/// Normalizes path for the minigui workflow.
+/// @param p p value consumed by this operation.
 function normalizePath(p)
   pp = pathSlash(p)
   parts = str.split(pp, "\\")
@@ -484,12 +639,17 @@ function normalizePath(p)
   return str.join(outv, "\\")
 end function
 
+/// Splits path parts for the minigui workflow.
+/// @param p p value consumed by this operation.
 function splitPathParts(p)
   pp = trimDotSlash(normalizePath(p))
   if pp == "." then return [] end if
   return str.split(pp, "\\")
 end function
 
+/// Performs the relativePath operation for the minigui module.
+/// @param fromDir fromDir value consumed by this operation.
+/// @param toPath Path associated with to.
 function relativePath(fromDir, toPath)
   fromParts = splitPathParts(fromDir)
   toParts = splitPathParts(toPath)
@@ -512,6 +672,8 @@ function relativePath(fromDir, toPath)
   return str.join(outv, "\\")
 end function
 
+/// Ensures dir is available to the minigui workflow.
+/// @param path Path of the file or directory used by the operation.
 function ensureDir(path)
   p = normalizePath(path)
   if p == "." then return end if
@@ -527,10 +689,15 @@ function ensureDir(path)
   end if
 end function
 
+/// Performs the q operation for the minigui module.
+/// @param s0 s0 value consumed by this operation.
 function q(s0)
   return "\"" + str.replaceAll(s0, "\"", "\\\"") + "\""
 end function
 
+/// Returns whether the supplied data contains contains.
+/// @param arr arr value consumed by this operation.
+/// @param value Value consumed or transformed by the operation.
 function contains(arr, value)
   if len(arr) == 0 then return false end if
   for i = 0 to len(arr) - 1
@@ -539,6 +706,8 @@ function contains(arr, value)
   return false
 end function
 
+/// Performs the identOk operation for the minigui module.
+/// @param value Value consumed or transformed by the operation.
 function identOk(value)
   if typeof(value) != "string" or len(value) == 0 then return false end if
   first = value[0]
@@ -550,6 +719,8 @@ function identOk(value)
   return true
 end function
 
+/// Performs the miniIdent operation for the minigui module.
+/// @param value Value consumed or transformed by the operation.
 function miniIdent(value)
   if typeof(value) != "string" then return "_" end if
   if len(value) == 0 then return "_" end if
@@ -568,6 +739,8 @@ function miniIdent(value)
   return "_" + outv
 end function
 
+/// Performs the upperFirst operation for the minigui module.
+/// @param s0 s0 value consumed by this operation.
 function upperFirst(s0)
   if s0 == "" then return "" end if
   ch = s0[0]
@@ -581,6 +754,8 @@ function upperFirst(s0)
   return ch + str.substr(s0, 1, len(s0) - 1)
 end function
 
+/// Performs the miniGuiTypeName operation for the minigui module.
+/// @param ns ns value consumed by this operation.
 function miniGuiTypeName(ns)
   parts = str.split(ns, ".")
   outv = ""
@@ -593,6 +768,8 @@ function miniGuiTypeName(ns)
   return miniIdent(outv)
 end function
 
+/// Performs the mlString operation for the minigui module.
+/// @param value Value consumed or transformed by the operation.
 function mlString(value)
   if typeof(value) != "string" then value = "" end if
   outv = "\""
@@ -610,6 +787,8 @@ function mlString(value)
   return outv + "\""
 end function
 
+/// Performs the jsonScalarToString operation for the minigui module.
+/// @param v v value consumed by this operation.
 function jsonScalarToString(v)
   if v.kind == "string" then return v.text end if
   if v.kind == "number" then return "" + v.number end if
@@ -620,6 +799,10 @@ function jsonScalarToString(v)
   return ""
 end function
 
+/// Performs the resourceValue operation for the minigui module.
+/// @param result Result object populated or inspected by the operation.
+/// @param path Path of the file or directory used by the operation.
+/// @param value Value consumed or transformed by the operation.
 function resourceValue(result, path, value)
   if hasValue(value) and value.kind == "object" and hasProp(value, "$resource") then
     name = asString(prop(value, "$resource"), "")
@@ -637,6 +820,9 @@ function resourceValue(result, path, value)
   return value
 end function
 
+/// Reads mson for the minigui workflow.
+/// @param result Result object populated or inspected by the operation.
+/// @param path Path of the file or directory used by the operation.
 function readMson(result, path)
   t = fs.readAllText(path)
   if typeof(t) == "error" then
@@ -651,6 +837,10 @@ function readMson(result, path)
   return parsed.value
 end function
 
+/// Resolves mson path for the minigui workflow.
+/// @param importPath Path associated with import.
+/// @param baseDir baseDir value consumed by this operation.
+/// @param includeDirs includeDirs value consumed by this operation.
 function resolveMsonPath(importPath, baseDir, includeDirs)
   cand = ""
   if isRooted(importPath) then
@@ -669,6 +859,9 @@ function resolveMsonPath(importPath, baseDir, includeDirs)
   return ""
 end function
 
+/// Performs the stackHas operation for the minigui module.
+/// @param stack stack value consumed by this operation.
+/// @param path Path of the file or directory used by the operation.
 function stackHas(stack, path)
   if len(stack) == 0 then return false end if
   for i = 0 to len(stack) - 1
@@ -677,6 +870,9 @@ function stackHas(stack, path)
   return false
 end function
 
+/// Performs the componentByName operation for the minigui module.
+/// @param result Result object populated or inspected by the operation.
+/// @param name Name of the affected item.
 function componentByName(result, name)
   if len(result.components) == 0 then return void end if
   for i = 0 to len(result.components) - 1
@@ -685,6 +881,11 @@ function componentByName(result, name)
   return void
 end function
 
+/// Loads graph for the minigui module.
+/// @param result Result object populated or inspected by the operation.
+/// @param path Path of the file or directory used by the operation.
+/// @param includeDirs includeDirs value consumed by this operation.
+/// @param stack stack value consumed by this operation.
 function loadGraph(result, path, includeDirs, stack)
   full = normalizePath(path)
   if stackHas(stack, full) then
@@ -730,6 +931,8 @@ function loadGraph(result, path, includeDirs, stack)
   end if
 end function
 
+/// Performs the cloneJson operation for the minigui module.
+/// @param v v value consumed by this operation.
 function cloneJson(v)
   if v.kind == "object" then
     vals = []
@@ -752,6 +955,10 @@ function cloneJson(v)
   return JsonValue(v.kind, v.text, v.number, v.flag, v.keys, v.values, v.items)
 end function
 
+/// Updates prop maintained by the minigui module.
+/// @param obj obj value consumed by this operation.
+/// @param name Name of the affected item.
+/// @param value Value consumed or transformed by the operation.
 function setProp(obj, name, value)
   if obj.kind != "object" then return obj end if
   if len(obj.keys) > 0 then
@@ -767,6 +974,9 @@ function setProp(obj, name, value)
   return obj
 end function
 
+/// Performs the copyNodeWithPrefix operation for the minigui module.
+/// @param node node value consumed by this operation.
+/// @param prefix prefix value consumed by this operation.
 function copyNodeWithPrefix(node, prefix)
   copy = cloneJson(node)
   id = asString(prop(copy, "id"), "")
@@ -782,6 +992,10 @@ function copyNodeWithPrefix(node, prefix)
   return copy
 end function
 
+/// Performs the expandComponents operation for the minigui module.
+/// @param result Result object populated or inspected by the operation.
+/// @param path Path of the file or directory used by the operation.
+/// @param node node value consumed by this operation.
 function expandComponents(result, path, node)
   typ = asString(prop(node, "type"), "")
   comp = componentByName(result, typ)
@@ -811,6 +1025,12 @@ function expandComponents(result, path, node)
   return node
 end function
 
+/// Performs the testPropertyNames operation for the minigui module.
+/// @param result Result object populated or inspected by the operation.
+/// @param path Path of the file or directory used by the operation.
+/// @param obj obj value consumed by this operation.
+/// @param allowed allowed value consumed by this operation.
+/// @param context Context that carries state for the operation.
 function testPropertyNames(result, path, obj, allowed, context)
   if isNull(obj) then return end if
   if obj.kind != "object" then return end if
@@ -822,6 +1042,8 @@ function testPropertyNames(result, path, obj, allowed, context)
   end for
 end function
 
+/// Performs the allowedControlEvents operation for the minigui module.
+/// @param typ typ value consumed by this operation.
 function allowedControlEvents(typ)
   commonEvents = ["focus", "blur"]
   if contains(["Button", "CheckBox", "RadioButton", "ToggleSwitch", "ToolBar", "MenuBar", "ContextMenu", "LinkLabel", "Image", "FilePicker", "FolderPicker", "ColorPicker"], typ) then return ["click", "clicked"] + commonEvents end if
@@ -833,10 +1055,13 @@ function allowedControlEvents(typ)
   return commonEvents
 end function
 
+/// Performs the commonControlProps operation for the minigui module.
 function commonControlProps()
   return ["text", "width", "height", "x", "y", "visible", "enabled", "margin", "horizontalAlignment", "verticalAlignment", "alignment", "dock", "fill", "resizeMode", "anchor", "minWidth", "minHeight", "maxWidth", "maxHeight", "tooltip", "tabIndex", "row", "column", "rowSpan", "columnSpan", "fontFamily", "fontSize", "fontWeight", "foreground", "background", "borderColor", "borderWidth"]
 end function
 
+/// Performs the allowedControlProps operation for the minigui module.
+/// @param typ typ value consumed by this operation.
 function allowedControlProps(typ)
   if contains(["TextBox", "SearchBox", "TextArea", "PasswordBox"], typ) then return commonControlProps() + ["placeholder", "readOnly", "maxLength", "inputType", "validationMessage"] end if
   if typ == "NumberBox" or typ == "SpinBox" then return commonControlProps() + ["placeholder", "readOnly", "maxLength", "minimum", "maximum", "value", "step", "decimals", "validationMessage"] end if
@@ -858,18 +1083,29 @@ function allowedControlProps(typ)
   return []
 end function
 
+/// Returns whether control satisfies the required condition.
+/// @param typ typ value consumed by this operation.
 function isControl(typ)
   return contains(["Label", "Button", "FilePicker", "FolderPicker", "ColorPicker", "TextBox", "SearchBox", "TextArea", "PasswordBox", "NumberBox", "SpinBox", "CheckBox", "ToggleSwitch", "RadioButton", "Image", "Separator", "Splitter", "LinkLabel", "Panel", "ScrollViewer", "GroupBox", "ComboBox", "EditableComboBox", "ListBox", "ScrollBar", "Slider", "ProgressBar", "TabControl", "MenuBar", "ContextMenu", "StatusBar", "ToolBar", "TreeView", "ListView", "Table", "DataGrid", "DatePicker", "DateTimePicker", "TimePicker", "Calendar"], typ)
 end function
 
+/// Returns whether container control satisfies the required condition.
+/// @param typ typ value consumed by this operation.
 function isContainerControl(typ)
   return contains(["Panel", "GroupBox", "TabControl", "ScrollViewer"], typ)
 end function
 
+/// Returns whether layout satisfies the required condition.
+/// @param typ typ value consumed by this operation.
 function isLayout(typ)
   return contains(["VerticalStack", "HorizontalStack", "Grid", "Canvas", "DockPanel", "WrapPanel"], typ)
 end function
 
+/// Performs the testControlProperties operation for the minigui module.
+/// @param result Result object populated or inspected by the operation.
+/// @param path Path of the file or directory used by the operation.
+/// @param typ typ value consumed by this operation.
+/// @param properties properties value consumed by this operation.
 function testControlProperties(result, path, typ, properties)
   if isNull(properties) then return end if
   testPropertyNames(result, path, properties, allowedControlProps(typ), typ + ".properties")
@@ -929,10 +1165,18 @@ function testControlProperties(result, path, typ, properties)
   end for
 end function
 
+/// Performs the idSeen operation for the minigui module.
+/// @param ids ids value consumed by this operation.
+/// @param id Stable identifier of the affected item.
 function idSeen(ids, id)
   return contains(ids, id)
 end function
 
+/// Performs the testLayoutNode operation for the minigui module.
+/// @param result Result object populated or inspected by the operation.
+/// @param path Path of the file or directory used by the operation.
+/// @param node node value consumed by this operation.
+/// @param ids ids value consumed by this operation.
 function testLayoutNode(result, path, node, ids)
   if isNull(node) then
     addError(result, path, "Missing layout node.")
@@ -983,6 +1227,9 @@ function testLayoutNode(result, path, node, ids)
   return ids
 end function
 
+/// Finds function arity used by the minigui module.
+/// @param text Text consumed by the operation.
+/// @param name Name of the affected item.
 function findFunctionArity(text, name)
   needle = "function " + name + "("
   pos = str.indexOf(text, needle, 0)
@@ -995,6 +1242,10 @@ function findFunctionArity(text, name)
   return len(str.split(raw, ","))
 end function
 
+/// Validates mson for the minigui workflow.
+/// @param path Path of the file or directory used by the operation.
+/// @param includeDirs includeDirs value consumed by this operation.
+/// @param codeBehindOverride codeBehindOverride value consumed by this operation.
 function validateMson(path, includeDirs, codeBehindOverride)
   result = newResult()
   entry = normalizePath(path)
@@ -1069,6 +1320,8 @@ function validateMson(path, includeDirs, codeBehindOverride)
   return result
 end function
 
+/// Performs the controlDefaultHeight operation for the minigui module.
+/// @param typ typ value consumed by this operation.
 function controlDefaultHeight(typ)
   if typ == "MenuBar" then return 24 end if
   if typ == "ContextMenu" then return 1 end if
@@ -1106,12 +1359,24 @@ function controlDefaultHeight(typ)
   return 24
 end function
 
+/// Performs the intProp operation for the minigui module.
+/// @param result Result object populated or inspected by the operation.
+/// @param path Path of the file or directory used by the operation.
+/// @param node node value consumed by this operation.
+/// @param name Name of the affected item.
+/// @param fallback Value returned when no explicit result is available.
 function intProp(result, path, node, name, fallback)
   v = resourceValue(result, path, prop(prop(node, "properties"), name))
   if v.kind == "number" then return v.number end if
   return fallback
 end function
 
+/// Performs the dimensionProp operation for the minigui module.
+/// @param result Result object populated or inspected by the operation.
+/// @param path Path of the file or directory used by the operation.
+/// @param node node value consumed by this operation.
+/// @param name Name of the affected item.
+/// @param fallback Value returned when no explicit result is available.
 function dimensionProp(result, path, node, name, fallback)
   v = resourceValue(result, path, prop(prop(node, "properties"), name))
   if v.kind == "number" then return v.number end if
@@ -1120,6 +1385,12 @@ function dimensionProp(result, path, node, name, fallback)
   return fallback
 end function
 
+/// Performs the clampDimension operation for the minigui module.
+/// @param result Result object populated or inspected by the operation.
+/// @param path Path of the file or directory used by the operation.
+/// @param node node value consumed by this operation.
+/// @param axis axis value consumed by this operation.
+/// @param value Value consumed or transformed by the operation.
 function clampDimension(result, path, node, axis, value)
   minName = "minWidth"
   maxName = "maxWidth"
@@ -1134,34 +1405,64 @@ function clampDimension(result, path, node, axis, value)
   return value
 end function
 
+/// Performs the stackSlotWidth operation for the minigui module.
+/// @param result Result object populated or inspected by the operation.
+/// @param path Path of the file or directory used by the operation.
+/// @param node node value consumed by this operation.
+/// @param fallback Value returned when no explicit result is available.
 function stackSlotWidth(result, path, node, fallback)
   return clampDimension(result, path, node, "width", dimensionProp(result, path, node, "width", fallback))
 end function
 
+/// Performs the layoutInt operation for the minigui module.
+/// @param node node value consumed by this operation.
+/// @param name Name of the affected item.
+/// @param fallback Value returned when no explicit result is available.
 function layoutInt(node, name, fallback)
   v = prop(prop(node, "properties"), name)
   if v.kind == "number" then return v.number end if
   return fallback
 end function
 
+/// Performs the boolProp operation for the minigui module.
+/// @param result Result object populated or inspected by the operation.
+/// @param path Path of the file or directory used by the operation.
+/// @param node node value consumed by this operation.
+/// @param name Name of the affected item.
+/// @param fallback Value returned when no explicit result is available.
 function boolProp(result, path, node, name, fallback)
   v = resourceValue(result, path, prop(prop(node, "properties"), name))
   if v.kind == "bool" then return v.flag end if
   return fallback
 end function
 
+/// Performs the controlText operation for the minigui module.
+/// @param result Result object populated or inspected by the operation.
+/// @param path Path of the file or directory used by the operation.
+/// @param node node value consumed by this operation.
 function controlText(result, path, node)
   v = resourceValue(result, path, prop(prop(node, "properties"), "text"))
   if v.kind == "string" then return v.text end if
   return ""
 end function
 
+/// Performs the stringProp operation for the minigui module.
+/// @param result Result object populated or inspected by the operation.
+/// @param path Path of the file or directory used by the operation.
+/// @param node node value consumed by this operation.
+/// @param name Name of the affected item.
+/// @param fallback Value returned when no explicit result is available.
 function stringProp(result, path, node, name, fallback)
   v = resourceValue(result, path, prop(prop(node, "properties"), name))
   if v.kind == "string" then return v.text end if
   return fallback
 end function
 
+/// Performs the stringArrayLiteral operation for the minigui module.
+/// @param result Result object populated or inspected by the operation.
+/// @param path Path of the file or directory used by the operation.
+/// @param node node value consumed by this operation.
+/// @param name Name of the affected item.
 function stringArrayLiteral(result, path, node, name)
   v = resourceValue(result, path, prop(prop(node, "properties"), name))
   if v.kind != "array" then return "[]" end if
@@ -1173,6 +1474,11 @@ function stringArrayLiteral(result, path, node, name)
   return "[" + str.join(parts, ", ") + "]"
 end function
 
+/// Performs the intArrayLiteral operation for the minigui module.
+/// @param result Result object populated or inspected by the operation.
+/// @param path Path of the file or directory used by the operation.
+/// @param node node value consumed by this operation.
+/// @param name Name of the affected item.
 function intArrayLiteral(result, path, node, name)
   v = resourceValue(result, path, prop(prop(node, "properties"), name))
   if v.kind != "array" then return "[]" end if
@@ -1185,6 +1491,12 @@ function intArrayLiteral(result, path, node, name)
   return "[" + str.join(parts, ", ") + "]"
 end function
 
+/// Collects tree item literals for the minigui workflow.
+/// @param result Result object populated or inspected by the operation.
+/// @param path Path of the file or directory used by the operation.
+/// @param parts parts value consumed by this operation.
+/// @param item item value consumed by this operation.
+/// @param level level value consumed by this operation.
 function collectTreeItemLiterals(result, path, parts, item, level)
   prefix = ""
   if level > 0 then
@@ -1210,6 +1522,11 @@ function collectTreeItemLiterals(result, path, parts, item, level)
   return parts
 end function
 
+/// Performs the treeArrayLiteral operation for the minigui module.
+/// @param result Result object populated or inspected by the operation.
+/// @param path Path of the file or directory used by the operation.
+/// @param node node value consumed by this operation.
+/// @param name Name of the affected item.
 function treeArrayLiteral(result, path, node, name)
   v = resourceValue(result, path, prop(prop(node, "properties"), name))
   if v.kind != "array" then return "[]" end if
@@ -1222,6 +1539,11 @@ function treeArrayLiteral(result, path, node, name)
   return "[" + str.join(parts, ", ") + "]"
 end function
 
+/// Performs the tableArrayLiteral operation for the minigui module.
+/// @param result Result object populated or inspected by the operation.
+/// @param path Path of the file or directory used by the operation.
+/// @param node node value consumed by this operation.
+/// @param name Name of the affected item.
 function tableArrayLiteral(result, path, node, name)
   v = resourceValue(result, path, prop(prop(node, "properties"), name))
   if v.kind != "array" then return "[]" end if
@@ -1244,6 +1566,8 @@ function tableArrayLiteral(result, path, node, name)
   return "[" + str.join(parts, ", ") + "]"
 end function
 
+/// Creates call for for the minigui module.
+/// @param typ typ value consumed by this operation.
 function createCallFor(typ)
   if typ == "Label" then return "MiniGui.Label.create" end if
   if typ == "Button" then return "MiniGui.Button.create" end if
@@ -1286,6 +1610,18 @@ function createCallFor(typ)
   return "MiniGui.TextBox.create"
 end function
 
+/// Adds generated node to the state managed by the minigui module.
+/// @param lines lines value consumed by this operation.
+/// @param fields fields value consumed by this operation.
+/// @param result Result object populated or inspected by the operation.
+/// @param path Path of the file or directory used by the operation.
+/// @param node node value consumed by this operation.
+/// @param parentVar parentVar value consumed by this operation.
+/// @param parentType parentType value consumed by this operation.
+/// @param x Horizontal coordinate used by the operation.
+/// @param y Vertical coordinate used by the operation.
+/// @param width Width in the coordinate or storage units used by the caller.
+/// @param height Height in the coordinate or storage units used by the caller.
 function addGeneratedNode(lines, fields, result, path, node, parentVar, parentType, x, y, width, height)
   typ = asString(prop(node, "type"), "")
   if isControl(typ) then
@@ -1618,6 +1954,9 @@ function addGeneratedNode(lines, fields, result, path, node, parentVar, parentTy
   return [lines, fields, usedTotal + padding]
 end function
 
+/// Generates code for the minigui workflow.
+/// @param result Result object populated or inspected by the operation.
+/// @param outputPath Path associated with output.
 function generateCode(result, outputPath)
   entryDoc = result.entryDocument
   ns = asString(prop(entryDoc, "namespace"), "minigui_app")
@@ -1691,6 +2030,9 @@ function generateCode(result, outputPath)
   return outFull
 end function
 
+/// Parses options for the minigui workflow.
+/// @param args Command-line or caller-supplied arguments.
+/// @param start start value consumed by this operation.
 function parseOptions(args, start)
   opts = [["output", ""], ["codeBehind", ""], ["generatedDir", ""], ["compiler", "..\\MiniLangCompilerML\\build\\mlc_win64.exe"], ["libraryDir", "."], ["noCompile", "false"], ["keepGenerated", "false"]]
   includes = []
@@ -1715,6 +2057,9 @@ function parseOptions(args, start)
   return [opts, includes]
 end function
 
+/// Performs the opt operation for the minigui module.
+/// @param opts opts value consumed by this operation.
+/// @param name Name of the affected item.
 function opt(opts, name)
   for i = 0 to len(opts) - 1
     if opts[i][0] == name then return opts[i][1] end if
@@ -1722,6 +2067,7 @@ function opt(opts, name)
   return ""
 end function
 
+/// Performs the usage operation for the minigui module.
 function usage()
   print "Usage:"
   print "  minigui validate <app.mson> [--include-dir <dir>] [--code-behind <file>]"
@@ -1729,6 +2075,11 @@ function usage()
   print "  minigui build <app.mson> --output <app.exe> [--no-compile]"
 end function
 
+/// Performs the compilerCommand operation for the minigui module.
+/// @param compiler compiler value consumed by this operation.
+/// @param generated generated value consumed by this operation.
+/// @param outExe outExe value consumed by this operation.
+/// @param libraryDir libraryDir value consumed by this operation.
 function compilerCommand(compiler, generated, outExe, libraryDir)
   base = q(compiler)
   if str.endsWith(compiler, ".py") or str.endsWith(compiler, ".PY") then
@@ -1737,6 +2088,8 @@ function compilerCommand(compiler, generated, outExe, libraryDir)
   return base + " " + q(generated) + " " + q(outExe) + " -I " + q(libraryDir) + " --subsystem gui"
 end function
 
+/// Writes validation for the minigui workflow.
+/// @param result Result object populated or inspected by the operation.
 function writeValidation(result)
   if len(result.errors) > 0 then
     for i = 0 to len(result.errors) - 1
@@ -1747,6 +2100,8 @@ function writeValidation(result)
   return true
 end function
 
+/// Performs the main operation for the minigui module.
+/// @param args Command-line or caller-supplied arguments.
 function main(args)
   if len(args) < 2 then usage(); return 2 end if
   command = args[0]

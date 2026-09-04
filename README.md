@@ -15,6 +15,21 @@ In short:
 - `tools/minigui.ml` is the MiniGui command-line tool.
 - `MiniGuiLib/minigui.ml` is the runtime library for native Win32 controls.
 
+## API documentation
+
+Browse the committed [MiniDoc API reference](docs/api/markdown/README.md) for
+the runtime library and command-line generator, or open
+`docs/api/html/index.html` locally. The MiniLang sources use `//!` file comments
+and `///` declaration comments with structured parameter and return contracts.
+
+```powershell
+pwsh .\tools\generate_minidoc.ps1
+pwsh .\tools\generate_minidoc.ps1 -Check
+```
+
+The strict [`minidoc.toml`](minidoc.toml) configuration keeps the checked-in
+reference and source documentation aligned.
+
 ## Screenshot
 
 The minimal hello example is built from `examples/hello-gui/app.mson` and
