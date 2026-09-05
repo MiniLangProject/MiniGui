@@ -3,9 +3,9 @@
 MiniGui keeps the declarative UI format separate from MiniLang compiler syntax.
 Applications describe their windows in JSON-based `.mson` files, the generator
 emits readable MiniLang source, and `MiniGuiLib/minigui.ml` supplies the native
-Windows x64 runtime.
+Windows x64 or Linux x64 runtime.
 
-The implementation uses current MiniLang Compiler 1.2.3 features and standard
+The implementation uses current MiniLang Compiler 1.2.6 features and standard
 library facilities:
 
 - `package` and `import` for multi-file programs.
@@ -13,16 +13,17 @@ library facilities:
 - `const`, explicit `function inline`, and exact typed FFI declarations.
 - `std.ds.list` and `std.string_builder` for geometrically growing collections
   and output buffers.
-- `std.process` plus native Windows process APIs for compiler discovery and
-  execution.
+- `std.process` plus CreateProcessW on Windows or fork/execvp/waitpid on Linux
+  for compiler discovery and shell-free execution.
 - `nativeCallback`, `nativeBytesPtr`, `nativeRawValue`, and
   `nativeValueFromRaw` for Win32 callbacks and opaque handles.
 - Compiler option `--subsystem gui` for native Windows applications.
 
-The public runtime API remains largely backend-neutral, but the current
-implementation deliberately binds Win32. The MiniLang compiler toolchains can
-also target Linux; MiniGui applications cannot until a separate native backend
-implements the same public API.
+The public runtime API selects its implementation through compile-time
+`TARGET_OS` branches. Win32 controls remain implemented in MiniLang; advanced
+Windows widgets use `native/windows/minigui_extra.cpp`. Linux uses
+`native/linux/minigui_gtk.c`, a GTK bridge with an event queue. The GTK callbacks
+never call MiniLang directly: `Application.pump` consumes events on the UI thread.
 
 ## Build-time flow
 
@@ -31,17 +32,20 @@ app.mson + app.ml
   -> tools/minigui.exe validate/generate/build
   -> deterministic generated MiniLang source
   -> selected Python or self-hosted compiler + MiniGuiLib/minigui.ml
-  -> Windows x64 PE executable
+  -> Windows x64 PE or Linux x64 ELF executable + native bridge library
 ```
 
 MSON is parsed only during generation. The generated file imports the
 code-behind module and `MiniGuiLib.minigui`, creates the application object and
 controls, binds handlers, and enters the runtime message loop.
 
-The CLI defaults to the neighboring self-hosted compiler and accepts either
-compiler through `--compiler`. It locates the selected compiler's standard
+The Windows CLI defaults to the neighboring self-hosted compiler; the Linux CLI
+defaults to the neighboring Python compiler. Both accept either compiler through
+`--compiler`. The CLI locates the selected compiler's standard
 library root and invokes the process directly through `CreateProcessW` using
-Windows CRT argument quoting. No command shell participates in the build path.
+Windows CRT argument quoting. The Linux CLI uses an argv vector passed to execvp. No command shell
+participates in the build path. Target-native libraries are copied beside the
+application before compilation.
 
 ## Parser, imports, and validation
 
@@ -54,7 +58,7 @@ cannot be emitted as MiniLang references.
 Resource and component imports are resolved relative to the importing document
 and then through explicit include directories. Active import stacks detect
 cycles, while a separate document set deduplicates shared diamond dependencies.
-Windows path identity is case-insensitive.
+Windows path identity is case-insensitive; Linux path identity is case-sensitive.
 
 Defensive limits bound untrusted input work: 16 MiB per document, 128 container
 levels, and 4,096 documents per import graph. Import paths remain intentionally
@@ -76,7 +80,7 @@ Append-heavy parser and generator paths use growable lists and string builders,
 then materialize normal MiniLang arrays only at API boundaries. This avoids
 quadratic array and string copying for large UI descriptions.
 
-## Runtime flow
+## Windows runtime flow
 
 `MiniGuiLib/minigui.ml` registers a `MiniGuiWindow` class with a MiniLang
 `WNDPROC` callback and falls back to subclassing a standard `#32770` window if
@@ -133,3 +137,26 @@ runtime constructor and behavior in `MiniGuiLib/minigui.ml`, update the schema,
 and cover it in the gallery and tests. New native backends should preserve the
 public runtime API and generated MSON shape, replacing only platform-specific
 windowing, controls, events, and resource management.
+
+## Linux runtime and advanced controls
+
+GTK owns the native widgets. Bridge node records live until application disposal,
+so queued IDs remain valid even after widget destruction. The event queue carries
+IDs, event kinds, numeric payloads and copied UTF-8 text. MiniLang looks up the
+matching control and dispatches ordinary code-behind handlers.
+
+Fixed-coordinate hosts suppress preferred-size feedback into top-level windows.
+ScrollViewer keeps GTK's normal content-size behavior so content can scroll.
+Native notebook pages retain their actual mount parents. TreeView uses a
+GtkTreeStore and tables use a GtkListStore with editable renderers.
+
+WebView uses WebKitGTK on Linux and asynchronously initialized WebView2 on Windows.
+RichTextBox uses GtkTextView or RichEdit; CodeEditor adds GtkSourceView or a small
+native highlighter. DrawingCanvas and Chart retain commands for Cairo/GDI repaint.
+TrayIcon uses AppIndicator or Shell_NotifyIcon.
+
+`Application.dispose` destroys windows and releases owned resources.
+`Application.pump` is also available for bounded event processing in tests.
+The native browser engines and widgets keep UI-thread affinity.
+
+See [platforms](platforms.md) for build/deployment details and tested coverage.

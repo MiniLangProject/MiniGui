@@ -12,7 +12,7 @@ struct DocEntry
 Represents the doc entry data used by the minigui module.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L105)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L128)
 
 ## Members
 
@@ -26,7 +26,7 @@ document
 Stores the document value associated with doc entry.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L109)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L132)
 
 <a id="field-field-docentry-path-path-tools-minigui-ml-1369323482"></a>
 ### path
@@ -38,4 +38,4 @@ path
 Stores the path value associated with doc entry.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L107)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L130)

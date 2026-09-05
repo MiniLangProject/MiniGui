@@ -12,7 +12,7 @@ struct LinkLabel
 Represents the link label data used by the minigui module.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2796)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2822)
 
 ## Members
 
@@ -38,4 +38,4 @@ Creates link label for the minigui link label module.
 | `url` | `dynamic` | — | url value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2807)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2833)

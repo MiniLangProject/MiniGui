@@ -12,7 +12,7 @@ struct CheckBox
 Represents the check box data used by the minigui module.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2636)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2662)
 
 ## Members
 
@@ -38,4 +38,4 @@ Creates check box for the minigui check box module.
 | `checked` | `dynamic` | — | checked value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2647)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2673)

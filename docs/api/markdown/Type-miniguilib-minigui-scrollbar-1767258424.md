@@ -12,7 +12,7 @@ struct ScrollBar
 Represents the scroll bar data used by the minigui module.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2917)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2943)
 
 ## Members
 
@@ -43,4 +43,4 @@ Creates scroll bar for the minigui scroll bar module.
 | `largeStep` | `dynamic` | — | largeStep value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2933)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2959)

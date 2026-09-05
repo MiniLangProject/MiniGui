@@ -391,10 +391,15 @@ function Assert-ControlGalleryInteractions {
   }
 }
 
+$testRoot = [IO.Path]::GetFullPath((Join-Path $Root 'tests/tmp')).TrimEnd('\') + '\'
+if (-not $Tmp.StartsWith($testRoot, [StringComparison]::OrdinalIgnoreCase)) { throw 'Test output must remain inside tests/tmp.' }
 if (Test-Path -LiteralPath $Tmp) {
   Remove-Item -LiteralPath $Tmp -Recurse -Force
 }
 New-Item -ItemType Directory -Force -Path $Tmp | Out-Null
+
+& (Join-Path $Root 'native/windows/build.ps1')
+Copy-Item (Join-Path $Root 'build/native/windows-x64/minigui_extra.dll') $Tmp -Force
 
 Assert-Ok (Invoke-Compiler @($ToolSource, $Tool, "-I", $Root, "-I", $CompilerRoot)) "compile MiniGui CLI"
 $SelfTool = Join-Path $Tmp "minigui-self.exe"

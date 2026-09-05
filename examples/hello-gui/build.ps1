@@ -13,6 +13,9 @@ if ($Output -eq "") {
   $Output = Join-Path $Here "build\hello-gui.exe"
 }
 
+& (Join-Path $Root "native/windows/build.ps1")
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
 py -3.14 $Compiler $ToolSource $Tool -I $Root -I $CompilerRoot
 if ($LASTEXITCODE -ne 0) {
   exit $LASTEXITCODE

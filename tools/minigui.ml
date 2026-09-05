@@ -11,6 +11,7 @@ import std.process as process
 /// Invokes the native _wmkdir entry point used by the minigui module.
 /// @param path Path of the file or directory used by the operation.
 /// @returns Native int result produced by the call.
+#if TARGET_OS == "windows"
 extern function _wmkdir(path as wstr) from "msvcrt.dll" returns int
 /// Starts a child compiler directly, without exposing its arguments to cmd.exe.
 /// @internal
@@ -27,8 +28,30 @@ extern function _CloseHandle(handle as ptr) from "kernel32.dll" symbol "CloseHan
 /// Resolves an executable through the Windows search path.
 /// @internal
 extern function _SearchPathW(path as ptr, fileName as wstr, extension as ptr, bufferCount as u32, output as bytes, filePart as ptr) from "kernel32.dll" symbol "SearchPathW" returns u32
+#else
+/// @internal
+extern function _mkdir(path as cstr, mode as int) from "libc.so.6" symbol "mkdir" returns int
+/// @internal
+extern function _fork() from "libc.so.6" symbol "fork" returns int
+/// @internal
+extern function _execvp(file as cstr, argv as bytes) from "libc.so.6" symbol "execvp" returns int
+/// @internal
+extern function _waitpid(pid as int, status as bytes, options as int) from "libc.so.6" symbol "waitpid" returns int
+/// @internal
+extern function _exit(code as int) from "libc.so.6" symbol "_exit" returns void
+#endif
+
 
 /// Maximum accepted MSON document size in UTF-8 bytes (16 MiB).
+#if TARGET_OS == "windows"
+const HOST_TARGET = "windows-x64"
+/// Default compiler for a Windows host.
+const HOST_COMPILER = "..\\MiniLangCompilerML\\build\\mlc_win64.exe"
+#else
+const HOST_TARGET = "linux-x64"
+/// Default compiler for a Linux host.
+const HOST_COMPILER = "../MiniLangCompilerPy/mlc_win64.py"
+#endif
 const MAX_MSON_BYTES = 16777216
 /// Maximum JSON container nesting accepted by the MSON parser.
 const MAX_MSON_DEPTH = 128
@@ -652,7 +675,11 @@ end function
 /// Performs the pathSlash operation for the minigui module.
 /// @param p p value consumed by this operation.
 function pathSlash(p)
+#if TARGET_OS == "linux"
+  return str.replaceAll(p, "\\", "/")
+#else
   return str.replaceAll(p, "/", "\\")
+#endif
 end function
 
 /// Performs the pathUnslash operation for the minigui module.
@@ -664,25 +691,49 @@ end function
 /// Performs the trimDotSlash operation for the minigui module.
 /// @param p p value consumed by this operation.
 function trimDotSlash(p)
+#if TARGET_OS == "linux"
+  r = pathSlash(p)
+  while str.startsWith(r, "./")
+    r = str.substr(r, 2, len(r) - 2)
+  end while
+  return r
+#else
   r = pathSlash(p)
   while str.startsWith(r, ".\\")
     r = str.substr(r, 2, len(r) - 2)
   end while
   return r
+#endif
 end function
 
 /// Returns whether rooted satisfies the required condition.
 /// @param p p value consumed by this operation.
 function isRooted(p)
+#if TARGET_OS == "linux"
+  return str.startsWith(pathSlash(p), "/")
+#else
   pp = pathSlash(p)
   if len(pp) >= 3 and pp[1] == ":" and pp[2] == "\\" then return true end if
   if str.startsWith(pp, "\\\\") then return true end if
   return false
+#endif
 end function
 
 /// Performs the dirname operation for the minigui module.
 /// @param path Path of the file or directory used by the operation.
 function dirname(path)
+#if TARGET_OS == "linux"
+  pp = pathSlash(path)
+  parts = str.split(pp, "/")
+  if len(parts) < 2 then return "." end if
+  outv = ""
+  for i = 0 to len(parts) - 2
+    if i > 0 then outv = outv + "/" end if
+    outv = outv + parts[i]
+  end for
+  if outv == "" then return "/" end if
+  return outv
+#else
   p = pathSlash(path)
   last = -1
   for i = 0 to len(p) - 1
@@ -691,11 +742,23 @@ function dirname(path)
   if last < 0 then return "." end if
   if last == 0 then return "\\" end if
   return str.substr(p, 0, last)
+#endif
 end function
 
 /// Performs the basenameNoExt operation for the minigui module.
 /// @param path Path of the file or directory used by the operation.
 function basenameNoExt(path)
+#if TARGET_OS == "linux"
+  pp = pathSlash(path)
+  parts = str.split(pp, "/")
+  name = parts[len(parts)-1]
+  dot = -1
+  for i = 0 to len(name)-1
+    if name[i] == "." then dot = i end if
+  end for
+  if dot > 0 then return str.substr(name, 0, dot) end if
+  return name
+#else
   p = pathSlash(path)
   start = 0
   for i = 0 to len(p) - 1
@@ -709,23 +772,51 @@ function basenameNoExt(path)
   end for
   if dot >= 0 then return str.substr(name, 0, dot) end if
   return name
+#endif
 end function
 
 /// Joins path for the minigui workflow.
 /// @param a a value consumed by this operation.
 /// @param b b value consumed by this operation.
 function joinPath(a, b)
+#if TARGET_OS == "linux"
+  if b == "" then return pathSlash(a) end if
+  if isRooted(b) then return pathSlash(b) end if
+  if a == "" or a == "." then return pathSlash(b) end if
+  return pathSlash(a) + "/" + pathSlash(b)
+#else
   if b == "" then return pathSlash(a) end if
   if isRooted(b) then return pathSlash(b) end if
   aa = pathSlash(a)
   if aa == "" or aa == "." then return pathSlash(b) end if
   if str.endsWith(aa, "\\") then return aa + pathSlash(b) end if
   return aa + "\\" + pathSlash(b)
+#endif
 end function
 
 /// Normalizes path for the minigui workflow.
 /// @param p p value consumed by this operation.
 function normalizePath(p)
+#if TARGET_OS == "linux"
+  pp = pathSlash(p)
+  absolute = isRooted(pp)
+  parts = str.split(pp, "/")
+  result = list.List.new()
+  for each part in parts
+    if part == "" or part == "." then continue end if
+    if part == ".." and result.len() > 0 and result.last() != ".." then
+      result.pop()
+    else if part == ".." and absolute then
+      continue
+    else
+      result.add(part)
+    end if
+  end for
+  joined = str.join(result.toArray(), "/")
+  if absolute then return "/" + joined end if
+  if joined == "" then return "." end if
+  return joined
+#else
   pp = pathSlash(p)
   unc = str.startsWith(pp, "\\\\")
   absoluteDrive = len(pp) >= 3 and pp[1] == ":" and pp[2] == "\\"
@@ -749,14 +840,19 @@ function normalizePath(p)
   joined = str.join(output.toArray(), "\\")
   if unc then return "\\\\" + joined end if
   return joined
+#endif
 end function
 
 /// Splits path parts for the minigui workflow.
 /// @param p p value consumed by this operation.
 function splitPathParts(p)
+#if TARGET_OS == "linux"
+  return str.split(normalizePath(p), "/")
+#else
   pp = trimDotSlash(normalizePath(p))
   if pp == "." then return [] end if
   return str.split(pp, "\\")
+#endif
 end function
 
 /// Performs the relativePath operation for the minigui module.
@@ -781,12 +877,19 @@ function relativePath(fromDir, toPath)
     end for
   end if
   if output.len() == 0 then return "." end if
-  return str.join(output.toArray(), "\\")
+  return pathUnslash(str.join(output.toArray(), "\\"))
 end function
 
 /// Ensures dir is available to the minigui workflow.
 /// @param path Path of the file or directory used by the operation.
 function ensureDir(path)
+#if TARGET_OS == "linux"
+  p = normalizePath(path)
+  if fs.isDir(p) then return end if
+  parent = dirname(p)
+  if parent != p then ensureDir(parent) end if
+  _mkdir(p, 493)
+#else
   p = normalizePath(path)
   if p == "." then return end if
   parts = str.split(p, "\\")
@@ -799,6 +902,7 @@ function ensureDir(path)
       _wmkdir(cur)
     end for
   end if
+#endif
 end function
 
 /// Quotes one argument according to the Windows CRT command-line rules.
@@ -859,6 +963,30 @@ end function
 /// @param executable Executable passed to CreateProcessW.
 /// @param args Exact argv values supplied to the child process.
 function runProcess(executable, args)
+#if TARGET_OS == "linux"
+  values = [executable] + args
+  storage = []
+  argv = bytes((len(values) + 1) * 8, 0)
+  for i = 0 to len(values) - 1
+    data = bytes(values[i]) + bytes(1, 0)
+    storage = storage + [data]
+    pointer = nativeBytesPtr(data)
+    for byteIndex = 0 to 7
+      argv[i * 8 + byteIndex] = (pointer >> (byteIndex * 8)) & 255
+    end for
+  end for
+  pid = _fork()
+  if pid < 0 then return -1 end if
+  if pid == 0 then
+    _execvp(executable, argv)
+    _exit(127)
+  end if
+  status = bytes(4, 0)
+  if _waitpid(pid, status, 0) < 0 then return -1 end if
+  code = readU32(status, 0)
+  if (code & 127) != 0 then return 128 + (code & 127) end if
+  return (code >> 8) & 255
+#else
   command = sb.StringBuilder.new()
   command.appendString(quoteProcessArgument(executable))
   if len(args) > 0 then
@@ -881,21 +1009,39 @@ function runProcess(executable, args)
   _CloseHandle(processHandle)
   if waited != 0 or gotExitCode == false then return -1 end if
   return readU32(exitCode, 0)
+#endif
 end function
 
 /// Resolves a named executable without invoking a command shell.
 /// @param name Executable name, including its extension.
 function resolveExecutable(name)
+#if TARGET_OS == "linux"
+  if isRooted(name) then
+    if fs.isFile(name) then return name end if
+    return ""
+  end if
+  envPath = process.environment("PATH")
+  if typeof(envPath) != "string" then return "" end if
+  for each entry in str.split(envPath, ":")
+    candidate = joinPath(entry, name)
+    if fs.isFile(candidate) then return candidate end if
+  end for
+  return ""
+#else
   output = bytes(MAX_WINDOWS_PATH_CHARS * 2, 0)
   count = _SearchPathW(0, name, 0, MAX_WINDOWS_PATH_CHARS, output, 0)
   if count == 0 or count >= MAX_WINDOWS_PATH_CHARS then return "" end if
   resolved = decode16Z(output)
   if typeof(resolved) != "string" then return "" end if
   return resolved
+#endif
 end function
 
 /// Resolves the preferred Python interpreter for the Python MiniLang compiler.
 function resolvePythonInterpreter()
+#if TARGET_OS == "linux"
+  return resolveExecutable("python3")
+#else
   localAppData = process.environment("LOCALAPPDATA")
   if typeof(localAppData) == "string" then
     preferred = joinPath(localAppData, "Programs\\Python\\Python314\\python.exe")
@@ -907,6 +1053,7 @@ function resolvePythonInterpreter()
     if fs.isFile(preferredSystem) then return preferredSystem end if
   end if
   return resolveExecutable("python.exe")
+#endif
 end function
 
 /// Returns whether the supplied data contains contains.
@@ -1095,7 +1242,11 @@ end function
 function stackHas(stack, path)
   if len(stack) == 0 then return false end if
   for i = 0 to len(stack) - 1
+    #if TARGET_OS == "windows"
     if str.equalsIgnoreCaseAscii(stack[i], path) then return true end if
+#else
+    if stack[i] == path then return true end if
+#endif
   end for
   return false
 end function
@@ -1106,7 +1257,11 @@ end function
 function documentLoaded(result, path)
   if len(result.documents) == 0 then return false end if
   for i = 0 to len(result.documents) - 1
+    #if TARGET_OS == "windows"
     if str.equalsIgnoreCaseAscii(result.documents[i].path, path) then return true end if
+#else
+    if result.documents[i].path == path then return true end if
+#endif
   end for
   return false
 end function
@@ -1301,6 +1456,9 @@ end function
 /// Performs the allowedControlEvents operation for the minigui module.
 /// @param typ typ value consumed by this operation.
 function allowedControlEvents(typ)
+  if typ == "TrayIcon" then return ["click", "clicked"] end if
+  if typ == "RichTextBox" or typ == "CodeEditor" then return ["textChanged", "changed", "change", "focus", "blur"] end if
+  if typ == "PropertyGrid" then return ["selectionChanged", "valueChanged", "changed", "change"] end if
   commonEvents = ["focus", "blur"]
   if contains(["Button", "CheckBox", "RadioButton", "ToggleSwitch", "ToolBar", "MenuBar", "ContextMenu", "LinkLabel", "Image", "FilePicker", "FolderPicker", "ColorPicker"], typ) then return ["click", "clicked"] + commonEvents end if
   if contains(["TextBox", "SearchBox", "TextArea", "PasswordBox", "DatePicker", "DateTimePicker", "TimePicker", "Calendar"], typ) then return ["textChanged", "changed", "change", "submit", "validating", "validated"] + commonEvents end if
@@ -1319,6 +1477,12 @@ end function
 /// Performs the allowedControlProps operation for the minigui module.
 /// @param typ typ value consumed by this operation.
 function allowedControlProps(typ)
+  if typ == "RichTextBox" or typ == "CodeEditor" then return commonControlProps() + ["language", "readOnly", "maxLength"] end if
+  if typ == "PropertyGrid" then return commonControlProps() + ["items"] end if
+  if typ == "TrayIcon" then return commonControlProps() + ["items", "source"] end if
+  if typ == "WebView" then return commonControlProps() + ["url", "html"] end if
+  if typ == "DrawingCanvas" then return commonControlProps() end if
+  if typ == "Chart" then return commonControlProps() + ["values", "chartType", "color"] end if
   if contains(["TextBox", "SearchBox", "TextArea", "PasswordBox"], typ) then return commonControlProps() + ["placeholder", "readOnly", "maxLength", "inputType", "validationMessage"] end if
   if typ == "NumberBox" or typ == "SpinBox" then return commonControlProps() + ["placeholder", "readOnly", "maxLength", "minimum", "maximum", "value", "step", "decimals", "validationMessage"] end if
   if contains(["CheckBox", "RadioButton", "ToggleSwitch"], typ) then return commonControlProps() + ["checked"] end if
@@ -1342,6 +1506,7 @@ end function
 /// Returns whether control satisfies the required condition.
 /// @param typ typ value consumed by this operation.
 function isControl(typ)
+  if contains(["RichTextBox", "CodeEditor", "PropertyGrid", "TrayIcon", "WebView", "DrawingCanvas", "Chart"], typ) then return true end if
   return contains(["Label", "Button", "FilePicker", "FolderPicker", "ColorPicker", "TextBox", "SearchBox", "TextArea", "PasswordBox", "NumberBox", "SpinBox", "CheckBox", "ToggleSwitch", "RadioButton", "Image", "Separator", "Splitter", "LinkLabel", "Panel", "ScrollViewer", "GroupBox", "ComboBox", "EditableComboBox", "ListBox", "ScrollBar", "Slider", "ProgressBar", "TabControl", "MenuBar", "ContextMenu", "StatusBar", "ToolBar", "TreeView", "ListView", "Table", "DataGrid", "DatePicker", "DateTimePicker", "TimePicker", "Calendar"], typ)
 end function
 
@@ -1369,6 +1534,20 @@ function testControlProperties(result, path, typ, properties)
   for i = 0 to len(properties.keys) - 1
     name = properties.keys[i]
     v = resourceValue(result, path, properties.values[i])
+    if contains(["language", "html", "chartType", "color"], name) and v.kind != "string" then addError(result, path, "Property '" + name + "' on " + typ + " must be a string.") end if
+    if name == "chartType" and v.kind == "string" and v.text != "bar" and v.text != "line" then addError(result, path, "chartType must be 'bar' or 'line'.") end if
+    if name == "language" and v.kind == "string" and contains(["", "minilang", "python", "json", "c", "cpp"], v.text) == false then addError(result, path, "Unsupported editor language: " + v.text) end if
+    if name == "values" then
+      if v.kind != "array" then
+        addError(result, path, "Chart values must be an array of nonnegative integers.")
+      else
+        for each entry in v.items
+          if entry.kind != "number" then addError(result, path, "Chart values must be integers.")
+          else if entry.number < 0 then addError(result, path, "Chart values must be nonnegative.")
+          end if
+        end for
+      end if
+    end if
     if contains(["x", "y", "selectedIndex", "tabIndex", "row", "column", "rowSpan", "columnSpan"], name) and v.kind != "number" then addError(result, path, "Property '" + name + "' on " + typ + " must be an integer.") end if
     if contains(["width", "height"], name) then
       if v.kind != "number" and v.kind != "string" then addError(result, path, "Property '" + name + "' on " + typ + " must be an integer, 'auto' or 'fill'.") end if
@@ -1387,7 +1566,7 @@ function testControlProperties(result, path, typ, properties)
         for itemIndex = 0 to len(v.items) - 1
           if typ == "TreeView" then
             if v.items[itemIndex].kind != "string" and v.items[itemIndex].kind != "object" then addError(result, path, "Property '" + name + "' on " + typ + " must contain strings or tree item objects.") end if
-          else if typ == "ListView" or typ == "Table" or typ == "DataGrid" then
+          else if typ == "ListView" or typ == "Table" or typ == "DataGrid" or typ == "PropertyGrid" then
             if v.items[itemIndex].kind == "array" then
               rowItems = v.items[itemIndex].items
               if len(rowItems) > 0 then
@@ -1585,6 +1764,8 @@ end function
 /// Performs the controlDefaultHeight operation for the minigui module.
 /// @param typ typ value consumed by this operation.
 function controlDefaultHeight(typ)
+  if contains(["RichTextBox", "CodeEditor", "PropertyGrid", "WebView", "DrawingCanvas", "Chart"], typ) then return 180 end if
+  if typ == "TrayIcon" then return 0 end if
   if typ == "MenuBar" then return 24 end if
   if typ == "ContextMenu" then return 1 end if
   if typ == "ToolBar" then return 30 end if
@@ -1831,6 +2012,7 @@ end function
 /// Creates call for for the minigui module.
 /// @param typ typ value consumed by this operation.
 function createCallFor(typ)
+  if contains(["RichTextBox", "CodeEditor", "PropertyGrid", "TrayIcon", "WebView", "DrawingCanvas", "Chart"], typ) then return "MiniGui." + typ + ".create" end if
   if typ == "Label" then return "MiniGui.Label.create" end if
   if typ == "Button" then return "MiniGui.Button.create" end if
   if typ == "FilePicker" then return "MiniGui.FilePicker.create" end if
@@ -1898,7 +2080,10 @@ function addGeneratedNode(lines, fields, result, path, node, parentVar, parentTy
       w = width
       h = height
     end if
-    align = stringProp(result, path, node, "alignment", stringProp(result, path, node, "horizontalAlignment", "fill"))
+    defaultAlign = "fill"
+    explicitWidth = resourceValue(result, path, prop(prop(node, "properties"), "width"))
+    if explicitWidth.kind == "number" then defaultAlign = "left" end if
+    align = stringProp(result, path, node, "alignment", stringProp(result, path, node, "horizontalAlignment", defaultAlign))
     valign = stringProp(result, path, node, "verticalAlignment", "")
     w = clampDimension(result, path, node, "width", w)
     h = clampDimension(result, path, node, "height", h)
@@ -1967,6 +2152,9 @@ function addGeneratedNode(lines, fields, result, path, node, parentVar, parentTy
       items = stringArrayLiteral(result, path, node, "items")
       selectedIndex = intProp(result, path, node, "selectedIndex", -1)
       lines.add(var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + items + ", " + selectedIndex + ")")
+    else if typ == "PropertyGrid" then
+      items = tableArrayLiteral(result, path, node, "items")
+      lines.add(var + " = MiniGui.PropertyGrid.create(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ", " + items + ")")
     else if typ == "ListView" or typ == "Table" or typ == "DataGrid" then
       items = tableArrayLiteral(result, path, node, "items")
       columns = stringArrayLiteral(result, path, node, "columns")
@@ -2006,6 +2194,19 @@ function addGeneratedNode(lines, fields, result, path, node, parentVar, parentTy
     else
       lines.add(var + " = " + createCallFor(typ) + "(app, " + parentVar + ", " + mlString(id) + ", " + mlString(controlText(result, path, node)) + ", " + x + ", " + y + ", " + w + ", " + h + ")")
     end if
+    if typ == "CodeEditor" then lines.add("MiniGui.CodeEditor.setLanguage(" + var + ", " + mlString(stringProp(result, path, node, "language", "minilang")) + ")") end if
+    if typ == "WebView" then
+      url = stringProp(result, path, node, "url", "")
+      html = stringProp(result, path, node, "html", "")
+      if url != "" then lines.add("MiniGui.WebView.navigate(" + var + ", " + mlString(url) + ")") end if
+      if html != "" then lines.add("MiniGui.WebView.loadHtml(" + var + ", " + mlString(html) + ")") end if
+    end if
+    if typ == "TrayIcon" then
+      lines.add("MiniGui.TrayIcon.setItems(" + var + ", " + stringArrayLiteral(result, path, node, "items") + ")")
+      iconSource = stringProp(result, path, node, "source", "")
+      if iconSource != "" then lines.add("MiniGui.TrayIcon.setIcon(" + var + ", " + mlString(iconSource) + ")") end if
+    end if
+    if typ == "Chart" then lines.add("MiniGui.Chart.setValues(" + var + ", " + intArrayLiteral(result, path, node, "values") + ", " + mlString(stringProp(result, path, node, "chartType", "bar")) + ", " + mlString(stringProp(result, path, node, "color", "#3867d6")) + ")") end if
     nodeProps = prop(node, "properties")
     if hasProp(nodeProps, "resizeMode") or hasProp(nodeProps, "anchor") or hasProp(nodeProps, "minWidth") or hasProp(nodeProps, "minHeight") or hasProp(nodeProps, "maxWidth") or hasProp(nodeProps, "maxHeight") then
       resizeMode = stringProp(result, path, node, "resizeMode", "scale")
@@ -2042,7 +2243,7 @@ function addGeneratedNode(lines, fields, result, path, node, parentVar, parentTy
       if typ == "DataGrid" and boolProp(result, path, node, "editable", false) then lines.add("MiniGui.Control.setEditable(" + var + ", true)") end if
     end if
     if listContains(fields, var) == false then fields.add(var) end if
-    if typ == "ContextMenu" then return [lines, fields, 0] end if
+    if typ == "ContextMenu" or typ == "TrayIcon" then return [lines, fields, 0] end if
     if isContainerControl(typ) then
       childPadding = intProp(result, path, node, "padding", 8)
       childSpacing = intProp(result, path, node, "spacing", 6)
@@ -2236,7 +2437,7 @@ function generateCode(result, outputPath)
   fields = list.List.new()
   fields.add("app")
   body = list.List.new()
-  body.addAll(["// Generated from " + result.entryPath, "app = MiniGui.Application.create()", "miniguiWindowProcPtr = nativeCallback(miniguiWindowProc, \"wndproc\")", "miniguiTimerProcPtr = nativeCallback(miniguiTimerProc, \"wndproc\")"])
+  body.addAll(["// Generated from " + result.entryPath, "app = MiniGui.Application.create()", "#if TARGET_OS == \"windows\"", "miniguiWindowProcPtr = nativeCallback(miniguiWindowProc, \"wndproc\")", "miniguiTimerProcPtr = nativeCallback(miniguiTimerProc, \"wndproc\")", "#endif"])
   for i = 0 to len(result.windows) - 1
     w = result.windows[i].window
     path = result.windows[i].path
@@ -2248,7 +2449,7 @@ function generateCode(result, outputPath)
     if title == "" then title = wid end if
     ww = asInt(resourceValue(result, path, prop(props, "width")), 640)
     wh = asInt(resourceValue(result, path, prop(props, "height")), 400)
-    body.addAll(["", "// Window '" + wid + "' from " + path, wid + " = MiniGui.Window.create(app, " + mlString(wid) + ", " + mlString(title) + ", " + ww + ", " + wh + ")", "MiniGui.Window.installProc(" + wid + ", miniguiWindowProcPtr)", "MiniGui.Window.startResizeTimer(" + wid + ", miniguiTimerProcPtr)"])
+    body.addAll(["", "// Window '" + wid + "' from " + path, wid + " = MiniGui.Window.create(app, " + mlString(wid) + ", " + mlString(title) + ", " + ww + ", " + wh + ")", "#if TARGET_OS == \"windows\"", "MiniGui.Window.installProc(" + wid + ", miniguiWindowProcPtr)", "MiniGui.Window.startResizeTimer(" + wid + ", miniguiTimerProcPtr)", "#endif"])
     if listContains(fields, wid) == false then fields.add(wid) end if
     r = addGeneratedNode(body, fields, result, path, prop(w, "layout"), wid, "Window", 0, 0, ww - 40, wh - 80)
   end for
@@ -2286,8 +2487,8 @@ function generateCode(result, outputPath)
     lines.add("  " + fields.get(f) + ",")
   end for
   lines.addAll(["end struct", ""])
-  lines.addAll(["function miniguiWindowProc(hwnd, msg, wParam, lParam)", "  return MiniGui.Application.windowProc(hwnd, msg, wParam, lParam)", "end function", ""])
-  lines.addAll(["function miniguiTimerProc(hwnd, msg, wParam, lParam)", "  return MiniGui.Application.timerProc(hwnd, msg, wParam, lParam)", "end function", ""])
+  lines.addAll(["#if TARGET_OS == \"windows\"", "function miniguiWindowProc(hwnd, msg, wParam, lParam)", "  return MiniGui.Application.windowProc(hwnd, msg, wParam, lParam)", "end function", ""])
+  lines.addAll(["function miniguiTimerProc(hwnd, msg, wParam, lParam)", "  return MiniGui.Application.timerProc(hwnd, msg, wParam, lParam)", "end function", "#endif", ""])
   if wrappers.len() > 0 then
     for widx = 0 to wrappers.len() - 1
       wrapperEntry = wrappers.get(widx)
@@ -2311,12 +2512,12 @@ end function
 /// @param args Command-line or caller-supplied arguments.
 /// @param start start value consumed by this operation.
 function parseOptions(args, start)
-  opts = [["output", ""], ["codeBehind", ""], ["generatedDir", ""], ["compiler", "..\\MiniLangCompilerML\\build\\mlc_win64.exe"], ["libraryDir", "."], ["noCompile", "false"], ["keepGenerated", "false"]]
+  opts = [["output", ""], ["codeBehind", ""], ["generatedDir", ""], ["compiler", HOST_COMPILER], ["libraryDir", "."], ["noCompile", "false"], ["keepGenerated", "false"], ["target", HOST_TARGET]]
   includes = list.List.new()
   i = start
   while i < len(args)
     a = args[i]
-    if a == "--output" or a == "--code-behind" or a == "--generated-dir" or a == "--compiler" or a == "--library-dir" or a == "--include-dir" then
+    if a == "--output" or a == "--code-behind" or a == "--generated-dir" or a == "--compiler" or a == "--library-dir" or a == "--include-dir" or a == "--target" then
       if i + 1 >= len(args) then return error(2, "Missing value for option: " + a) end if
       i = i + 1
       if a == "--output" then opts[0][1] = args[i]
@@ -2324,6 +2525,7 @@ function parseOptions(args, start)
       else if a == "--generated-dir" then opts[2][1] = args[i]
       else if a == "--compiler" then opts[3][1] = args[i]
       else if a == "--library-dir" then opts[4][1] = args[i]
+      else if a == "--target" then opts[7][1] = args[i]
       else includes.add(normalizePath(args[i]))
       end if
     else if a == "--no-compile" then opts[5][1] = "true"
@@ -2335,6 +2537,7 @@ function parseOptions(args, start)
     end if
     i = i + 1
   end while
+  if opts[7][1] != "windows-x64" and opts[7][1] != "linux-x64" then return error(2, "Unsupported target: " + opts[7][1]) end if
   return [opts, includes.toArray()]
 end function
 
@@ -2353,7 +2556,7 @@ function usage()
   print "Usage:"
   print "  minigui validate <app.mson> [--include-dir <dir>] [--code-behind <file>]"
   print "  minigui generate <app.mson> --output <app.gui.ml>"
-  print "  minigui build <app.mson> --output <app.exe> [--no-compile]"
+  print "  minigui build <app.mson> --output <app> --target windows-x64|linux-x64 [--no-compile]"
 end function
 
 /// Runs the selected MiniLang compiler without involving a command shell.
@@ -2361,9 +2564,11 @@ end function
 /// @param generated generated value consumed by this operation.
 /// @param outExe outExe value consumed by this operation.
 /// @param libraryDir libraryDir value consumed by this operation.
-function runCompiler(compiler, generated, outExe, libraryDir)
+/// @param target Target executable platform, windows-x64 or linux-x64.
+function runCompiler(compiler, generated, outExe, libraryDir, target)
   executable = compiler
-  args = [generated, outExe, "-I", libraryDir, "--subsystem", "gui"]
+  args = [generated, outExe, "-I", libraryDir, "--target", target]
+  if target == "windows-x64" then args = args + ["--subsystem", "gui"] end if
   compilerDir = dirname(normalizePath(compiler))
   compilerRoot = compilerDir
   if fs.isDir(joinPath(compilerRoot, "std")) == false then
@@ -2422,9 +2627,23 @@ function main(args)
   print "Generated: " + generated
   if command == "generate" or opt(opts, "noCompile") == "true" then return 0 end if
   outExe = opt(opts, "output")
-  if outExe == "" then outExe = joinPath(dirname(normalizePath(msonPath)), "build\\app.exe") end if
+  if outExe == "" then
+    filename = "app"
+    if opt(opts, "target") == "windows-x64" then filename = "app.exe" end if
+    outExe = joinPath(dirname(normalizePath(msonPath)), "build/" + filename)
+  end if
   ensureDir(dirname(outExe))
-  rc = runCompiler(opt(opts, "compiler"), generated, outExe, opt(opts, "libraryDir"))
+  nativeName = "libminigui_gtk.so"
+  if opt(opts, "target") == "windows-x64" then nativeName = "minigui_extra.dll" end if
+  nativeSource = joinPath(opt(opts, "libraryDir"), "build/native/" + opt(opts, "target") + "/" + nativeName)
+  if fs.isFile(nativeSource) == false then
+    print "Native backend missing: " + nativeSource
+    print "Build it with native/windows/build.ps1 or native/linux/build.sh before compiling applications."
+    return 1
+  end if
+  copied = fs.copyFile(nativeSource, joinPath(dirname(outExe), nativeName), true)
+  if typeof(copied) == "error" then print copied.message; return 1 end if
+  rc = runCompiler(opt(opts, "compiler"), generated, outExe, opt(opts, "libraryDir"), opt(opts, "target"))
   if rc < 0 then print "Failed to start MiniLang compiler."; return 1 end if
   if rc != 0 then return rc end if
   print "Built: " + normalizePath(outExe)

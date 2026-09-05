@@ -1,9 +1,11 @@
 # MiniGui user guide
 
 MiniGui describes MiniLang desktop UIs in JSON `.mson` files and keeps
-application logic in normal `.ml` files. The current native backend targets
-Windows x64 and requires MiniLang Compiler 1.2.3 or newer. Both the Python and
-self-hosted compiler are supported.
+application logic in normal `.ml` files. Windows x64 uses Win32; Linux x64 uses
+GTK 3. Use the current MiniLang Compiler 1.2.5 checkout with the Linux C-string
+return fix. Both the Python and self-hosted compilers are supported.
+
+See [platform builds and deployment](platforms.md) and [advanced controls](advanced-controls.md).
 
 ## CLI
 

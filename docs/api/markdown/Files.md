@@ -4,5 +4,5 @@
 
 | File | Package | Reachable | Symbols |
 | --- | --- | --- | ---: |
-| [MiniGuiLib/minigui.ml](File-miniguilib-minigui-ml-1319721044.md) | `MiniGuiLib.minigui` | no | 634 |
-| [tools/minigui.ml](File-tools-minigui-ml-742202604.md) | `(global)` | yes | 162 |
+| [MiniGuiLib/minigui.ml](File-miniguilib-minigui-ml-1319721044.md) | `MiniGuiLib.minigui` | no | 674 |
+| [tools/minigui.ml](File-tools-minigui-ml-742202604.md) | `(global)` | yes | 164 |

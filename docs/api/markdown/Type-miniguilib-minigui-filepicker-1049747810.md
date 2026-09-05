@@ -12,7 +12,7 @@ struct FilePicker
 Represents the file picker data used by the minigui module.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2430)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2456)
 
 ## Members
 
@@ -39,4 +39,4 @@ Creates file picker for the minigui file picker module.
 | `filter` | `dynamic` | — | filter value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2442)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2468)

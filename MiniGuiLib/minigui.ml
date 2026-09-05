@@ -20,6 +20,9 @@ limitations under the License.
 
 package MiniGuiLib.minigui
 import std.string_builder as sb
+import std.string as str
+
+#if TARGET_OS == "windows"
 
 /// Invokes the native CreateWindowExW entry point used by the minigui module.
 /// @param exStyle exStyle value consumed by this operation.
@@ -1688,6 +1691,7 @@ struct Application
     end if
     if initialized == false then
       _resizeInitializedWindows = _resizeInitializedWindows + [window.handle]
+      initialSize = [window.width, window.height]
       window.width = clientWidth
       window.height = clientHeight
       window.baseClientWidth = clientWidth
@@ -1710,6 +1714,7 @@ struct Application
         end for
       end if
       Application.syncDynamicControls(app)
+      Events.dispatchResize(app, window, initialSize, [clientWidth, clientHeight])
       RedrawWindow(window.handle, void, void, RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN | RDW_UPDATENOW)
       return true
     end if
@@ -1849,6 +1854,27 @@ struct Application
     _releaseRuntimeResources()
     return 0
   end function
+  /// Processes native messages, optionally waiting for one.
+  /// @param app app supplied by the caller.
+  /// @param wait wait supplied by the caller.
+  static function pump(app, wait)
+    block = 0
+    if wait then block = 1 end if
+    return mx_pump(block) != 0
+  end function
+
+  /// Destroys application windows and releases runtime resources.
+  /// @param app app supplied by the caller.
+  static function dispose(app)
+    for each window in app.windows
+      if IsWindow(window.handle) then DestroyWindow(window.handle) end if
+    end for
+    app.running = false
+    _releaseRuntimeResources()
+    return true
+  end function
+
+
 end struct
 
 /// Represents the window data used by the minigui module.
@@ -3484,6 +3510,11 @@ struct Control
   static function setVisible(control, visible)
     if control is void then return false end if
     control.visible = visible
+    if control.kind == "TrayIcon" then
+      v = 0
+      if visible then v = 1 end if
+      return mx_property(control.handle, "visible", "", v) != 0
+    end if
     if control.handle is void then return false end if
     if visible then
       return ShowWindow(control.handle, SW_SHOW)
@@ -3619,7 +3650,7 @@ struct Control
   /// @param weight weight value consumed by this operation.
   static function setFont(control, family, size, weight)
     if control is void then return false end if
-    return true
+    return mx_property(control.handle, "font", family, size) != 0
   end function
 
   /// Performs the applyCtlColor operation for the minigui control module.
@@ -3649,7 +3680,7 @@ struct Control
   static function setReadOnly(control, readOnly)
     if control is void then return false end if
     if control.handle is void then return false end if
-    if control.kind == "TextBox" or control.kind == "SearchBox" or control.kind == "TextArea" or control.kind == "PasswordBox" or control.kind == "NumberBox" or control.kind == "SpinBox" then
+    if control.kind == "TextBox" or control.kind == "SearchBox" or control.kind == "TextArea" or control.kind == "RichTextBox" or control.kind == "CodeEditor" or control.kind == "PasswordBox" or control.kind == "NumberBox" or control.kind == "SpinBox" then
       flag = 0
       if readOnly then flag = 1 end if
       SendMessageW(control.handle, EM_SETREADONLY, flag, 0)
@@ -3665,7 +3696,7 @@ struct Control
     if control is void then return false end if
     if control.handle is void then return false end if
     if maxLength < 0 then maxLength = 0 end if
-    if control.kind == "TextBox" or control.kind == "SearchBox" or control.kind == "TextArea" or control.kind == "PasswordBox" or control.kind == "NumberBox" or control.kind == "SpinBox" then
+    if control.kind == "TextBox" or control.kind == "SearchBox" or control.kind == "TextArea" or control.kind == "RichTextBox" or control.kind == "CodeEditor" or control.kind == "PasswordBox" or control.kind == "NumberBox" or control.kind == "SpinBox" then
       SendMessageW(control.handle, EM_LIMITTEXT, maxLength, 0)
       return true
     end if
@@ -5718,6 +5749,7 @@ struct Events
         if c is void == false then
           if c.nativeId == nativeId or c.handle == hwndControl then
             clickValue = true
+            if c.kind == "TrayIcon" then clickValue = mx_property(c.handle, "selectedIndex", "", 0) end if
             if c.kind == "FilePicker" then
               clickValue = Dialog.pickOpenFile(app, _itemTextAt(c.lastText, 0), _itemTextAt(c.lastText, 1))
             else if c.kind == "FolderPicker" then
@@ -5770,4 +5802,2551 @@ struct Events
 
     return false
   end function
+end struct
+
+/// @internal
+extern function mx_create(kind as cstr, parent as ptr, id as int, text as cstr, x as int, y as int, width as int, height as int) from "minigui_extra.dll" returns ptr
+/// @internal
+extern function mx_property(node as ptr, key as cstr, text as cstr, value as int) from "minigui_extra.dll" returns int
+/// @internal
+extern function mx_draw(node as ptr, op as int, x as double, y as double, width as double, height as double, color as cstr, text as cstr) from "minigui_extra.dll" returns void
+/// @internal
+extern function mx_format(node as ptr, start as int, endIndex as int, color as cstr, bold as int, italic as int) from "minigui_extra.dll" returns int
+/// _advancedCreate for the native backend.
+/// @param app app supplied by the caller.
+/// @param parent parent supplied by the caller.
+/// @param id id supplied by the caller.
+/// @param kind kind supplied by the caller.
+/// @param text text supplied by the caller.
+/// @param x x supplied by the caller.
+/// @param y y supplied by the caller.
+/// @param width width supplied by the caller.
+/// @param height height supplied by the caller.
+function _advancedCreate(app, parent, id, kind, text, x, y, width, height)
+  nid = app.nextNativeId
+  app.nextNativeId = nid + 1
+  handle = mx_create(kind, parent.handle, nid, text, x, y, width, height)
+  if handle == 0 then return error(700, "Native control creation failed: " + kind) end if
+  c = NativeControl(id, kind, handle, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, 0, 0, parent, parent.width, parent.height)
+  return Application.addControl(app, c)
+end function
+
+/// _advancedProperty for the native backend.
+/// @param control control supplied by the caller.
+/// @param key key supplied by the caller.
+/// @param text text supplied by the caller.
+/// @param value value supplied by the caller.
+function _advancedProperty(control, key, text, value)
+  return mx_property(control.handle, key, text, value)
+end function
+
+/// _advancedDraw for the native backend.
+/// @param control control supplied by the caller.
+/// @param op op supplied by the caller.
+/// @param x x supplied by the caller.
+/// @param y y supplied by the caller.
+/// @param width width supplied by the caller.
+/// @param height height supplied by the caller.
+/// @param color color supplied by the caller.
+/// @param text text supplied by the caller.
+function _advancedDraw(control, op, x, y, width, height, color, text)
+  mx_draw(control.handle, op, x, y, width, height, color, text)
+  return true
+end function
+
+/// _advancedFormat for the native backend.
+/// @param control control supplied by the caller.
+/// @param start start supplied by the caller.
+/// @param endIndex end supplied by the caller.
+/// @param color color supplied by the caller.
+/// @param bold bold supplied by the caller.
+/// @param italic italic supplied by the caller.
+function _advancedFormat(control, start, endIndex, color, bold, italic)
+  b = 0; i = 0
+  if bold then b = 1 end if
+  if italic then i = 1 end if
+  return mx_format(control.handle, start, endIndex, color, b, i)
+end function
+
+/// @internal
+extern function mx_pump(wait as int) from "minigui_extra.dll" returns int
+
+#else
+
+/// @internal
+extern function mg_message(owner as ptr, title as cstr, message as cstr, buttons as cstr, icon as cstr) from "$ORIGIN/libminigui_gtk.so" returns int
+/// @internal
+extern function mg_modal(window as ptr, owner as ptr, enabled as int) from "$ORIGIN/libminigui_gtk.so" returns void
+// Native GTK callbacks enqueue events; MiniLang drains them on its UI thread.
+/// @internal
+extern function mg_init() from "$ORIGIN/libminigui_gtk.so" returns int
+/// @internal
+extern function mg_create(kind as cstr, parent as ptr, id as int, text as cstr, x as int, y as int, width as int, height as int) from "$ORIGIN/libminigui_gtk.so" returns ptr
+/// @internal
+extern function mg_alive(node as ptr) from "$ORIGIN/libminigui_gtk.so" returns bool
+/// @internal
+extern function mg_show(node as ptr, visible as int) from "$ORIGIN/libminigui_gtk.so" returns void
+/// @internal
+extern function mg_destroy(node as ptr) from "$ORIGIN/libminigui_gtk.so" returns void
+/// @internal
+extern function mg_bounds(node as ptr, x as double, y as double, width as double, height as double) from "$ORIGIN/libminigui_gtk.so" returns void
+/// @internal
+extern function mg_text(node as ptr, text as cstr) from "$ORIGIN/libminigui_gtk.so" returns void
+/// @internal
+extern function mg_get_text(node as ptr) from "$ORIGIN/libminigui_gtk.so" returns cstr
+/// @internal
+extern function mg_columns(node as ptr, columns as cstr) from "$ORIGIN/libminigui_gtk.so" returns void
+/// @internal
+extern function mg_clear(node as ptr) from "$ORIGIN/libminigui_gtk.so" returns void
+/// @internal
+extern function mg_add(node as ptr, row as cstr) from "$ORIGIN/libminigui_gtk.so" returns void
+/// @internal
+extern function mg_selection(node as ptr, value as int, set as int) from "$ORIGIN/libminigui_gtk.so" returns int
+/// @internal
+extern function mg_value(node as ptr, value as int, set as int) from "$ORIGIN/libminigui_gtk.so" returns int
+/// @internal
+extern function mg_range(node as ptr, minimum as int, maximum as int, step as int) from "$ORIGIN/libminigui_gtk.so" returns void
+/// @internal
+extern function mg_property(node as ptr, key as cstr, text as cstr, value as int) from "$ORIGIN/libminigui_gtk.so" returns int
+/// @internal
+extern function mg_draw(node as ptr, op as int, x as double, y as double, width as double, height as double, color as cstr, text as cstr) from "$ORIGIN/libminigui_gtk.so" returns void
+/// @internal
+extern function mg_poll(wait as int) from "$ORIGIN/libminigui_gtk.so" returns int
+/// @internal
+extern function mg_event(field as int) from "$ORIGIN/libminigui_gtk.so" returns int
+/// @internal
+extern function mg_event_text() from "$ORIGIN/libminigui_gtk.so" returns cstr
+/// @internal
+extern function mg_dialog(parent as ptr, kind as int, title as cstr, text as cstr) from "$ORIGIN/libminigui_gtk.so" returns cstr
+/// @internal
+extern function mg_shutdown() from "$ORIGIN/libminigui_gtk.so" returns void
+/// @internal
+extern function mg_format(node as ptr, start as int, endIndex as int, color as cstr, bold as int, italic as int) from "$ORIGIN/libminigui_gtk.so" returns int
+/// @internal
+extern function mg_cell(node as ptr, row as int, column as int, text as cstr, set as int) from "$ORIGIN/libminigui_gtk.so" returns cstr
+/// Runtime Event data.
+struct Event
+  /// Stores the sender value associated with event.
+  sender,
+  /// Stores the event type value associated with event.
+  eventType,
+  /// Stores the old value value associated with event.
+  oldValue,
+  /// Stores the new value value associated with event.
+  newValue,
+  /// Stores the cancel value associated with event.
+  cancel,
+end struct
+
+/// Runtime Binding data.
+struct Binding
+  /// Stores the control value associated with binding.
+  control,
+  /// Stores the callback value associated with binding.
+  callback,
+  /// Stores the context value associated with binding.
+  context,
+  /// Stores the event type value associated with binding.
+  eventType,
+end struct
+
+/// Runtime NativeControl data.
+struct NativeControl
+  /// Stores the id value associated with native control.
+  id,
+  /// Stores the kind value associated with native control.
+  kind,
+  /// Stores the handle value associated with native control.
+  handle,
+  /// Stores the native id value associated with native control.
+  nativeId,
+  /// Stores the text value associated with native control.
+  text,
+  /// Stores the x value associated with native control.
+  x,
+  /// Stores the y value associated with native control.
+  y,
+  /// Stores the width value associated with native control.
+  width,
+  /// Stores the height value associated with native control.
+  height,
+  /// Stores the visible value associated with native control.
+  visible,
+  /// Stores the enabled value associated with native control.
+  enabled,
+  /// Stores the last text value associated with native control.
+  lastText,
+  /// Stores the last selection value associated with native control.
+  lastSelection,
+  /// Stores the scroll min value associated with native control.
+  scrollMin,
+  /// Stores the scroll max value associated with native control.
+  scrollMax,
+  /// Stores the scroll value value associated with native control.
+  scrollValue,
+  /// Stores the small step value associated with native control.
+  smallStep,
+  /// Stores the large step value associated with native control.
+  largeStep,
+  /// Stores the base x value associated with native control.
+  baseX,
+  /// Stores the base y value associated with native control.
+  baseY,
+  /// Stores the base width value associated with native control.
+  baseWidth,
+  /// Stores the base height value associated with native control.
+  baseHeight,
+  /// Stores the base client width value associated with native control.
+  baseClientWidth,
+  /// Stores the base client height value associated with native control.
+  baseClientHeight,
+  /// Stores the parent value associated with native control.
+  parent,
+  /// Stores the base parent width value associated with native control.
+  baseParentWidth,
+  /// Stores the base parent height value associated with native control.
+  baseParentHeight,
+end struct
+
+/// Runtime ApplicationState data.
+struct ApplicationState
+  /// Stores the windows value associated with application state.
+  windows,
+  /// Stores the controls value associated with application state.
+  controls,
+  /// Stores the click bindings value associated with application state.
+  clickBindings,
+  /// Stores the text bindings value associated with application state.
+  textBindings,
+  /// Stores the selection bindings value associated with application state.
+  selectionBindings,
+  /// Stores the scroll bindings value associated with application state.
+  scrollBindings,
+  /// Stores the load bindings value associated with application state.
+  loadBindings,
+  /// Stores the close bindings value associated with application state.
+  closeBindings,
+  /// Stores the resize bindings value associated with application state.
+  resizeBindings,
+  /// Stores the focus bindings value associated with application state.
+  focusBindings,
+  /// Stores the blur bindings value associated with application state.
+  blurBindings,
+  /// Stores the startup window value associated with application state.
+  startupWindow,
+  /// Stores the next native id value associated with application state.
+  nextNativeId,
+  /// Stores the running value associated with application state.
+  running,
+end struct
+
+/// Runtime DialogWindow data.
+struct DialogWindow
+  /// Stores the app value associated with dialog window.
+  app,
+  /// Stores the window value associated with dialog window.
+  window,
+  /// Stores the prompt label value associated with dialog window.
+  promptLabel,
+  /// Stores the input box value associated with dialog window.
+  inputBox,
+  /// Stores the ok button value associated with dialog window.
+  okButton,
+  /// Stores the cancel button value associated with dialog window.
+  cancelButton,
+  /// Stores the result value associated with dialog window.
+  result,
+  /// Stores the value value associated with dialog window.
+  value,
+end struct
+
+/// @internal
+function _joinText(items, separator)
+  output = sb.StringBuilder.new()
+  if len(items) > 0 then
+    for i = 0 to len(items) - 1
+      if i > 0 then output.appendString(separator) end if
+      output.appendString(items[i])
+    end for
+  end if
+  return output.toString()
+end function
+
+/// @internal
+function _itemTextAt(itemsText, index)
+  current = sb.StringBuilder.new()
+  currentIndex = 0
+  if len(itemsText) > 0 then
+    for i = 0 to len(itemsText) - 1
+      ch = itemsText[i]
+      if ch == "\n" then
+        if currentIndex == index then return current.toString() end if
+        current.clear()
+        currentIndex = currentIndex + 1
+      else
+        current.appendString(ch)
+      end if
+    end for
+  end if
+  if currentIndex == index then return current.toString() end if
+  return ""
+end function
+
+/// @internal
+function _itemCount(itemsText)
+  if itemsText == "" then return 0 end if
+  count = 1
+  for i = 0 to len(itemsText) - 1
+    if itemsText[i] == "\n" then count = count + 1 end if
+  end for
+  return count
+end function
+
+/// @internal
+_linuxBindings = []
+/// @internal
+_linuxLayouts = []
+/// _new for the native backend.
+/// @param app app supplied by the caller.
+/// @param parent parent supplied by the caller.
+/// @param id id supplied by the caller.
+/// @param kind kind supplied by the caller.
+/// @param text text supplied by the caller.
+/// @param x x supplied by the caller.
+/// @param y y supplied by the caller.
+/// @param width width supplied by the caller.
+/// @param height height supplied by the caller.
+function _new(app, parent, id, kind, text, x, y, width, height)
+  handle = 0
+  if parent is void == false then handle = parent.handle end if
+  nid = app.nextNativeId
+  app.nextNativeId = nid + 1
+  handle = mg_create(kind, handle, nid, text, x, y, width, height)
+  if handle == 0 then return error(700, "GTK could not create " + kind) end if
+  pw = width
+  ph = height
+  if parent is void == false then pw = parent.width; ph = parent.height end if
+  c = NativeControl(id, kind, handle, nid, text, x, y, width, height, true, true, text, -1, 0, 100, 0, 1, 10, x, y, width, height, width, height, parent, pw, ph)
+  if kind == "Window" then
+    app.windows = app.windows + [c]
+    if app.startupWindow is void then app.startupWindow = c end if
+  else
+    app.controls = app.controls + [c]
+  end if
+  return c
+end function
+
+/// Native Application operations.
+struct Application
+  /// create for the Application backend implementation.
+  static function create()
+    global _linuxBindings
+    global _linuxLayouts
+    if _linuxBindings is void then _linuxBindings = [] end if
+    if _linuxLayouts is void then _linuxLayouts = [] end if
+    if mg_init() == 0 then return error(700, "GTK cannot connect to a display") end if
+    return ApplicationState([], [], [], [], [], [], [], [], [], [], [], void, 1000, false)
+  end function
+
+  /// setStartupWindow for the Application backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param window window supplied by the caller.
+  static function setStartupWindow(app, window)
+    app.startupWindow = window
+    return window
+  end function
+
+  /// run for the Application backend implementation.
+  /// @param app app supplied by the caller.
+  static function run(app)
+    if app.startupWindow is void then return 0 end if
+    app.running = true
+    for each window in app.windows
+      Events._emit(window, "load", "", "")
+    end for
+    while app.running and mg_alive(app.startupWindow.handle)
+      Application.pump(app, true)
+    end while
+    Application.dispose(app)
+    return 0
+  end function
+
+  /// dispose for the Application backend implementation.
+  /// @param app app supplied by the caller.
+  static function dispose(app)
+    global _linuxBindings
+    global _linuxLayouts
+    app.running = false
+    mg_shutdown()
+    _linuxBindings = []
+    _linuxLayouts = []
+    return true
+  end function
+
+  /// pump for the Application backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param wait wait supplied by the caller.
+  static function pump(app, wait)
+    block = 0
+    if wait then block = 1 end if
+    kind = mg_poll(block)
+    if kind == 0 then return false end if
+    id = mg_event(0)
+    allControls = app.windows + app.controls
+    for each c in allControls
+      if c.nativeId != id then continue end if
+      if kind == 1 then
+        value = true
+        if c.kind == "FilePicker" then value = Dialog.pickOpenFile(app, _itemTextAt(c.lastText, 0), _itemTextAt(c.lastText, 1)) end if
+        if c.kind == "FolderPicker" then value = Dialog.pickFolder(app, c.lastText) end if
+        if c.kind == "ColorPicker" then value = Dialog.pickColor(app, c.lastText, "") end if
+        if c.kind == "TrayIcon" then value = mg_event(1) end if
+        if c.kind == "MenuBar" or c.kind == "ToolBar" or c.kind == "ContextMenu" then value = mg_event_text() end if
+        Events._emit(c, "click", false, value)
+      else if kind == 2 then
+        previous = c.lastText
+        value = Control.getText(c)
+        c.lastText = value
+        Events._emit(c, "textChanged", previous, value)
+      else if kind == 3 then
+        previous = c.lastSelection
+        c.lastSelection = mg_event(1)
+        Events._emit(c, "selectionChanged", previous, Control.getSelectedText(c))
+      else if kind == 4 then
+        previous = c.scrollValue
+        c.scrollValue = mg_event(1)
+        if c.kind == "Splitter" then
+          delta = c.scrollValue - c.smallStep
+          c.smallStep = c.scrollValue
+          beforeId = _itemTextAt(c.lastText, 0)
+          afterId = _itemTextAt(c.lastText, 1)
+          for each pane in app.controls
+            if pane.parent is void then continue end if
+            if pane.parent.handle != c.parent.handle then continue end if
+            vertical = c.height > c.width
+            if pane.id == beforeId then
+              if vertical then Control.setBounds(pane, pane.x, pane.y, pane.width + delta, pane.height)
+              else Control.setBounds(pane, pane.x, pane.y, pane.width, pane.height + delta)
+              end if
+            end if
+            if pane.id == afterId then
+              if vertical then Control.setBounds(pane, pane.x + delta, pane.y, pane.width - delta, pane.height)
+              else Control.setBounds(pane, pane.x, pane.y + delta, pane.width, pane.height - delta)
+              end if
+            end if
+          end for
+          if c.height > c.width then Control.setBounds(c, c.x + delta, c.y, c.width, c.height)
+          else Control.setBounds(c, c.x, c.y + delta, c.width, c.height)
+          end if
+        end if
+        Events._emit(c, "valueChanged", previous, c.scrollValue)
+      else if kind == 5 then
+        canceled = Events._emit(c, "close", "", "")
+        if canceled == false then Window.close(c) end if
+      else if kind == 6 then
+        Application.resizeWindow(app, c, mg_event(1), mg_event(2))
+      else if kind == 7 then Events._emit(c, "focus", false, true)
+      else if kind == 8 then Events._emit(c, "blur", true, false)
+      else if kind == 9 then Events._emit(c, "valueChanged", [mg_event(1), mg_event(2)], mg_event_text())
+      end if
+      return true
+    end for
+    return false
+  end function
+
+  /// resizeWindow for the Application backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param window window supplied by the caller.
+  /// @param width width supplied by the caller.
+  /// @param height height supplied by the caller.
+  static function resizeWindow(app, window, width, height)
+    if window.width == width and window.height == height then return false end if
+    old = [window.width, window.height]
+    window.width = width
+    window.height = height
+    Control._resizeChildren(app, window)
+    Events._emit(window, "resized", old, [width, height])
+    return true
+  end function
+
+end struct
+
+/// Native Window operations.
+struct Window
+  /// create for the Window backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param id id supplied by the caller.
+  /// @param title title supplied by the caller.
+  /// @param width width supplied by the caller.
+  /// @param height height supplied by the caller.
+  static function create(app, id, title, width, height)
+    return _new(app, void, id, "Window", title, 0, 0, width, height)
+  end function
+
+  /// show for the Window backend implementation.
+  /// @param window window supplied by the caller.
+  static function show(window)
+    mg_show(window.handle, 1)
+    return true
+  end function
+
+  /// close for the Window backend implementation.
+  /// @param window window supplied by the caller.
+  static function close(window)
+    mg_destroy(window.handle)
+    return true
+  end function
+
+  /// setTitle for the Window backend implementation.
+  /// @param window window supplied by the caller.
+  /// @param title title supplied by the caller.
+  static function setTitle(window, title)
+    return Control.setText(window, title)
+  end function
+
+  /// getClientWidth for the Window backend implementation.
+  /// @param window window supplied by the caller.
+  static function getClientWidth(window)
+    return window.width
+  end function
+
+  /// getClientHeight for the Window backend implementation.
+  /// @param window window supplied by the caller.
+  static function getClientHeight(window)
+    return window.height
+  end function
+
+end struct
+
+/// Native Label operations.
+struct Label
+  /// create for the Label backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param parent parent supplied by the caller.
+  /// @param id id supplied by the caller.
+  /// @param text text supplied by the caller.
+  /// @param x x supplied by the caller.
+  /// @param y y supplied by the caller.
+  /// @param width width supplied by the caller.
+  /// @param height height supplied by the caller.
+  static function create(app, parent, id, text, x, y, width, height)
+    c = _new(app, parent, id, "Label", text, x, y, width, height)
+    return c
+  end function
+
+end struct
+
+/// Native Button operations.
+struct Button
+  /// create for the Button backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param parent parent supplied by the caller.
+  /// @param id id supplied by the caller.
+  /// @param text text supplied by the caller.
+  /// @param x x supplied by the caller.
+  /// @param y y supplied by the caller.
+  /// @param width width supplied by the caller.
+  /// @param height height supplied by the caller.
+  static function create(app, parent, id, text, x, y, width, height)
+    c = _new(app, parent, id, "Button", text, x, y, width, height)
+    return c
+  end function
+
+end struct
+
+/// Native TextBox operations.
+struct TextBox
+  /// create for the TextBox backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param parent parent supplied by the caller.
+  /// @param id id supplied by the caller.
+  /// @param text text supplied by the caller.
+  /// @param x x supplied by the caller.
+  /// @param y y supplied by the caller.
+  /// @param width width supplied by the caller.
+  /// @param height height supplied by the caller.
+  static function create(app, parent, id, text, x, y, width, height)
+    c = _new(app, parent, id, "TextBox", text, x, y, width, height)
+    return c
+  end function
+
+end struct
+
+/// Native FilePicker operations.
+struct FilePicker
+  /// create for the FilePicker backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param parent parent supplied by the caller.
+  /// @param id id supplied by the caller.
+  /// @param text text supplied by the caller.
+  /// @param x x supplied by the caller.
+  /// @param y y supplied by the caller.
+  /// @param width width supplied by the caller.
+  /// @param height height supplied by the caller.
+  /// @param title title supplied by the caller.
+  /// @param filter filter supplied by the caller.
+  static function create(app, parent, id, text, x, y, width, height, title, filter)
+    c = _new(app, parent, id, "FilePicker", text, x, y, width, height)
+    c.lastText = title + "\n" + filter
+    return c
+  end function
+
+end struct
+
+/// Native FolderPicker operations.
+struct FolderPicker
+  /// create for the FolderPicker backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param parent parent supplied by the caller.
+  /// @param id id supplied by the caller.
+  /// @param text text supplied by the caller.
+  /// @param x x supplied by the caller.
+  /// @param y y supplied by the caller.
+  /// @param width width supplied by the caller.
+  /// @param height height supplied by the caller.
+  /// @param title title supplied by the caller.
+  static function create(app, parent, id, text, x, y, width, height, title)
+    c = _new(app, parent, id, "FolderPicker", text, x, y, width, height)
+    c.lastText = title
+    return c
+  end function
+
+end struct
+
+/// Native ColorPicker operations.
+struct ColorPicker
+  /// create for the ColorPicker backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param parent parent supplied by the caller.
+  /// @param id id supplied by the caller.
+  /// @param text text supplied by the caller.
+  /// @param x x supplied by the caller.
+  /// @param y y supplied by the caller.
+  /// @param width width supplied by the caller.
+  /// @param height height supplied by the caller.
+  /// @param title title supplied by the caller.
+  /// @param value value supplied by the caller.
+  static function create(app, parent, id, text, x, y, width, height, title, value)
+    c = _new(app, parent, id, "ColorPicker", text, x, y, width, height)
+    Control.setValue(c, value)
+    c.lastText = title
+    return c
+  end function
+
+end struct
+
+/// Native SearchBox operations.
+struct SearchBox
+  /// create for the SearchBox backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param parent parent supplied by the caller.
+  /// @param id id supplied by the caller.
+  /// @param text text supplied by the caller.
+  /// @param x x supplied by the caller.
+  /// @param y y supplied by the caller.
+  /// @param width width supplied by the caller.
+  /// @param height height supplied by the caller.
+  static function create(app, parent, id, text, x, y, width, height)
+    c = _new(app, parent, id, "SearchBox", text, x, y, width, height)
+    return c
+  end function
+
+end struct
+
+/// Native TextArea operations.
+struct TextArea
+  /// create for the TextArea backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param parent parent supplied by the caller.
+  /// @param id id supplied by the caller.
+  /// @param text text supplied by the caller.
+  /// @param x x supplied by the caller.
+  /// @param y y supplied by the caller.
+  /// @param width width supplied by the caller.
+  /// @param height height supplied by the caller.
+  static function create(app, parent, id, text, x, y, width, height)
+    c = _new(app, parent, id, "TextArea", text, x, y, width, height)
+    return c
+  end function
+
+end struct
+
+/// Native PasswordBox operations.
+struct PasswordBox
+  /// create for the PasswordBox backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param parent parent supplied by the caller.
+  /// @param id id supplied by the caller.
+  /// @param text text supplied by the caller.
+  /// @param x x supplied by the caller.
+  /// @param y y supplied by the caller.
+  /// @param width width supplied by the caller.
+  /// @param height height supplied by the caller.
+  static function create(app, parent, id, text, x, y, width, height)
+    c = _new(app, parent, id, "PasswordBox", text, x, y, width, height)
+    return c
+  end function
+
+end struct
+
+/// Native NumberBox operations.
+struct NumberBox
+  /// create for the NumberBox backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param parent parent supplied by the caller.
+  /// @param id id supplied by the caller.
+  /// @param text text supplied by the caller.
+  /// @param x x supplied by the caller.
+  /// @param y y supplied by the caller.
+  /// @param width width supplied by the caller.
+  /// @param height height supplied by the caller.
+  /// @param minimum minimum supplied by the caller.
+  /// @param maximum maximum supplied by the caller.
+  /// @param value value supplied by the caller.
+  /// @param step step supplied by the caller.
+  static function create(app, parent, id, text, x, y, width, height, minimum, maximum, value, step)
+    c = _new(app, parent, id, "NumberBox", text, x, y, width, height)
+    Control.setRange(c, minimum, maximum)
+    Control.setValue(c, value)
+    Control.setStep(c, step)
+    return c
+  end function
+
+end struct
+
+/// Native SpinBox operations.
+struct SpinBox
+  /// create for the SpinBox backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param parent parent supplied by the caller.
+  /// @param id id supplied by the caller.
+  /// @param text text supplied by the caller.
+  /// @param x x supplied by the caller.
+  /// @param y y supplied by the caller.
+  /// @param width width supplied by the caller.
+  /// @param height height supplied by the caller.
+  /// @param minimum minimum supplied by the caller.
+  /// @param maximum maximum supplied by the caller.
+  /// @param value value supplied by the caller.
+  /// @param step step supplied by the caller.
+  static function create(app, parent, id, text, x, y, width, height, minimum, maximum, value, step)
+    c = _new(app, parent, id, "SpinBox", text, x, y, width, height)
+    Control.setRange(c, minimum, maximum)
+    Control.setValue(c, value)
+    Control.setStep(c, step)
+    return c
+  end function
+
+end struct
+
+/// Native CheckBox operations.
+struct CheckBox
+  /// create for the CheckBox backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param parent parent supplied by the caller.
+  /// @param id id supplied by the caller.
+  /// @param text text supplied by the caller.
+  /// @param x x supplied by the caller.
+  /// @param y y supplied by the caller.
+  /// @param width width supplied by the caller.
+  /// @param height height supplied by the caller.
+  /// @param checked checked supplied by the caller.
+  static function create(app, parent, id, text, x, y, width, height, checked)
+    c = _new(app, parent, id, "CheckBox", text, x, y, width, height)
+    Control.setChecked(c, checked)
+    return c
+  end function
+
+end struct
+
+/// Native ToggleSwitch operations.
+struct ToggleSwitch
+  /// create for the ToggleSwitch backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param parent parent supplied by the caller.
+  /// @param id id supplied by the caller.
+  /// @param text text supplied by the caller.
+  /// @param x x supplied by the caller.
+  /// @param y y supplied by the caller.
+  /// @param width width supplied by the caller.
+  /// @param height height supplied by the caller.
+  /// @param checked checked supplied by the caller.
+  static function create(app, parent, id, text, x, y, width, height, checked)
+    c = _new(app, parent, id, "ToggleSwitch", text, x, y, width, height)
+    Control.setChecked(c, checked)
+    return c
+  end function
+
+end struct
+
+/// Native RadioButton operations.
+struct RadioButton
+  /// create for the RadioButton backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param parent parent supplied by the caller.
+  /// @param id id supplied by the caller.
+  /// @param text text supplied by the caller.
+  /// @param x x supplied by the caller.
+  /// @param y y supplied by the caller.
+  /// @param width width supplied by the caller.
+  /// @param height height supplied by the caller.
+  /// @param checked checked supplied by the caller.
+  static function create(app, parent, id, text, x, y, width, height, checked)
+    c = _new(app, parent, id, "RadioButton", text, x, y, width, height)
+    Control.setChecked(c, checked)
+    return c
+  end function
+
+end struct
+
+/// Native Image operations.
+struct Image
+  /// create for the Image backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param parent parent supplied by the caller.
+  /// @param id id supplied by the caller.
+  /// @param text text supplied by the caller.
+  /// @param x x supplied by the caller.
+  /// @param y y supplied by the caller.
+  /// @param width width supplied by the caller.
+  /// @param height height supplied by the caller.
+  /// @param source source supplied by the caller.
+  /// @param stretch stretch supplied by the caller.
+  static function create(app, parent, id, text, x, y, width, height, source, stretch)
+    c = _new(app, parent, id, "Image", text, x, y, width, height)
+    mg_property(c.handle, "source", source, 0)
+    return c
+  end function
+
+end struct
+
+/// Native Separator operations.
+struct Separator
+  /// create for the Separator backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param parent parent supplied by the caller.
+  /// @param id id supplied by the caller.
+  /// @param text text supplied by the caller.
+  /// @param x x supplied by the caller.
+  /// @param y y supplied by the caller.
+  /// @param width width supplied by the caller.
+  /// @param height height supplied by the caller.
+  /// @param orientation orientation supplied by the caller.
+  static function create(app, parent, id, text, x, y, width, height, orientation)
+    c = _new(app, parent, id, "Separator", text, x, y, width, height)
+    mg_property(c.handle, "orientation", orientation, 0)
+    return c
+  end function
+
+end struct
+
+/// Native Splitter operations.
+struct Splitter
+  /// create for the Splitter backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param parent parent supplied by the caller.
+  /// @param id id supplied by the caller.
+  /// @param text text supplied by the caller.
+  /// @param x x supplied by the caller.
+  /// @param y y supplied by the caller.
+  /// @param width width supplied by the caller.
+  /// @param height height supplied by the caller.
+  /// @param orientation orientation supplied by the caller.
+  static function create(app, parent, id, text, x, y, width, height, orientation)
+    c = _new(app, parent, id, "Splitter", text, x, y, width, height)
+    mg_property(c.handle, "orientation", orientation, 0)
+    return c
+  end function
+
+  /// createPane for the Splitter backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param parent parent supplied by the caller.
+  /// @param id id supplied by the caller.
+  /// @param text text supplied by the caller.
+  /// @param x x supplied by the caller.
+  /// @param y y supplied by the caller.
+  /// @param width width supplied by the caller.
+  /// @param height height supplied by the caller.
+  /// @param orientation orientation supplied by the caller.
+  /// @param targetBefore targetBefore supplied by the caller.
+  /// @param targetAfter targetAfter supplied by the caller.
+  static function createPane(app, parent, id, text, x, y, width, height, orientation, targetBefore, targetAfter)
+    c = _new(app, parent, id, "Splitter", text, x, y, width, height)
+    mg_property(c.handle, "orientation", orientation, 0)
+    c.lastText = targetBefore + "\n" + targetAfter
+    c.smallStep = 0
+    return c
+  end function
+
+end struct
+
+/// Native LinkLabel operations.
+struct LinkLabel
+  /// create for the LinkLabel backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param parent parent supplied by the caller.
+  /// @param id id supplied by the caller.
+  /// @param text text supplied by the caller.
+  /// @param x x supplied by the caller.
+  /// @param y y supplied by the caller.
+  /// @param width width supplied by the caller.
+  /// @param height height supplied by the caller.
+  /// @param url url supplied by the caller.
+  static function create(app, parent, id, text, x, y, width, height, url)
+    c = _new(app, parent, id, "LinkLabel", text, x, y, width, height)
+    mg_property(c.handle, "url", url, 0)
+    return c
+  end function
+
+end struct
+
+/// Native Panel operations.
+struct Panel
+  /// create for the Panel backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param parent parent supplied by the caller.
+  /// @param id id supplied by the caller.
+  /// @param text text supplied by the caller.
+  /// @param x x supplied by the caller.
+  /// @param y y supplied by the caller.
+  /// @param width width supplied by the caller.
+  /// @param height height supplied by the caller.
+  static function create(app, parent, id, text, x, y, width, height)
+    c = _new(app, parent, id, "Panel", text, x, y, width, height)
+    return c
+  end function
+
+  /// Creates the next native notebook page content panel.
+  /// @param app app supplied by the caller.
+  /// @param tabControl tabControl supplied by the caller.
+  /// @param id id supplied by the caller.
+  /// @param text text supplied by the caller.
+  /// @param x x supplied by the caller.
+  /// @param y y supplied by the caller.
+  /// @param width width supplied by the caller.
+  /// @param height height supplied by the caller.
+  static function createTabPage(app, tabControl, id, text, x, y, width, height)
+    return _new(app, tabControl, id, "Panel", text, 0, 0, width, height)
+  end function
+
+
+end struct
+
+/// Native ScrollViewer operations.
+struct ScrollViewer
+  /// create for the ScrollViewer backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param parent parent supplied by the caller.
+  /// @param id id supplied by the caller.
+  /// @param text text supplied by the caller.
+  /// @param x x supplied by the caller.
+  /// @param y y supplied by the caller.
+  /// @param width width supplied by the caller.
+  /// @param height height supplied by the caller.
+  /// @param horizontalScroll horizontalScroll supplied by the caller.
+  /// @param verticalScroll verticalScroll supplied by the caller.
+  static function create(app, parent, id, text, x, y, width, height, horizontalScroll, verticalScroll)
+    c = _new(app, parent, id, "ScrollViewer", text, x, y, width, height)
+    return c
+  end function
+
+end struct
+
+/// Native GroupBox operations.
+struct GroupBox
+  /// create for the GroupBox backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param parent parent supplied by the caller.
+  /// @param id id supplied by the caller.
+  /// @param text text supplied by the caller.
+  /// @param x x supplied by the caller.
+  /// @param y y supplied by the caller.
+  /// @param width width supplied by the caller.
+  /// @param height height supplied by the caller.
+  static function create(app, parent, id, text, x, y, width, height)
+    c = _new(app, parent, id, "GroupBox", text, x, y, width, height)
+    return c
+  end function
+
+end struct
+
+/// Native ScrollBar operations.
+struct ScrollBar
+  /// create for the ScrollBar backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param parent parent supplied by the caller.
+  /// @param id id supplied by the caller.
+  /// @param text text supplied by the caller.
+  /// @param x x supplied by the caller.
+  /// @param y y supplied by the caller.
+  /// @param width width supplied by the caller.
+  /// @param height height supplied by the caller.
+  /// @param orientation orientation supplied by the caller.
+  /// @param minimum minimum supplied by the caller.
+  /// @param maximum maximum supplied by the caller.
+  /// @param value value supplied by the caller.
+  /// @param smallStep smallStep supplied by the caller.
+  /// @param largeStep largeStep supplied by the caller.
+  static function create(app, parent, id, text, x, y, width, height, orientation, minimum, maximum, value, smallStep, largeStep)
+    c = _new(app, parent, id, "ScrollBar", text, x, y, width, height)
+    Control.setRange(c, minimum, maximum)
+    Control.setValue(c, value)
+    mg_property(c.handle, "orientation", orientation, 0)
+    return c
+  end function
+
+end struct
+
+/// Native Slider operations.
+struct Slider
+  /// create for the Slider backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param parent parent supplied by the caller.
+  /// @param id id supplied by the caller.
+  /// @param text text supplied by the caller.
+  /// @param x x supplied by the caller.
+  /// @param y y supplied by the caller.
+  /// @param width width supplied by the caller.
+  /// @param height height supplied by the caller.
+  /// @param orientation orientation supplied by the caller.
+  /// @param minimum minimum supplied by the caller.
+  /// @param maximum maximum supplied by the caller.
+  /// @param value value supplied by the caller.
+  /// @param smallStep smallStep supplied by the caller.
+  /// @param largeStep largeStep supplied by the caller.
+  static function create(app, parent, id, text, x, y, width, height, orientation, minimum, maximum, value, smallStep, largeStep)
+    c = _new(app, parent, id, "Slider", text, x, y, width, height)
+    Control.setRange(c, minimum, maximum)
+    Control.setValue(c, value)
+    mg_property(c.handle, "orientation", orientation, 0)
+    return c
+  end function
+
+end struct
+
+/// Native ProgressBar operations.
+struct ProgressBar
+  /// create for the ProgressBar backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param parent parent supplied by the caller.
+  /// @param id id supplied by the caller.
+  /// @param text text supplied by the caller.
+  /// @param x x supplied by the caller.
+  /// @param y y supplied by the caller.
+  /// @param width width supplied by the caller.
+  /// @param height height supplied by the caller.
+  /// @param minimum minimum supplied by the caller.
+  /// @param maximum maximum supplied by the caller.
+  /// @param value value supplied by the caller.
+  static function create(app, parent, id, text, x, y, width, height, minimum, maximum, value)
+    c = _new(app, parent, id, "ProgressBar", text, x, y, width, height)
+    Control.setRange(c, minimum, maximum)
+    Control.setValue(c, value)
+    return c
+  end function
+
+end struct
+
+/// Native TabControl operations.
+struct TabControl
+  /// create for the TabControl backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param parent parent supplied by the caller.
+  /// @param id id supplied by the caller.
+  /// @param text text supplied by the caller.
+  /// @param x x supplied by the caller.
+  /// @param y y supplied by the caller.
+  /// @param width width supplied by the caller.
+  /// @param height height supplied by the caller.
+  /// @param items items supplied by the caller.
+  /// @param selectedIndex selectedIndex supplied by the caller.
+  static function create(app, parent, id, text, x, y, width, height, items, selectedIndex)
+    c = _new(app, parent, id, "TabControl", text, x, y, width, height)
+    Control.setItems(c, items)
+    Control.setSelectedIndex(c, selectedIndex)
+    return c
+  end function
+
+end struct
+
+/// Native MenuBar operations.
+struct MenuBar
+  /// create for the MenuBar backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param parent parent supplied by the caller.
+  /// @param id id supplied by the caller.
+  /// @param text text supplied by the caller.
+  /// @param x x supplied by the caller.
+  /// @param y y supplied by the caller.
+  /// @param width width supplied by the caller.
+  /// @param height height supplied by the caller.
+  /// @param items items supplied by the caller.
+  static function create(app, parent, id, text, x, y, width, height, items)
+    c = _new(app, parent, id, "MenuBar", text, x, y, width, height)
+    Control.setItems(c, items)
+    return c
+  end function
+
+end struct
+
+/// Native ContextMenu operations.
+struct ContextMenu
+  /// create for the ContextMenu backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param parent parent supplied by the caller.
+  /// @param id id supplied by the caller.
+  /// @param text text supplied by the caller.
+  /// @param x x supplied by the caller.
+  /// @param y y supplied by the caller.
+  /// @param width width supplied by the caller.
+  /// @param height height supplied by the caller.
+  /// @param items items supplied by the caller.
+  static function create(app, parent, id, text, x, y, width, height, items)
+    c = _new(app, parent, id, "ContextMenu", text, x, y, width, height)
+    Control.setItems(c, items)
+    return c
+  end function
+
+end struct
+
+/// Native StatusBar operations.
+struct StatusBar
+  /// create for the StatusBar backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param parent parent supplied by the caller.
+  /// @param id id supplied by the caller.
+  /// @param text text supplied by the caller.
+  /// @param x x supplied by the caller.
+  /// @param y y supplied by the caller.
+  /// @param width width supplied by the caller.
+  /// @param height height supplied by the caller.
+  static function create(app, parent, id, text, x, y, width, height)
+    c = _new(app, parent, id, "StatusBar", text, x, y, width, height)
+    return c
+  end function
+
+end struct
+
+/// Native ToolBar operations.
+struct ToolBar
+  /// create for the ToolBar backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param parent parent supplied by the caller.
+  /// @param id id supplied by the caller.
+  /// @param text text supplied by the caller.
+  /// @param x x supplied by the caller.
+  /// @param y y supplied by the caller.
+  /// @param width width supplied by the caller.
+  /// @param height height supplied by the caller.
+  /// @param items items supplied by the caller.
+  static function create(app, parent, id, text, x, y, width, height, items)
+    c = _new(app, parent, id, "ToolBar", text, x, y, width, height)
+    Control.setItems(c, items)
+    return c
+  end function
+
+end struct
+
+/// Native TreeView operations.
+struct TreeView
+  /// create for the TreeView backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param parent parent supplied by the caller.
+  /// @param id id supplied by the caller.
+  /// @param text text supplied by the caller.
+  /// @param x x supplied by the caller.
+  /// @param y y supplied by the caller.
+  /// @param width width supplied by the caller.
+  /// @param height height supplied by the caller.
+  /// @param items items supplied by the caller.
+  static function create(app, parent, id, text, x, y, width, height, items)
+    c = _new(app, parent, id, "TreeView", text, x, y, width, height)
+    Control.setItems(c, items)
+    return c
+  end function
+
+end struct
+
+/// Native ListView operations.
+struct ListView
+  /// create for the ListView backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param parent parent supplied by the caller.
+  /// @param id id supplied by the caller.
+  /// @param text text supplied by the caller.
+  /// @param x x supplied by the caller.
+  /// @param y y supplied by the caller.
+  /// @param width width supplied by the caller.
+  /// @param height height supplied by the caller.
+  /// @param items items supplied by the caller.
+  /// @param selectedIndex selectedIndex supplied by the caller.
+  static function create(app, parent, id, text, x, y, width, height, items, selectedIndex)
+    c = _new(app, parent, id, "ListView", text, x, y, width, height)
+    Control.setItems(c, items)
+    Control.setSelectedIndex(c, selectedIndex)
+    return c
+  end function
+
+  /// createColumns for the ListView backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param parent parent supplied by the caller.
+  /// @param id id supplied by the caller.
+  /// @param text text supplied by the caller.
+  /// @param x x supplied by the caller.
+  /// @param y y supplied by the caller.
+  /// @param width width supplied by the caller.
+  /// @param height height supplied by the caller.
+  /// @param columns columns supplied by the caller.
+  /// @param items items supplied by the caller.
+  /// @param selectedIndex selectedIndex supplied by the caller.
+  static function createColumns(app, parent, id, text, x, y, width, height, columns, items, selectedIndex)
+    c = _new(app, parent, id, "ListView", text, x, y, width, height)
+    Control.setColumns(c, columns)
+    Control.setItems(c, items)
+    Control.setSelectedIndex(c, selectedIndex)
+    return c
+  end function
+
+end struct
+
+/// Native DataGrid operations.
+struct DataGrid
+  /// create for the DataGrid backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param parent parent supplied by the caller.
+  /// @param id id supplied by the caller.
+  /// @param text text supplied by the caller.
+  /// @param x x supplied by the caller.
+  /// @param y y supplied by the caller.
+  /// @param width width supplied by the caller.
+  /// @param height height supplied by the caller.
+  /// @param columns columns supplied by the caller.
+  /// @param items items supplied by the caller.
+  /// @param selectedIndex selectedIndex supplied by the caller.
+  static function create(app, parent, id, text, x, y, width, height, columns, items, selectedIndex)
+    c = _new(app, parent, id, "DataGrid", text, x, y, width, height)
+    Control.setColumns(c, columns)
+    Control.setItems(c, items)
+    Control.setSelectedIndex(c, selectedIndex)
+    return c
+  end function
+
+end struct
+
+/// Native DatePicker operations.
+struct DatePicker
+  /// create for the DatePicker backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param parent parent supplied by the caller.
+  /// @param id id supplied by the caller.
+  /// @param text text supplied by the caller.
+  /// @param x x supplied by the caller.
+  /// @param y y supplied by the caller.
+  /// @param width width supplied by the caller.
+  /// @param height height supplied by the caller.
+  static function create(app, parent, id, text, x, y, width, height)
+    c = _new(app, parent, id, "DatePicker", text, x, y, width, height)
+    return c
+  end function
+
+end struct
+
+/// Native DateTimePicker operations.
+struct DateTimePicker
+  /// create for the DateTimePicker backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param parent parent supplied by the caller.
+  /// @param id id supplied by the caller.
+  /// @param text text supplied by the caller.
+  /// @param x x supplied by the caller.
+  /// @param y y supplied by the caller.
+  /// @param width width supplied by the caller.
+  /// @param height height supplied by the caller.
+  static function create(app, parent, id, text, x, y, width, height)
+    c = _new(app, parent, id, "DateTimePicker", text, x, y, width, height)
+    return c
+  end function
+
+end struct
+
+/// Native TimePicker operations.
+struct TimePicker
+  /// create for the TimePicker backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param parent parent supplied by the caller.
+  /// @param id id supplied by the caller.
+  /// @param text text supplied by the caller.
+  /// @param x x supplied by the caller.
+  /// @param y y supplied by the caller.
+  /// @param width width supplied by the caller.
+  /// @param height height supplied by the caller.
+  static function create(app, parent, id, text, x, y, width, height)
+    c = _new(app, parent, id, "TimePicker", text, x, y, width, height)
+    return c
+  end function
+
+end struct
+
+/// Native Calendar operations.
+struct Calendar
+  /// create for the Calendar backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param parent parent supplied by the caller.
+  /// @param id id supplied by the caller.
+  /// @param text text supplied by the caller.
+  /// @param x x supplied by the caller.
+  /// @param y y supplied by the caller.
+  /// @param width width supplied by the caller.
+  /// @param height height supplied by the caller.
+  static function create(app, parent, id, text, x, y, width, height)
+    c = _new(app, parent, id, "Calendar", text, x, y, width, height)
+    return c
+  end function
+
+end struct
+
+/// Native ComboBox operations.
+struct ComboBox
+  /// create for the ComboBox backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param parent parent supplied by the caller.
+  /// @param id id supplied by the caller.
+  /// @param text text supplied by the caller.
+  /// @param x x supplied by the caller.
+  /// @param y y supplied by the caller.
+  /// @param width width supplied by the caller.
+  /// @param height height supplied by the caller.
+  /// @param items items supplied by the caller.
+  /// @param selectedIndex selectedIndex supplied by the caller.
+  static function create(app, parent, id, text, x, y, width, height, items, selectedIndex)
+    c = _new(app, parent, id, "ComboBox", text, x, y, width, height)
+    Control.setItems(c, items)
+    Control.setSelectedIndex(c, selectedIndex)
+    return c
+  end function
+
+end struct
+
+/// Native EditableComboBox operations.
+struct EditableComboBox
+  /// create for the EditableComboBox backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param parent parent supplied by the caller.
+  /// @param id id supplied by the caller.
+  /// @param text text supplied by the caller.
+  /// @param x x supplied by the caller.
+  /// @param y y supplied by the caller.
+  /// @param width width supplied by the caller.
+  /// @param height height supplied by the caller.
+  /// @param items items supplied by the caller.
+  /// @param selectedIndex selectedIndex supplied by the caller.
+  static function create(app, parent, id, text, x, y, width, height, items, selectedIndex)
+    c = _new(app, parent, id, "EditableComboBox", text, x, y, width, height)
+    Control.setItems(c, items)
+    Control.setSelectedIndex(c, selectedIndex)
+    return c
+  end function
+
+end struct
+
+/// Native ListBox operations.
+struct ListBox
+  /// create for the ListBox backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param parent parent supplied by the caller.
+  /// @param id id supplied by the caller.
+  /// @param text text supplied by the caller.
+  /// @param x x supplied by the caller.
+  /// @param y y supplied by the caller.
+  /// @param width width supplied by the caller.
+  /// @param height height supplied by the caller.
+  /// @param items items supplied by the caller.
+  /// @param selectedIndex selectedIndex supplied by the caller.
+  static function create(app, parent, id, text, x, y, width, height, items, selectedIndex)
+    c = _new(app, parent, id, "ListBox", text, x, y, width, height)
+    Control.setItems(c, items)
+    Control.setSelectedIndex(c, selectedIndex)
+    return c
+  end function
+
+end struct
+
+/// Native Control operations.
+struct Control
+  /// setText for the Control backend implementation.
+  /// @param control control supplied by the caller.
+  /// @param text text supplied by the caller.
+  static function setText(control, text)
+    control.text = text
+    control.lastText = text
+    mg_text(control.handle, text)
+    return true
+  end function
+
+  /// getText for the Control backend implementation.
+  /// @param control control supplied by the caller.
+  static function getText(control)
+    return mg_get_text(control.handle)
+  end function
+
+  /// setVisible for the Control backend implementation.
+  /// @param control control supplied by the caller.
+  /// @param visible visible supplied by the caller.
+  static function setVisible(control, visible)
+    control.visible = visible
+    v = 0
+    if visible then v = 1 end if
+    mg_show(control.handle, v)
+    return true
+  end function
+
+  /// setEnabled for the Control backend implementation.
+  /// @param control control supplied by the caller.
+  /// @param enabled enabled supplied by the caller.
+  static function setEnabled(control, enabled)
+    v = 0
+    if enabled then v = 1 end if
+    return mg_property(control.handle, "enabled", "", v) != 0
+  end function
+
+  /// setReadOnly for the Control backend implementation.
+  /// @param control control supplied by the caller.
+  /// @param readOnly readOnly supplied by the caller.
+  static function setReadOnly(control, readOnly)
+    v = 0
+    if readOnly then v = 1 end if
+    return mg_property(control.handle, "readOnly", "", v) != 0
+  end function
+
+  /// setEditable for the Control backend implementation.
+  /// @param control control supplied by the caller.
+  /// @param editable editable supplied by the caller.
+  static function setEditable(control, editable)
+    v = 0
+    if editable then v = 1 end if
+    return mg_property(control.handle, "editable", "", v) != 0
+  end function
+
+  /// setTooltip for the Control backend implementation.
+  /// @param control control supplied by the caller.
+  /// @param text text supplied by the caller.
+  static function setTooltip(control, text)
+    return mg_property(control.handle, "tooltip", text, 0) != 0
+  end function
+
+  /// setPlaceholder for the Control backend implementation.
+  /// @param control control supplied by the caller.
+  /// @param text text supplied by the caller.
+  static function setPlaceholder(control, text)
+    return mg_property(control.handle, "placeholder", text, 0) != 0
+  end function
+
+  /// setImageSource for the Control backend implementation.
+  /// @param control control supplied by the caller.
+  /// @param source source supplied by the caller.
+  static function setImageSource(control, source)
+    return mg_property(control.handle, "source", source, 0) != 0
+  end function
+
+  /// setSource for the Control backend implementation.
+  /// @param control control supplied by the caller.
+  /// @param source source supplied by the caller.
+  static function setSource(control, source)
+    return mg_property(control.handle, "source", source, 0) != 0
+  end function
+
+  /// setUrl for the Control backend implementation.
+  /// @param control control supplied by the caller.
+  /// @param url url supplied by the caller.
+  static function setUrl(control, url)
+    return mg_property(control.handle, "url", url, 0) != 0
+  end function
+
+  /// setMaxLength for the Control backend implementation.
+  /// @param control control supplied by the caller.
+  /// @param maxLength maxLength supplied by the caller.
+  static function setMaxLength(control, maxLength)
+    return mg_property(control.handle, "maxLength", "", maxLength) != 0
+  end function
+
+  /// setChecked for the Control backend implementation.
+  /// @param control control supplied by the caller.
+  /// @param checked checked supplied by the caller.
+  static function setChecked(control, checked)
+    v = 0
+    if checked then v = 1 end if
+    mg_value(control.handle, v, 1)
+    return true
+  end function
+
+  /// getChecked for the Control backend implementation.
+  /// @param control control supplied by the caller.
+  static function getChecked(control)
+    return mg_value(control.handle, 0, 0) != 0
+  end function
+
+  /// setValue for the Control backend implementation.
+  /// @param control control supplied by the caller.
+  /// @param value value supplied by the caller.
+  static function setValue(control, value)
+    if control.kind == "ColorPicker" then control.lastText = value; return true end if
+    control.scrollValue = value
+    mg_value(control.handle, value, 1)
+    return true
+  end function
+
+  /// getValue for the Control backend implementation.
+  /// @param control control supplied by the caller.
+  static function getValue(control)
+    return mg_value(control.handle, 0, 0)
+  end function
+
+  /// setRange for the Control backend implementation.
+  /// @param control control supplied by the caller.
+  /// @param minimum minimum supplied by the caller.
+  /// @param maximum maximum supplied by the caller.
+  static function setRange(control, minimum, maximum)
+    control.scrollMin = minimum
+    control.scrollMax = maximum
+    mg_range(control.handle, minimum, maximum, control.smallStep)
+    return true
+  end function
+
+  /// setStep for the Control backend implementation.
+  /// @param control control supplied by the caller.
+  /// @param step step supplied by the caller.
+  static function setStep(control, step)
+    control.smallStep = step
+    mg_range(control.handle, control.scrollMin, control.scrollMax, step)
+    return true
+  end function
+
+  /// setColumns for the Control backend implementation.
+  /// @param control control supplied by the caller.
+  /// @param columns columns supplied by the caller.
+  static function setColumns(control, columns)
+    control.lastText = _joinText(columns, "\t")
+    mg_columns(control.handle, control.lastText)
+    return true
+  end function
+
+  /// setItems for the Control backend implementation.
+  /// @param control control supplied by the caller.
+  /// @param items items supplied by the caller.
+  static function setItems(control, items)
+    mg_clear(control.handle)
+    rows = []
+    for each item in items
+      row = item
+      if typeof(item) == "array" then row = _joinText(item, "\t") end if
+      rows = rows + [row]
+      mg_add(control.handle, row)
+    end for
+    control.text = _joinText(rows, "\n")
+    return true
+  end function
+
+  /// addItem for the Control backend implementation.
+  /// @param control control supplied by the caller.
+  /// @param text text supplied by the caller.
+  static function addItem(control, text)
+    mg_add(control.handle, text)
+    return true
+  end function
+
+  /// clearItems for the Control backend implementation.
+  /// @param control control supplied by the caller.
+  static function clearItems(control)
+    mg_clear(control.handle)
+    control.text = ""
+    return true
+  end function
+
+  /// setSelectedIndex for the Control backend implementation.
+  /// @param control control supplied by the caller.
+  /// @param index index supplied by the caller.
+  static function setSelectedIndex(control, index)
+    mg_selection(control.handle, index, 1)
+    control.lastSelection = index
+    return true
+  end function
+
+  /// getSelectedIndex for the Control backend implementation.
+  /// @param control control supplied by the caller.
+  static function getSelectedIndex(control)
+    return mg_selection(control.handle, 0, 0)
+  end function
+
+  /// getSelectedText for the Control backend implementation.
+  /// @param control control supplied by the caller.
+  static function getSelectedText(control)
+    if control.kind == "TreeView" then return mg_get_text(control.handle) end if
+    return _itemTextAt(control.text, Control.getSelectedIndex(control))
+  end function
+
+  /// getCellText for the Control backend implementation.
+  /// @param control control supplied by the caller.
+  /// @param row row supplied by the caller.
+  /// @param column column supplied by the caller.
+  static function getCellText(control, row, column)
+    return mg_cell(control.handle, row, column, "", 0)
+  end function
+
+  /// setCellText for the Control backend implementation.
+  /// @param control control supplied by the caller.
+  /// @param row row supplied by the caller.
+  /// @param column column supplied by the caller.
+  /// @param value value supplied by the caller.
+  static function setCellText(control, row, column, value)
+    mg_cell(control.handle, row, column, value, 1)
+    return true
+  end function
+
+  /// setBounds for the Control backend implementation.
+  /// @param control control supplied by the caller.
+  /// @param x x supplied by the caller.
+  /// @param y y supplied by the caller.
+  /// @param width width supplied by the caller.
+  /// @param height height supplied by the caller.
+  static function setBounds(control, x, y, width, height)
+    control.x = x
+    control.y = y
+    control.width = width
+    control.height = height
+    mg_bounds(control.handle, x, y, width, height)
+    return true
+  end function
+
+  /// setLayout for the Control backend implementation.
+  /// @param control control supplied by the caller.
+  /// @param mode mode supplied by the caller.
+  /// @param anchor anchor supplied by the caller.
+  /// @param minWidth minWidth supplied by the caller.
+  /// @param minHeight minHeight supplied by the caller.
+  /// @param maxWidth maxWidth supplied by the caller.
+  /// @param maxHeight maxHeight supplied by the caller.
+  static function setLayout(control, mode, anchor, minWidth, minHeight, maxWidth, maxHeight)
+    global _linuxLayouts
+    _linuxLayouts = _linuxLayouts + [[control, mode, anchor, minWidth, minHeight, maxWidth, maxHeight]]
+    return true
+  end function
+
+  /// _resizeChildren for the Control backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param parent parent supplied by the caller.
+  static function _resizeChildren(app, parent)
+    global _linuxLayouts
+    for each c in app.controls
+      if c.parent is void then continue end if
+      if c.parent.handle != parent.handle then continue end if
+      mode = "scale"; anchor = "left,top"
+      minw = 1; minh = 1; maxw = -1; maxh = -1
+      for each rule in _linuxLayouts
+        if rule[0].handle == c.handle then
+          mode = rule[1]; anchor = rule[2]
+          minw = rule[3]; minh = rule[4]; maxw = rule[5]; maxh = rule[6]
+        end if
+      end for
+      dx = parent.width - c.baseParentWidth
+      dy = parent.height - c.baseParentHeight
+      x = c.baseX; y = c.baseY; w = c.baseWidth; h = c.baseHeight
+      if mode == "fill" then w = w + dx; h = h + dy end if
+      if mode == "scale" and c.baseParentWidth > 0 and c.baseParentHeight > 0 then
+        x = x * parent.width / c.baseParentWidth; w = w * parent.width / c.baseParentWidth
+        y = y * parent.height / c.baseParentHeight; h = h * parent.height / c.baseParentHeight
+      end if
+      if mode == "anchor" then
+        if _hasWord(anchor, "right") then
+          if _hasWord(anchor, "left") then w = w + dx else x = x + dx end if
+        end if
+        if _hasWord(anchor, "bottom") then
+          if _hasWord(anchor, "top") then h = h + dy else y = y + dy end if
+        end if
+      end if
+      if w < minw then w = minw end if
+      if h < minh then h = minh end if
+      if maxw >= 0 and w > maxw then w = maxw end if
+      if maxh >= 0 and h > maxh then h = maxh end if
+      Control.setBounds(c, x, y, w, h)
+      Control._resizeChildren(app, c)
+    end for
+    return true
+  end function
+
+  /// setForeground for the Control backend implementation.
+  /// @param control control supplied by the caller.
+  /// @param color color supplied by the caller.
+  static function setForeground(control, color)
+    return mg_property(control.handle, "css", "* { color: " + color + "; }", 0) != 0
+  end function
+
+  /// setBackground for the Control backend implementation.
+  /// @param control control supplied by the caller.
+  /// @param color color supplied by the caller.
+  static function setBackground(control, color)
+    return mg_property(control.handle, "css", "* { background-color: " + color + "; }", 0) != 0
+  end function
+
+  /// setFont for the Control backend implementation.
+  /// @param control control supplied by the caller.
+  /// @param family family supplied by the caller.
+  /// @param size size supplied by the caller.
+  /// @param weight weight supplied by the caller.
+  static function setFont(control, family, size, weight)
+    if size < 1 then size = 12 end if
+    return mg_property(control.handle, "css", "* { font-family: " + family + "; font-size: " + size + "px; }", 0) != 0
+  end function
+
+  /// setBorder for the Control backend implementation.
+  /// @param control control supplied by the caller.
+  /// @param color color supplied by the caller.
+  /// @param width width supplied by the caller.
+  static function setBorder(control, color, width)
+    return mg_property(control.handle, "css", "* { border: " + width + "px solid " + color + "; }", 0) != 0
+  end function
+
+  /// Orders keyboard focus among sibling controls.
+  /// @param control control supplied by the caller.
+  /// @param tabIndex tabIndex supplied by the caller.
+  static function setTabIndex(control, tabIndex)
+    return mg_property(control.handle, "tabIndex", "", tabIndex) != 0
+  end function
+
+  /// Sets a native table column width.
+  /// @param control control supplied by the caller.
+  /// @param column column supplied by the caller.
+  /// @param width width supplied by the caller.
+  static function setColumnWidth(control, column, width)
+    return mg_property(control.handle, "columnWidth", "" + column, width) != 0
+  end function
+
+  /// Applies widths to successive table columns.
+  /// @param control control supplied by the caller.
+  /// @param widths widths supplied by the caller.
+  static function setColumnWidths(control, widths)
+    if len(widths) == 0 then return true end if
+    for i = 0 to len(widths) - 1
+      Control.setColumnWidth(control, i, widths[i])
+    end for
+    return true
+  end function
+
+  /// Moves keyboard focus to a native control.
+  /// @param control control supplied by the caller.
+  static function focus(control)
+    return mg_property(control.handle, "focus", "", 0) != 0
+  end function
+
+
+  /// Reads the native checkbox state.
+  /// @param control control supplied by the caller.
+  static function isChecked(control)
+    return Control.getChecked(control)
+  end function
+  /// Sets keyboard and page increments for a range control.
+  /// @param control control supplied by the caller.
+  /// @param smallStep smallStep supplied by the caller.
+  /// @param largeStep largeStep supplied by the caller.
+  static function setScrollSteps(control, smallStep, largeStep)
+    control.smallStep = smallStep
+    control.largeStep = largeStep
+    mg_range(control.handle, control.scrollMin, control.scrollMax, smallStep)
+    return mg_property(control.handle, "largeStep", "", largeStep) != 0
+  end function
+
+end struct
+
+/// _hasWord for the native backend.
+/// @param text text supplied by the caller.
+/// @param word word supplied by the caller.
+function _hasWord(text, word)
+  for each part in str.split(text, ",")
+    if part == word then return true end if
+  end for
+  return false
+end function
+
+/// Native Events operations.
+struct Events
+  /// bindLoad for the Events backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param control control supplied by the caller.
+  /// @param callback callback supplied by the caller.
+  /// @param context context supplied by the caller.
+  static function bindLoad(app, control, callback, context)
+    global _linuxBindings
+    _linuxBindings = _linuxBindings + [Binding(control, callback, context, "load")]
+    return control
+  end function
+
+  /// bindClose for the Events backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param control control supplied by the caller.
+  /// @param callback callback supplied by the caller.
+  /// @param context context supplied by the caller.
+  static function bindClose(app, control, callback, context)
+    global _linuxBindings
+    _linuxBindings = _linuxBindings + [Binding(control, callback, context, "close")]
+    return control
+  end function
+
+  /// bindResized for the Events backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param control control supplied by the caller.
+  /// @param callback callback supplied by the caller.
+  /// @param context context supplied by the caller.
+  static function bindResized(app, control, callback, context)
+    global _linuxBindings
+    _linuxBindings = _linuxBindings + [Binding(control, callback, context, "resized")]
+    return control
+  end function
+
+  /// bindClick for the Events backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param control control supplied by the caller.
+  /// @param callback callback supplied by the caller.
+  /// @param context context supplied by the caller.
+  static function bindClick(app, control, callback, context)
+    global _linuxBindings
+    _linuxBindings = _linuxBindings + [Binding(control, callback, context, "click")]
+    return control
+  end function
+
+  /// bindClicked for the Events backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param control control supplied by the caller.
+  /// @param callback callback supplied by the caller.
+  /// @param context context supplied by the caller.
+  static function bindClicked(app, control, callback, context)
+    global _linuxBindings
+    _linuxBindings = _linuxBindings + [Binding(control, callback, context, "click")]
+    return control
+  end function
+
+  /// bindTextChanged for the Events backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param control control supplied by the caller.
+  /// @param callback callback supplied by the caller.
+  /// @param context context supplied by the caller.
+  static function bindTextChanged(app, control, callback, context)
+    global _linuxBindings
+    _linuxBindings = _linuxBindings + [Binding(control, callback, context, "textChanged")]
+    return control
+  end function
+
+  /// bindChanged for the Events backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param control control supplied by the caller.
+  /// @param callback callback supplied by the caller.
+  /// @param context context supplied by the caller.
+  static function bindChanged(app, control, callback, context)
+    global _linuxBindings
+    _linuxBindings = _linuxBindings + [Binding(control, callback, context, "changed")]
+    return control
+  end function
+
+  /// bindChange for the Events backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param control control supplied by the caller.
+  /// @param callback callback supplied by the caller.
+  /// @param context context supplied by the caller.
+  static function bindChange(app, control, callback, context)
+    global _linuxBindings
+    _linuxBindings = _linuxBindings + [Binding(control, callback, context, "changed")]
+    return control
+  end function
+
+  /// bindSelectionChanged for the Events backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param control control supplied by the caller.
+  /// @param callback callback supplied by the caller.
+  /// @param context context supplied by the caller.
+  static function bindSelectionChanged(app, control, callback, context)
+    global _linuxBindings
+    _linuxBindings = _linuxBindings + [Binding(control, callback, context, "selectionChanged")]
+    return control
+  end function
+
+  /// bindSelected for the Events backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param control control supplied by the caller.
+  /// @param callback callback supplied by the caller.
+  /// @param context context supplied by the caller.
+  static function bindSelected(app, control, callback, context)
+    global _linuxBindings
+    _linuxBindings = _linuxBindings + [Binding(control, callback, context, "selectionChanged")]
+    return control
+  end function
+
+  /// bindValueChanged for the Events backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param control control supplied by the caller.
+  /// @param callback callback supplied by the caller.
+  /// @param context context supplied by the caller.
+  static function bindValueChanged(app, control, callback, context)
+    global _linuxBindings
+    _linuxBindings = _linuxBindings + [Binding(control, callback, context, "valueChanged")]
+    return control
+  end function
+
+  /// bindScrollChanged for the Events backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param control control supplied by the caller.
+  /// @param callback callback supplied by the caller.
+  /// @param context context supplied by the caller.
+  static function bindScrollChanged(app, control, callback, context)
+    global _linuxBindings
+    _linuxBindings = _linuxBindings + [Binding(control, callback, context, "valueChanged")]
+    return control
+  end function
+
+  /// bindFocus for the Events backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param control control supplied by the caller.
+  /// @param callback callback supplied by the caller.
+  /// @param context context supplied by the caller.
+  static function bindFocus(app, control, callback, context)
+    global _linuxBindings
+    _linuxBindings = _linuxBindings + [Binding(control, callback, context, "focus")]
+    return control
+  end function
+
+  /// bindBlur for the Events backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param control control supplied by the caller.
+  /// @param callback callback supplied by the caller.
+  /// @param context context supplied by the caller.
+  static function bindBlur(app, control, callback, context)
+    global _linuxBindings
+    _linuxBindings = _linuxBindings + [Binding(control, callback, context, "blur")]
+    return control
+  end function
+
+  /// bindSubmit for the Events backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param control control supplied by the caller.
+  /// @param callback callback supplied by the caller.
+  /// @param context context supplied by the caller.
+  static function bindSubmit(app, control, callback, context)
+    global _linuxBindings
+    _linuxBindings = _linuxBindings + [Binding(control, callback, context, "submit")]
+    return control
+  end function
+
+  /// bindValidating for the Events backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param control control supplied by the caller.
+  /// @param callback callback supplied by the caller.
+  /// @param context context supplied by the caller.
+  static function bindValidating(app, control, callback, context)
+    global _linuxBindings
+    _linuxBindings = _linuxBindings + [Binding(control, callback, context, "validating")]
+    return control
+  end function
+
+  /// bindValidated for the Events backend implementation.
+  /// @param app app supplied by the caller.
+  /// @param control control supplied by the caller.
+  /// @param callback callback supplied by the caller.
+  /// @param context context supplied by the caller.
+  static function bindValidated(app, control, callback, context)
+    global _linuxBindings
+    _linuxBindings = _linuxBindings + [Binding(control, callback, context, "validated")]
+    return control
+  end function
+
+  /// _emit for the Events backend implementation.
+  /// @param control control supplied by the caller.
+  /// @param kind kind supplied by the caller.
+  /// @param oldValue oldValue supplied by the caller.
+  /// @param newValue newValue supplied by the caller.
+  static function _emit(control, kind, oldValue, newValue)
+    global _linuxBindings
+    cancel = false
+    bindings = _linuxBindings
+    for each b in bindings
+      if b.control.handle != control.handle then continue end if
+      matches = b.eventType == kind
+      if b.eventType == "changed" and (kind == "textChanged" or kind == "selectionChanged" or kind == "valueChanged") then matches = true end if
+      if matches then
+        e = Event(control, b.eventType, oldValue, newValue, false)
+        b.callback(b.context, e)
+        if e.cancel then cancel = true end if
+      end if
+    end for
+    return cancel
+  end function
+
+end struct
+
+/// Native Dialog operations.
+struct Dialog
+  /// Finds the native owner of a dialog.
+  /// @param app app supplied by the caller.
+  static function _owner(app)
+    if app.startupWindow is void then return 0 end if
+    return app.startupWindow.handle
+  end function
+  /// Shows a native message dialog and returns a named result.
+  /// @param app app supplied by the caller.
+  /// @param title title supplied by the caller.
+  /// @param message message supplied by the caller.
+  /// @param buttons buttons supplied by the caller.
+  /// @param icon icon supplied by the caller.
+  static function showMessage(app, title, message, buttons, icon)
+    return Dialog.resultName(mg_message(Dialog._owner(app), title, message, buttons, icon))
+  end function
+  /// Returns true only when the user confirms.
+  /// @param app app supplied by the caller.
+  /// @param title title supplied by the caller.
+  /// @param message message supplied by the caller.
+  static function confirm(app, title, message)
+    return mg_message(Dialog._owner(app), title, message, "okCancel", "question") == 1
+  end function
+  /// Shows a native info message.
+  /// @param app app supplied by the caller.
+  /// @param title title supplied by the caller.
+  /// @param message message supplied by the caller.
+  static function showInfo(app, title, message)
+    return mg_message(Dialog._owner(app), title, message, "ok", "info")
+  end function
+  /// Shows a native warning message.
+  /// @param app app supplied by the caller.
+  /// @param title title supplied by the caller.
+  /// @param message message supplied by the caller.
+  static function showWarning(app, title, message)
+    return mg_message(Dialog._owner(app), title, message, "ok", "warning")
+  end function
+  /// Shows a native error message.
+  /// @param app app supplied by the caller.
+  /// @param title title supplied by the caller.
+  /// @param message message supplied by the caller.
+  static function showError(app, title, message)
+    return mg_message(Dialog._owner(app), title, message, "ok", "error")
+  end function
+  /// Implements resultName for Linux dialogs.
+  /// @param code code supplied by the caller.
+  static function resultName(code)
+    if code == 1 then return "ok" end if
+    if code == 2 then return "cancel" end if
+    if code == 3 then return "abort" end if
+    if code == 4 then return "retry" end if
+    if code == 5 then return "ignore" end if
+    if code == 6 then return "yes" end if
+    if code == 7 then return "no" end if
+    return "unknown"
+  end function
+  /// Implements info for Linux dialogs.
+  /// @param app app supplied by the caller.
+  /// @param title title supplied by the caller.
+  /// @param message message supplied by the caller.
+  static function info(app, title, message)
+    return Dialog.showMessage(app, title, message, "ok", "info")
+  end function
+  /// Implements warning for Linux dialogs.
+  /// @param app app supplied by the caller.
+  /// @param title title supplied by the caller.
+  /// @param message message supplied by the caller.
+  static function warning(app, title, message)
+    return Dialog.showMessage(app, title, message, "ok", "warning")
+  end function
+  /// Implements errorMessage for Linux dialogs.
+  /// @param app app supplied by the caller.
+  /// @param title title supplied by the caller.
+  /// @param message message supplied by the caller.
+  static function errorMessage(app, title, message)
+    return Dialog.showMessage(app, title, message, "ok", "error")
+  end function
+  /// Implements question for Linux dialogs.
+  /// @param app app supplied by the caller.
+  /// @param title title supplied by the caller.
+  /// @param message message supplied by the caller.
+  static function question(app, title, message)
+    return Dialog.showMessage(app, title, message, "yesNo", "question")
+  end function
+  /// Implements yesNo for Linux dialogs.
+  /// @param app app supplied by the caller.
+  /// @param title title supplied by the caller.
+  /// @param message message supplied by the caller.
+  static function yesNo(app, title, message)
+    return Dialog.showMessage(app, title, message, "yesNo", "question")
+  end function
+  /// Implements yesNoCancel for Linux dialogs.
+  /// @param app app supplied by the caller.
+  /// @param title title supplied by the caller.
+  /// @param message message supplied by the caller.
+  static function yesNoCancel(app, title, message)
+    return Dialog.showMessage(app, title, message, "yesNoCancel", "question")
+  end function
+  /// Implements retryCancel for Linux dialogs.
+  /// @param app app supplied by the caller.
+  /// @param title title supplied by the caller.
+  /// @param message message supplied by the caller.
+  static function retryCancel(app, title, message)
+    return Dialog.showMessage(app, title, message, "retryCancel", "warning")
+  end function
+  /// Implements abortRetryIgnore for Linux dialogs.
+  /// @param app app supplied by the caller.
+  /// @param title title supplied by the caller.
+  /// @param message message supplied by the caller.
+  static function abortRetryIgnore(app, title, message)
+    return Dialog.showMessage(app, title, message, "abortRetryIgnore", "warning")
+  end function
+  /// Implements createCustom for Linux dialogs.
+  /// @param app app supplied by the caller.
+  /// @param id id supplied by the caller.
+  /// @param title title supplied by the caller.
+  /// @param width width supplied by the caller.
+  /// @param height height supplied by the caller.
+  static function createCustom(app, id, title, width, height)
+    win = Window.create(app, id, title, width, height)
+    return DialogWindow(app, win, void, void, void, void, "", "")
+  end function
+  /// Implements createInput for Linux dialogs.
+  /// @param app app supplied by the caller.
+  /// @param id id supplied by the caller.
+  /// @param title title supplied by the caller.
+  /// @param prompt prompt supplied by the caller.
+  /// @param defaultValue defaultValue supplied by the caller.
+  /// @param width width supplied by the caller.
+  static function createInput(app, id, title, prompt, defaultValue, width)
+    if width <= 0 then width = 420 end if
+    win = Window.create(app, id, title, width, 160)
+    label = Label.create(app, win, id + "_prompt", prompt, 14, 14, width - 42, 24)
+    input = TextBox.create(app, win, id + "_input", defaultValue, 14, 44, width - 42, 26)
+    ok = Button.create(app, win, id + "_ok", "OK", width - 194, 88, 80, 28)
+    cancel = Button.create(app, win, id + "_cancel", "Cancel", width - 106, 88, 80, 28)
+    dialog = DialogWindow(app, win, label, input, ok, cancel, "", defaultValue)
+    Events.bindClick(app, ok, _dialogInputOk, dialog)
+    Events.bindClick(app, cancel, _dialogInputCancel, dialog)
+    return dialog
+  end function
+  /// Implements showInput for Linux dialogs.
+  /// @param app app supplied by the caller.
+  /// @param title title supplied by the caller.
+  /// @param prompt prompt supplied by the caller.
+  /// @param defaultValue defaultValue supplied by the caller.
+  static function showInput(app, title, prompt, defaultValue)
+    dialog = Dialog.createInput(app, "__inputDialog", title, prompt, defaultValue, 420)
+    result = Dialog.showModal(dialog)
+    if result == "ok" then return Dialog.getValue(dialog) end if
+    return ""
+  end function
+  /// Implements getValue for Linux dialogs.
+  /// @param dialog dialog supplied by the caller.
+  static function getValue(dialog)
+    if dialog is void then return "" end if
+    if dialog.inputBox is void == false then dialog.value = Control.getText(dialog.inputBox) end if
+    return dialog.value
+  end function
+  /// Implements getResult for Linux dialogs.
+  /// @param dialog dialog supplied by the caller.
+  static function getResult(dialog)
+    if dialog is void then return "" end if
+    return dialog.result
+  end function
+  /// Implements setValue for Linux dialogs.
+  /// @param dialog dialog supplied by the caller.
+  /// @param value value supplied by the caller.
+  static function setValue(dialog, value)
+    if dialog is void then return false end if
+    dialog.value = value
+    if dialog.inputBox is void == false then return Control.setText(dialog.inputBox, value) end if
+    return true
+  end function
+  /// Ends a custom modal dialog without destroying its content.
+  /// @param dialog dialog supplied by the caller.
+  /// @param result result supplied by the caller.
+  static function close(dialog, result)
+    dialog.result = result
+    mg_show(dialog.window.handle, 0)
+    return true
+  end function
+  /// Runs a custom dialog with native modal ownership.
+  /// @param dialog dialog supplied by the caller.
+  static function showModal(dialog)
+    dialog.result = ""
+    mg_modal(dialog.window.handle, Dialog._owner(dialog.app), 1)
+    Window.show(dialog.window)
+    while dialog.result == "" and mg_alive(dialog.window.handle)
+      Application.pump(dialog.app, true)
+    end while
+    mg_modal(dialog.window.handle, Dialog._owner(dialog.app), 0)
+    if dialog.result == "" then dialog.result = "cancel" end if
+    return dialog.result
+  end function
+  /// Opens the native pickOpenFile dialog.
+  /// @param app app supplied by the caller.
+  /// @param title title supplied by the caller.
+  /// @param filter filter supplied by the caller.
+  static function pickOpenFile(app, title, filter)
+    owner = 0
+    if app.startupWindow is void == false then owner = app.startupWindow.handle end if
+    return mg_dialog(owner, 0, title, filter)
+  end function
+  /// Opens the native pickSaveFile dialog.
+  /// @param app app supplied by the caller.
+  /// @param title title supplied by the caller.
+  /// @param filter filter supplied by the caller.
+  static function pickSaveFile(app, title, filter)
+    owner = 0
+    if app.startupWindow is void == false then owner = app.startupWindow.handle end if
+    return mg_dialog(owner, 1, title, filter)
+  end function
+  /// Opens the native pickFolder dialog.
+  /// @param app app supplied by the caller.
+  /// @param title title supplied by the caller.
+  static function pickFolder(app, title)
+    owner = 0
+    if app.startupWindow is void == false then owner = app.startupWindow.handle end if
+    return mg_dialog(owner, 2, title, "")
+  end function
+  /// Opens the native pickColor dialog.
+  /// @param app app supplied by the caller.
+  /// @param title title supplied by the caller.
+  /// @param initialColor initialColor supplied by the caller.
+  static function pickColor(app, title, initialColor)
+    owner = 0
+    if app.startupWindow is void == false then owner = app.startupWindow.handle end if
+    return mg_dialog(owner, 3, title, initialColor)
+  end function
+
+end struct
+
+/// _advancedCreate for the native backend.
+/// @param app app supplied by the caller.
+/// @param parent parent supplied by the caller.
+/// @param id id supplied by the caller.
+/// @param kind kind supplied by the caller.
+/// @param text text supplied by the caller.
+/// @param x x supplied by the caller.
+/// @param y y supplied by the caller.
+/// @param width width supplied by the caller.
+/// @param height height supplied by the caller.
+function _advancedCreate(app, parent, id, kind, text, x, y, width, height)
+  return _new(app, parent, id, kind, text, x, y, width, height)
+end function
+
+/// _advancedProperty for the native backend.
+/// @param control control supplied by the caller.
+/// @param key key supplied by the caller.
+/// @param text text supplied by the caller.
+/// @param value value supplied by the caller.
+function _advancedProperty(control, key, text, value)
+  return mg_property(control.handle, key, text, value)
+end function
+
+/// _advancedDraw for the native backend.
+/// @param control control supplied by the caller.
+/// @param op op supplied by the caller.
+/// @param x x supplied by the caller.
+/// @param y y supplied by the caller.
+/// @param width width supplied by the caller.
+/// @param height height supplied by the caller.
+/// @param color color supplied by the caller.
+/// @param text text supplied by the caller.
+function _advancedDraw(control, op, x, y, width, height, color, text)
+  mg_draw(control.handle, op, x, y, width, height, color, text)
+  return true
+end function
+
+/// _advancedFormat for the native backend.
+/// @param control control supplied by the caller.
+/// @param start start supplied by the caller.
+/// @param endIndex end supplied by the caller.
+/// @param color color supplied by the caller.
+/// @param bold bold supplied by the caller.
+/// @param italic italic supplied by the caller.
+function _advancedFormat(control, start, endIndex, color, bold, italic)
+  b = 0; i = 0
+  if bold then b = 1 end if
+  if italic then i = 1 end if
+  return mg_format(control.handle, start, endIndex, color, b, i)
+end function
+
+
+/// @internal
+function _dialogInputOk(context, event)
+  if context is void then return 0 end if
+  context.result = "ok"
+  if context.inputBox is void == false then context.value = Control.getText(context.inputBox) end if
+  if context.window is void == false and context.window.handle is void == false then mg_show(context.window.handle, 0) end if
+  return 0
+end function
+
+/// @internal
+function _dialogInputCancel(context, event)
+  if context is void then return 0 end if
+  context.result = "cancel"
+  if context.window is void == false and context.window.handle is void == false then mg_show(context.window.handle, 0) end if
+  return 0
+end function
+
+#endif
+/// Native RichTextBox operations.
+struct RichTextBox
+  /// Creates a native RichTextBox control.
+  /// @param app app supplied by the caller.
+  /// @param parent parent supplied by the caller.
+  /// @param id id supplied by the caller.
+  /// @param text text supplied by the caller.
+  /// @param x x supplied by the caller.
+  /// @param y y supplied by the caller.
+  /// @param width width supplied by the caller.
+  /// @param height height supplied by the caller.
+  static function create(app, parent, id, text, x, y, width, height)
+    return _advancedCreate(app, parent, id, "RichTextBox", text, x, y, width, height)
+  end function
+
+  /// Formats a character range; end is exclusive.
+  /// @param control control supplied by the caller.
+  /// @param start start supplied by the caller.
+  /// @param endIndex end supplied by the caller.
+  /// @param color color supplied by the caller.
+  /// @param bold bold supplied by the caller.
+  /// @param italic italic supplied by the caller.
+  static function formatRange(control, start, endIndex, color, bold, italic)
+    return _advancedFormat(control, start, endIndex, color, bold, italic)
+  end function
+
+end struct
+
+/// Native CodeEditor operations.
+struct CodeEditor
+  /// Creates a native CodeEditor control.
+  /// @param app app supplied by the caller.
+  /// @param parent parent supplied by the caller.
+  /// @param id id supplied by the caller.
+  /// @param text text supplied by the caller.
+  /// @param x x supplied by the caller.
+  /// @param y y supplied by the caller.
+  /// @param width width supplied by the caller.
+  /// @param height height supplied by the caller.
+  static function create(app, parent, id, text, x, y, width, height)
+    return _advancedCreate(app, parent, id, "CodeEditor", text, x, y, width, height)
+  end function
+
+  /// Selects the syntax language for the editor.
+  /// @param control control supplied by the caller.
+  /// @param language language supplied by the caller.
+  static function setLanguage(control, language)
+    return _advancedProperty(control, "language", language, 0)
+  end function
+
+end struct
+
+/// Native WebView operations.
+struct WebView
+  /// Creates a native WebView control.
+  /// @param app app supplied by the caller.
+  /// @param parent parent supplied by the caller.
+  /// @param id id supplied by the caller.
+  /// @param text text supplied by the caller.
+  /// @param x x supplied by the caller.
+  /// @param y y supplied by the caller.
+  /// @param width width supplied by the caller.
+  /// @param height height supplied by the caller.
+  static function create(app, parent, id, text, x, y, width, height)
+    return _advancedCreate(app, parent, id, "WebView", text, x, y, width, height)
+  end function
+
+  /// Navigates the embedded browser to a URL.
+  /// @param control control supplied by the caller.
+  /// @param url url supplied by the caller.
+  static function navigate(control, url)
+    return _advancedProperty(control, "url", url, 0)
+  end function
+
+  /// Displays HTML in the embedded browser.
+  /// @param control control supplied by the caller.
+  /// @param html html supplied by the caller.
+  static function loadHtml(control, html)
+    return _advancedProperty(control, "html", html, 0)
+  end function
+
+  /// Returns 1 when ready, 0 while loading, or -1 after initialization failure.
+  /// @param control control supplied by the caller.
+  static function getStatus(control)
+    return _advancedProperty(control, "status", "", 0)
+  end function
+
+end struct
+
+/// Native TrayIcon operations.
+struct TrayIcon
+  /// Creates a native TrayIcon control.
+  /// @param app app supplied by the caller.
+  /// @param parent parent supplied by the caller.
+  /// @param id id supplied by the caller.
+  /// @param text text supplied by the caller.
+  /// @param x x supplied by the caller.
+  /// @param y y supplied by the caller.
+  /// @param width width supplied by the caller.
+  /// @param height height supplied by the caller.
+  static function create(app, parent, id, text, x, y, width, height)
+    return _advancedCreate(app, parent, id, "TrayIcon", text, x, y, width, height)
+  end function
+
+  /// Sets the system tray context menu labels.
+  /// @param control control supplied by the caller.
+  /// @param items items supplied by the caller.
+  static function setItems(control, items)
+    return _advancedProperty(control, "items", _joinText(items, "\n"), 0)
+  end function
+
+  /// Sets an icon file on Windows or icon name/path on Linux.
+  /// @param control control supplied by the caller.
+  /// @param source source supplied by the caller.
+  static function setIcon(control, source)
+    return _advancedProperty(control, "icon", source, 0)
+  end function
+
+end struct
+
+/// Native DrawingCanvas operations.
+struct DrawingCanvas
+  /// Creates a native DrawingCanvas control.
+  /// @param app app supplied by the caller.
+  /// @param parent parent supplied by the caller.
+  /// @param id id supplied by the caller.
+  /// @param text text supplied by the caller.
+  /// @param x x supplied by the caller.
+  /// @param y y supplied by the caller.
+  /// @param width width supplied by the caller.
+  /// @param height height supplied by the caller.
+  static function create(app, parent, id, text, x, y, width, height)
+    return _advancedCreate(app, parent, id, "DrawingCanvas", text, x, y, width, height)
+  end function
+
+  /// Clears retained drawing commands.
+  /// @param control control supplied by the caller.
+  static function clear(control)
+    return _advancedDraw(control, 0, 0, 0, 0, 0, "#ffffff", "")
+  end function
+
+  /// Appends a line that is repainted after window exposure.
+  /// @param control control supplied by the caller.
+  /// @param x1 x1 supplied by the caller.
+  /// @param y1 y1 supplied by the caller.
+  /// @param x2 x2 supplied by the caller.
+  /// @param y2 y2 supplied by the caller.
+  /// @param color color supplied by the caller.
+  static function line(control, x1, y1, x2, y2, color)
+    return _advancedDraw(control, 1, x1, y1, x2, y2, color, "")
+  end function
+
+  /// Appends a filled rectangle.
+  /// @param control control supplied by the caller.
+  /// @param x x supplied by the caller.
+  /// @param y y supplied by the caller.
+  /// @param width width supplied by the caller.
+  /// @param height height supplied by the caller.
+  /// @param color color supplied by the caller.
+  static function fillRect(control, x, y, width, height, color)
+    return _advancedDraw(control, 2, x, y, width, height, color, "")
+  end function
+
+  /// Appends text at the supplied position.
+  /// @param control control supplied by the caller.
+  /// @param x x supplied by the caller.
+  /// @param y y supplied by the caller.
+  /// @param text text supplied by the caller.
+  /// @param color color supplied by the caller.
+  static function drawText(control, x, y, text, color)
+    return _advancedDraw(control, 3, x, y, 0, 0, color, text)
+  end function
+
+end struct
+
+/// Native Chart operations.
+struct Chart
+  /// Creates a native Chart control.
+  /// @param app app supplied by the caller.
+  /// @param parent parent supplied by the caller.
+  /// @param id id supplied by the caller.
+  /// @param text text supplied by the caller.
+  /// @param x x supplied by the caller.
+  /// @param y y supplied by the caller.
+  /// @param width width supplied by the caller.
+  /// @param height height supplied by the caller.
+  static function create(app, parent, id, text, x, y, width, height)
+    return _advancedCreate(app, parent, id, "Chart", text, x, y, width, height)
+  end function
+
+  /// Clears retained drawing commands.
+  /// @param control control supplied by the caller.
+  static function clear(control)
+    return _advancedDraw(control, 0, 0, 0, 0, 0, "#ffffff", "")
+  end function
+
+  /// Draws a bar or line chart from nonnegative numeric values.
+  /// @param control control supplied by the caller.
+  /// @param values values supplied by the caller.
+  /// @param chartType chartType supplied by the caller.
+  /// @param color color supplied by the caller.
+  static function setValues(control, values, chartType, color)
+    Chart.clear(control)
+    if len(values) == 0 then return true end if
+    maximum = 1
+    for each value in values
+      if value > maximum then maximum = value end if
+    end for
+    width = control.width - 24
+    height = control.height - 24
+    step = width / len(values)
+    px = 12; py = height + 12
+    for i = 0 to len(values) - 1
+      x = 12 + i * step
+      y = 12 + height - values[i] * height / maximum
+      if chartType == "line" then
+        if i > 0 then _advancedDraw(control, 1, px, py, x, y, color, "") end if
+      else
+        _advancedDraw(control, 2, x, y, step - 3, height + 12 - y, color, "")
+      end if
+      px = x; py = y
+    end for
+    return true
+  end function
+
+end struct
+
+/// Native PropertyGrid operations.
+struct PropertyGrid
+  /// Creates an editable two-column property table.
+  /// @param app app supplied by the caller.
+  /// @param parent parent supplied by the caller.
+  /// @param id id supplied by the caller.
+  /// @param text text supplied by the caller.
+  /// @param x x supplied by the caller.
+  /// @param y y supplied by the caller.
+  /// @param width width supplied by the caller.
+  /// @param height height supplied by the caller.
+  /// @param items items supplied by the caller.
+  static function create(app, parent, id, text, x, y, width, height, items)
+    rows = []
+    for each item in items
+      row = item
+      if typeof(item) == "array" then row = _joinText(item, "\t") end if
+      rows = rows + [row]
+    end for
+    c = DataGrid.create(app, parent, id, text, x, y, width, height, ["Property", "Value"], rows, -1)
+    Control.setEditable(c, true)
+    return c
+  end function
+
+  /// Returns the property value at a row.
+  /// @param control control supplied by the caller.
+  /// @param row row supplied by the caller.
+  static function getValue(control, row)
+    return Control.getCellText(control, row, 1)
+  end function
+
+  /// Updates the property value at a row.
+  /// @param control control supplied by the caller.
+  /// @param row row supplied by the caller.
+  /// @param value value supplied by the caller.
+  static function setValue(control, row, value)
+    return Control.setCellText(control, row, 1, value)
+  end function
+
 end struct

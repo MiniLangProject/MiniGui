@@ -1,0 +1,144 @@
+{
+  "version": 1,
+  "namespace": "advanced_controls",
+  "codeBehind": "app.ml",
+  "application": {
+    "name": "AdvancedControls",
+    "startupWindow": "mainWindow"
+  },
+  "windows": [
+    {
+      "id": "mainWindow",
+      "type": "Window",
+      "properties": {
+        "title": "MiniGui — Advanced Controls",
+        "width": 790,
+        "height": 640
+      },
+      "events": {
+        "load": "onLoad"
+      },
+      "layout": {
+        "type": "Canvas",
+        "children": [
+          {
+            "id": "richText",
+            "type": "RichTextBox",
+            "properties": {
+              "text": "MiniGui rich text\nSelect, copy and edit formatted text.",
+              "x": 12,
+              "y": 12,
+              "width": 350,
+              "height": 100
+            }
+          },
+          {
+            "id": "editor",
+            "type": "CodeEditor",
+            "properties": {
+              "text": "function greet(name)\n  print \"Hello, \" + name\nend function",
+              "language": "minilang",
+              "x": 12,
+              "y": 125,
+              "width": 350,
+              "height": 170
+            },
+            "events": {
+              "textChanged": "onEditorChanged"
+            }
+          },
+          {
+            "id": "properties",
+            "type": "PropertyGrid",
+            "properties": {
+              "items": [
+                [
+                  "Name",
+                  "Ada"
+                ],
+                [
+                  "Language",
+                  "MiniLang"
+                ],
+                [
+                  "Enabled",
+                  "true"
+                ]
+              ],
+              "x": 12,
+              "y": 308,
+              "width": 350,
+              "height": 150
+            }
+          },
+          {
+            "id": "drawing",
+            "type": "DrawingCanvas",
+            "properties": {
+              "x": 380,
+              "y": 12,
+              "width": 360,
+              "height": 120
+            }
+          },
+          {
+            "id": "chart",
+            "type": "Chart",
+            "properties": {
+              "values": [
+                10,
+                30,
+                20,
+                45,
+                60,
+                35
+              ],
+              "chartType": "bar",
+              "color": "#3867d6",
+              "x": 380,
+              "y": 145,
+              "width": 360,
+              "height": 180
+            }
+          },
+          {
+            "id": "browser",
+            "type": "WebView",
+            "properties": {
+              "html": "<!doctype html><html><body style='font:16px sans-serif;padding:16px'><h2>MiniGui WebView</h2><p>Embedded HTML on Windows and Linux.</p><button onclick='this.textContent=\"JavaScript works\"'>Test JavaScript</button></body></html>",
+              "x": 380,
+              "y": 338,
+              "width": 360,
+              "height": 220
+            }
+          },
+          {
+            "id": "status",
+            "type": "Label",
+            "properties": {
+              "text": "Ready",
+              "x": 12,
+              "y": 475,
+              "width": 350,
+              "height": 30
+            }
+          },
+          {
+            "id": "tray",
+            "type": "TrayIcon",
+            "properties": {
+              "text": "MiniGui advanced controls",
+              "items": [
+                "Show",
+                "Exit"
+              ]
+            },
+            "events": {
+              "click": "onTray"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -3,63 +3,129 @@
   "$id": "https://minilang.local/minigui.schema.json",
   "title": "MiniGui MSON",
   "type": "object",
-  "required": ["version", "namespace", "application", "windows"],
+  "required": [
+    "version",
+    "namespace",
+    "application",
+    "windows"
+  ],
   "properties": {
-    "$schema": { "type": "string" },
-    "version": { "const": 1 },
-    "namespace": { "type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_]*(\\.[A-Za-z_][A-Za-z0-9_]*)*$" },
-    "codeBehind": { "type": "string" },
-    "imports": { "type": "array", "items": { "type": "string" } },
-    "resources": { "type": "object" },
+    "$schema": {
+      "type": "string"
+    },
+    "version": {
+      "const": 1
+    },
+    "namespace": {
+      "type": "string",
+      "pattern": "^[A-Za-z_][A-Za-z0-9_]*(\\.[A-Za-z_][A-Za-z0-9_]*)*$"
+    },
+    "codeBehind": {
+      "type": "string"
+    },
+    "imports": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "resources": {
+      "type": "object"
+    },
     "application": {
       "type": "object",
-      "required": ["name", "startupWindow"],
+      "required": [
+        "name",
+        "startupWindow"
+      ],
       "properties": {
-        "name": { "type": "string" },
-        "startupWindow": { "type": "string" },
-        "events": { "type": "object" }
+        "name": {
+          "type": "string"
+        },
+        "startupWindow": {
+          "type": "string"
+        },
+        "events": {
+          "type": "object"
+        }
       },
       "additionalProperties": false
     },
     "windows": {
       "type": "array",
-      "items": { "$ref": "#/$defs/window" }
+      "items": {
+        "$ref": "#/$defs/window"
+      }
     },
     "components": {
       "type": "array",
-      "items": { "$ref": "#/$defs/component" }
+      "items": {
+        "$ref": "#/$defs/component"
+      }
     }
   },
   "additionalProperties": false,
   "$defs": {
     "component": {
       "type": "object",
-      "required": ["name", "content"],
+      "required": [
+        "name",
+        "content"
+      ],
       "properties": {
-        "name": { "type": "string" },
-        "parameters": { "type": "array", "items": { "type": "string" } },
-        "codeBehind": { "type": "string" },
-        "content": { "$ref": "#/$defs/node" }
+        "name": {
+          "type": "string"
+        },
+        "parameters": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "codeBehind": {
+          "type": "string"
+        },
+        "content": {
+          "$ref": "#/$defs/node"
+        }
       },
       "additionalProperties": false
     },
     "window": {
       "type": "object",
-      "required": ["id", "type", "layout"],
+      "required": [
+        "id",
+        "type",
+        "layout"
+      ],
       "properties": {
-        "id": { "type": "string" },
-        "type": { "const": "Window" },
-        "properties": { "type": "object" },
-        "events": { "type": "object" },
-        "layout": { "$ref": "#/$defs/node" }
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "const": "Window"
+        },
+        "properties": {
+          "type": "object"
+        },
+        "events": {
+          "type": "object"
+        },
+        "layout": {
+          "$ref": "#/$defs/node"
+        }
       },
       "additionalProperties": false
     },
     "node": {
       "type": "object",
-      "required": ["type"],
+      "required": [
+        "type"
+      ],
       "properties": {
-        "id": { "type": "string" },
+        "id": {
+          "type": "string"
+        },
         "type": {
           "type": "string",
           "enum": [
@@ -108,16 +174,40 @@
             "DatePicker",
             "DateTimePicker",
             "TimePicker",
-            "Calendar"
+            "Calendar",
+            "RichTextBox",
+            "CodeEditor",
+            "PropertyGrid",
+            "TrayIcon",
+            "WebView",
+            "DrawingCanvas",
+            "Chart"
           ]
         },
-        "properties": { "type": "object" },
-        "events": { "type": "object" },
-        "children": { "type": "array", "items": { "$ref": "#/$defs/node" } },
-        "rows": { "type": "array" },
-        "columns": { "type": "array" },
-        "grid": { "type": "object" },
-        "parameters": { "type": "object" }
+        "properties": {
+          "type": "object"
+        },
+        "events": {
+          "type": "object"
+        },
+        "children": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/node"
+          }
+        },
+        "rows": {
+          "type": "array"
+        },
+        "columns": {
+          "type": "array"
+        },
+        "grid": {
+          "type": "object"
+        },
+        "parameters": {
+          "type": "object"
+        }
       },
       "additionalProperties": false
     }

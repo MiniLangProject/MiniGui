@@ -1,0 +1,42 @@
+# `MiniGuiLib.minigui.TabControl`
+
+[Home](README.md) · [Source file](File-miniguilib-minigui-ml-1319721044.md)
+
+<a id="struct-struct-miniguilib-minigui-tabcontrol-struct-tabcontrol-miniguilib-minigui-ml-265480311"></a>
+## TabControl
+
+```ml
+struct TabControl
+```
+
+Native TabControl operations.
+
+
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6851)
+
+## Members
+
+<a id="static_method-static-method-miniguilib-minigui-tabcontrol-create-static-function-create-app-parent-id-text-x-y-width-height-items-selectedindex-miniguilib-minigui-ml-2106808952"></a>
+### create
+
+```ml
+static function create(app, parent, id, text, x, y, width, height, items, selectedIndex)
+```
+
+create for the TabControl backend implementation.
+
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| `app` | `dynamic` | — | app supplied by the caller. |
+| `parent` | `dynamic` | — | parent supplied by the caller. |
+| `id` | `dynamic` | — | id supplied by the caller. |
+| `text` | `dynamic` | — | text supplied by the caller. |
+| `x` | `dynamic` | — | x supplied by the caller. |
+| `y` | `dynamic` | — | y supplied by the caller. |
+| `width` | `dynamic` | — | width supplied by the caller. |
+| `height` | `dynamic` | — | height supplied by the caller. |
+| `items` | `dynamic` | — | items supplied by the caller. |
+| `selectedIndex` | `dynamic` | — | selectedIndex supplied by the caller. |
+
+
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6863)

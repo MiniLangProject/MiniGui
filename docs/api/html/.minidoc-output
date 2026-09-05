@@ -27,7 +27,9 @@ type-miniguilib-minigui-applicationstate-2092619441.html
 type-miniguilib-minigui-binding-1005909067.html
 type-miniguilib-minigui-button-1520404438.html
 type-miniguilib-minigui-calendar-1740464088.html
+type-miniguilib-minigui-chart-586409834.html
 type-miniguilib-minigui-checkbox-903069219.html
+type-miniguilib-minigui-codeeditor-1337733838.html
 type-miniguilib-minigui-colorpicker-360522475.html
 type-miniguilib-minigui-combobox-2072734281.html
 type-miniguilib-minigui-contextmenu-115441878.html
@@ -37,6 +39,7 @@ type-miniguilib-minigui-datepicker-2133079376.html
 type-miniguilib-minigui-datetimepicker-50480545.html
 type-miniguilib-minigui-dialog-758938230.html
 type-miniguilib-minigui-dialogwindow-1871481418.html
+type-miniguilib-minigui-drawingcanvas-1632518052.html
 type-miniguilib-minigui-editablecombobox-1293251185.html
 type-miniguilib-minigui-event-173082466.html
 type-miniguilib-minigui-events-1317937091.html
@@ -54,7 +57,9 @@ type-miniguilib-minigui-numberbox-1673605572.html
 type-miniguilib-minigui-panel-1796001828.html
 type-miniguilib-minigui-passwordbox-1578552828.html
 type-miniguilib-minigui-progressbar-2050757430.html
+type-miniguilib-minigui-propertygrid-137288887.html
 type-miniguilib-minigui-radiobutton-2120866377.html
+type-miniguilib-minigui-richtextbox-1511588.html
 type-miniguilib-minigui-scrollbar-1767258424.html
 type-miniguilib-minigui-scrollviewer-1330694613.html
 type-miniguilib-minigui-searchbox-189843555.html
@@ -69,7 +74,9 @@ type-miniguilib-minigui-textbox-245475314.html
 type-miniguilib-minigui-timepicker-1929323797.html
 type-miniguilib-minigui-toggleswitch-1594220486.html
 type-miniguilib-minigui-toolbar-853395957.html
+type-miniguilib-minigui-trayicon-674147511.html
 type-miniguilib-minigui-treeview-42567539.html
+type-miniguilib-minigui-webview-1864129617.html
 type-miniguilib-minigui-window-1943367786.html
 type-parser-895089114.html
 type-result-1347088452.html

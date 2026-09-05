@@ -1,30 +1,35 @@
 # MiniGui
 
+Current release: **0.1.0**. Requires MiniLang Compiler **1.2.6**.
+See the [release notes](RELEASE_NOTES_0.1.0.md).
+
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
 [![Language: MiniLang](https://img.shields.io/badge/written%20in-MiniLang-5b5bd6.svg)](.)
 
 MiniGui is a GUI library for MiniLang that helps you build simple desktop
 applications quickly. You describe the user interface declaratively in `.mson`,
 keep the application logic in normal MiniLang code, and let MiniGui generate and
-compile the glue code for a native Windows application.
+compile the glue code for a native Windows x64 or Linux x64 application.
 
 In short:
 
 - `.mson` describes windows, layouts, controls, attributes, and events.
 - `.ml` contains your application logic and event handlers.
 - `tools/minigui.ml` is the MiniGui command-line tool.
-- `MiniGuiLib/minigui.ml` is the runtime library for native Win32 controls.
+- `MiniGuiLib/minigui.ml` selects the Win32 or GTK runtime at compile time.
 
 ## API documentation
 
 Browse the committed [MiniDoc API reference](docs/api/markdown/README.md) for
 the runtime library and command-line generator, or open
-`docs/api/html/index.html` locally. The MiniLang sources use `//!` file comments
+`docs/api/html/index.html` locally. The [Linux API reference](docs/api/linux/markdown/README.md)
+and `docs/api/linux/html/index.html` document the target-specific implementation. The MiniLang sources use `//!` file comments
 and `///` declaration comments with structured parameter and return contracts.
 
 ```powershell
 pwsh .\tools\generate_minidoc.ps1
 pwsh .\tools\generate_minidoc.ps1 -Check
+pwsh .\tools\generate_minidoc.ps1 -Target linux-x64
 ```
 
 The strict [`minidoc.toml`](minidoc.toml) configuration keeps the checked-in
@@ -45,7 +50,7 @@ MiniGui is its own project and is expected to live next to the MiniLang
 compiler checkouts:
 
 ```text
-MiniGui/
+workspace/
   MiniGui/
     MiniGuiLib/
     tools/
@@ -59,15 +64,17 @@ MiniGui/
 ```
 
 The Python compiler is currently the faster compiler for MiniGui builds.
-MiniGui targets native Windows x64; the compiler toolchains themselves may also
-target Linux, but the MiniGui runtime deliberately binds Win32 controls.
+MiniGui targets native Windows x64 (Win32) and Linux x64 (GTK 3). The same MSON
+and code-behind can be compiled for either target. See [building for Windows and
+Linux](docs/platforms.md) for native dependencies, cross-builds and deployment.
 
 ## Quick Start
 
-MiniGui itself is written in MiniLang. Build the CLI with the Python compiler:
+MiniGui itself is written in MiniLang. Build the native Windows extension and CLI with the Python compiler:
 
 ```powershell
-cd C:\Users\nilsk\Desktop\MiniGui\MiniGui
+cd MiniGui
+pwsh ./native/windows/build.ps1
 py -3.14 ..\MiniLangCompilerPy\mlc_win64.py .\tools\minigui.ml .\tools\minigui.exe -I . -I ..\MiniLangCompilerPy
 ```
 
@@ -95,6 +102,7 @@ Run the finished application:
 
 Useful options:
 
+- `--target windows-x64|linux-x64` selects the application target (default: host).
 - `--compiler <path>` selects the MiniLang compiler.
 - `--output <file>` sets the generated source or executable output path.
 - `--code-behind <file>` overrides the `codeBehind` value from `.mson`.
@@ -344,7 +352,8 @@ These properties can be used on controls:
 - `tabIndex`: keyboard navigation order.
 - `row`, `column`, `rowSpan`, `columnSpan`: reserved for richer grid placement.
 - `foreground`, `background`: native text/background styling for standard Win32 controls.
-- `borderColor`, `borderWidth`, `fontFamily`, `fontSize`, `fontWeight`: generated styling hooks reserved for richer native rendering.
+- `fontFamily`, `fontSize`: native font selection. `fontWeight` remains platform-dependent.
+- `borderColor`, `borderWidth`: GTK CSS borders; Windows border rendering remains reserved.
 
 Example:
 
@@ -445,6 +454,22 @@ control-specific events in addition to those common focus events.
 | `DateTimePicker` | Date/time input | `text` | `textChanged`, `changed`, `change` |
 | `TimePicker` | Time input | `text` | `textChanged`, `changed`, `change` |
 | `Calendar` | Month calendar selector | `text` | `textChanged`, `changed`, `change` |
+
+## Advanced controls
+
+The [advanced-controls example](examples/advanced-controls/app.mson) uses all
+seven additions on both platforms. Their shared API is described in
+[advanced controls](docs/advanced-controls.md).
+
+| Control | Purpose | Main properties |
+| --- | --- | --- |
+| RichTextBox | Multiline text with range formatting | text, readOnly, maxLength |
+| CodeEditor | Syntax-colored code editing | text, language, readOnly |
+| PropertyGrid | Editable property/value rows | items |
+| TrayIcon | Desktop tray entry with an action menu | text, items, source |
+| WebView | Embedded WebView2 / WebKitGTK browser | url or html |
+| DrawingCanvas | Retained lines, rectangles and text | width, height |
+| Chart | Bar and line charts | values, chartType, color |
 
 ## Control Screenshot Gallery
 
@@ -1063,6 +1088,7 @@ instance ID.
 - `examples/control-gallery`: a test and demo application covering all
   controls, attributes, layouts, and event binding paths.
 - `examples/customer-form`: an example for imports, resources, and components.
+- `examples/advanced-controls`: rich text, code editing, properties, tray, browser, canvas and charts.
 
 Build the control gallery:
 
@@ -1089,7 +1115,8 @@ runs a self-hosted build and runtime smoke test.
 
 ## Compiler Requirements
 
-MiniGui requires MiniLang Compiler 1.2.3 or newer and is tested with both the
+MiniGui requires the current MiniLang Compiler 1.2.5 checkout (including the
+native C-string return fix for Linux) and is tested with both the
 Python and self-hosted compilers. It uses current language/runtime features such
 as `const`, explicit `function inline` helpers, exact typed FFI declarations,
 `copyArray`-backed growable lists, and the standard-library `StringBuilder`.
@@ -1150,7 +1177,7 @@ not as untrusted data. MSON import paths may intentionally refer to any readable
 local path; applications that accept third-party MSON should constrain their
 own allowed roots before invoking MiniGui.
 
-Win32 controls have UI-thread affinity. Worker threads may prepare data, but
+Native controls have UI-thread affinity. Worker threads may prepare data, but
 must not mutate MiniGui controls directly; marshal such changes back to the UI
 thread in application code.
 
@@ -1165,3 +1192,16 @@ To add a new control:
 
 The public MSON shape should stay stable: applications describe the UI
 declaratively while the runtime hides native implementation details.
+
+## Cross-platform verification
+
+Run the existing Windows regression suite and the additional native-control suite:
+
+```powershell
+pwsh ./tests/minigui/run_minigui_tests.ps1
+pwsh ./tests/minigui/run_cross_platform_tests.ps1 -LinuxDistro Ubuntu
+```
+
+On Linux, run `bash tests/minigui/run_linux_tests.sh`. It builds the native bridge,
+tests GTK signals/models and the shared MiniLang API, then builds and starts all
+four examples under Xvfb. See [platforms](docs/platforms.md) for dependencies.
