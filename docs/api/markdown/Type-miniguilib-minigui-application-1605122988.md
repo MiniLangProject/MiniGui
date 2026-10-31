@@ -12,7 +12,7 @@ struct Application
 Represents the application data used by the minigui module.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1611)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1622)
 
 ## Members
 
@@ -31,7 +31,7 @@ Adds control to the state managed by the minigui module.
 | `control` | `dynamic` | — | control value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1634)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1645)
 
 <a id="static_method-static-method-miniguilib-minigui-application-addwindow-static-function-addwindow-app-window-miniguilib-minigui-ml-351853637"></a>
 ### addWindow
@@ -48,7 +48,7 @@ Adds window to the state managed by the minigui module.
 | `window` | `dynamic` | — | window value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1621)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1632)
 
 <a id="static_method-static-method-miniguilib-minigui-application-create-static-function-create-miniguilib-minigui-ml-1950541448"></a>
 ### create
@@ -60,7 +60,7 @@ static function create()
 Creates application for the minigui application module.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1613)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1624)
 
 <a id="static_method-static-method-miniguilib-minigui-application-dispose-static-function-dispose-app-miniguilib-minigui-ml-1526319089"></a>
 ### dispose
@@ -76,7 +76,7 @@ Destroys application windows and releases runtime resources.
 | `app` | `dynamic` | — | app supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1868)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1879)
 
 <a id="static_method-static-method-miniguilib-minigui-application-pollresize-static-function-pollresize-app-miniguilib-minigui-ml-1063046351"></a>
 ### pollResize
@@ -92,7 +92,7 @@ Performs the pollResize operation for the minigui application module.
 | `app` | `dynamic` | — | Application instance operated on by this call. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1763)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1774)
 
 <a id="static_method-static-method-miniguilib-minigui-application-pump-static-function-pump-app-wait-miniguilib-minigui-ml-558180210"></a>
 ### pump
@@ -109,7 +109,7 @@ Processes native messages, optionally waiting for one.
 | `wait` | `dynamic` | — | wait supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1860)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1871)
 
 <a id="static_method-static-method-miniguilib-minigui-application-redrawall-static-function-redrawall-app-miniguilib-minigui-ml-2027861673"></a>
 ### redrawAll
@@ -125,7 +125,7 @@ Performs the redrawAll operation for the minigui application module.
 | `app` | `dynamic` | — | Application instance operated on by this call. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1805)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1816)
 
 <a id="static_method-static-method-miniguilib-minigui-application-resizewindow-static-function-resizewindow-app-window-clientwidth-clientheight-miniguilib-minigui-ml-857300068"></a>
 ### resizeWindow
@@ -144,7 +144,7 @@ Performs the resizeWindow operation for the minigui application module.
 | `clientHeight` | `dynamic` | — | clientHeight value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1680)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1691)
 
 <a id="static_method-static-method-miniguilib-minigui-application-run-static-function-run-app-miniguilib-minigui-ml-1153699829"></a>
 ### run
@@ -160,7 +160,7 @@ Runs run for the minigui workflow.
 | `app` | `dynamic` | — | Application instance operated on by this call. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1832)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1843)
 
 <a id="static_method-static-method-miniguilib-minigui-application-setstartupwindow-static-function-setstartupwindow-app-window-miniguilib-minigui-ml-848416671"></a>
 ### setStartupWindow
@@ -177,7 +177,7 @@ Updates startup window maintained by the minigui module.
 | `window` | `dynamic` | — | window value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1652)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1663)
 
 <a id="static_method-static-method-miniguilib-minigui-application-syncdynamiccontrols-static-function-syncdynamiccontrols-app-miniguilib-minigui-ml-2002184905"></a>
 ### syncDynamicControls
@@ -193,7 +193,7 @@ Performs the syncDynamicControls operation for the minigui application module.
 | `app` | `dynamic` | — | Application instance operated on by this call. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1790)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1801)
 
 <a id="static_method-static-method-miniguilib-minigui-application-timerproc-static-function-timerproc-hwnd-msg-wparam-lparam-miniguilib-minigui-ml-710608009"></a>
 ### timerProc
@@ -212,7 +212,7 @@ Performs the timerProc operation for the minigui application module.
 | `lParam` | `dynamic` | — | lParam value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1671)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1682)
 
 <a id="static_method-static-method-miniguilib-minigui-application-windowproc-static-function-windowproc-hwnd-msg-wparam-lparam-miniguilib-minigui-ml-1793497217"></a>
 ### windowProc
@@ -231,4 +231,4 @@ Performs the windowProc operation for the minigui application module.
 | `lParam` | `dynamic` | — | lParam value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1662)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1673)

@@ -12,7 +12,7 @@ struct ScrollViewer
 Represents the scroll viewer data used by the minigui module.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2895)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2906)
 
 ## Members
 
@@ -39,4 +39,4 @@ Creates scroll viewer for the minigui scroll viewer module.
 | `verticalScroll` | `dynamic` | — | verticalScroll value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2907)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2918)

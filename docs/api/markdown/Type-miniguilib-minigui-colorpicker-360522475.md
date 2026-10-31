@@ -12,7 +12,7 @@ struct ColorPicker
 Represents the color picker data used by the minigui module.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2505)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2516)
 
 ## Members
 
@@ -39,4 +39,4 @@ Creates color picker for the minigui color picker module.
 | `value` | `dynamic` | — | Value consumed or transformed by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2517)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2528)

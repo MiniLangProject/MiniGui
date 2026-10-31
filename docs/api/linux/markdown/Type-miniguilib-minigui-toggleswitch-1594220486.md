@@ -12,7 +12,7 @@ struct ToggleSwitch
 Native ToggleSwitch operations.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6563)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6574)
 
 ## Members
 
@@ -38,4 +38,4 @@ create for the ToggleSwitch backend implementation.
 | `checked` | `dynamic` | — | checked supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6574)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6585)

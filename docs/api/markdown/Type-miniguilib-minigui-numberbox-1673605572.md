@@ -12,7 +12,7 @@ struct NumberBox
 Represents the number box data used by the minigui module.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2597)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2608)
 
 ## Members
 
@@ -41,4 +41,4 @@ Creates number box for the minigui number box module.
 | `step` | `dynamic` | — | step value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2611)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2622)

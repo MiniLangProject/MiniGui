@@ -12,7 +12,7 @@ struct DatePicker
 Represents the date picker data used by the minigui module.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L3284)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L3295)
 
 ## Members
 
@@ -37,4 +37,4 @@ Creates date picker for the minigui date picker module.
 | `height` | `dynamic` | — | Height in the coordinate or storage units used by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L3294)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L3305)

@@ -12,7 +12,7 @@ struct ProgressBar
 Native ProgressBar operations.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6828)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6839)
 
 ## Members
 
@@ -40,4 +40,4 @@ create for the ProgressBar backend implementation.
 | `value` | `dynamic` | — | value supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6841)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6852)

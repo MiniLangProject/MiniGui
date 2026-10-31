@@ -12,7 +12,7 @@ struct SpinBox
 Represents the spin box data used by the minigui module.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2625)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2636)
 
 ## Members
 
@@ -41,4 +41,4 @@ Creates spin box for the minigui spin box module.
 | `step` | `dynamic` | — | step value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2639)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2650)

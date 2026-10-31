@@ -12,7 +12,7 @@ struct ScrollBar
 Native ScrollBar operations.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6774)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6785)
 
 ## Members
 
@@ -43,4 +43,4 @@ create for the ScrollBar backend implementation.
 | `largeStep` | `dynamic` | — | largeStep supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6790)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6801)

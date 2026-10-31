@@ -12,7 +12,7 @@ struct Events
 Native Events operations.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7570)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7581)
 
 ## Members
 
@@ -33,7 +33,7 @@ _emit for the Events backend implementation.
 | `newValue` | `dynamic` | — | newValue supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7763)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7774)
 
 <a id="static_method-static-method-miniguilib-minigui-events-bindblur-static-function-bindblur-app-control-callback-context-miniguilib-minigui-ml-1137879427"></a>
 ### bindBlur
@@ -52,7 +52,7 @@ bindBlur for the Events backend implementation.
 | `context` | `dynamic` | — | context supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7719)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7730)
 
 <a id="static_method-static-method-miniguilib-minigui-events-bindchange-static-function-bindchange-app-control-callback-context-miniguilib-minigui-ml-1220486673"></a>
 ### bindChange
@@ -71,7 +71,7 @@ bindChange for the Events backend implementation.
 | `context` | `dynamic` | — | context supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7653)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7664)
 
 <a id="static_method-static-method-miniguilib-minigui-events-bindchanged-static-function-bindchanged-app-control-callback-context-miniguilib-minigui-ml-785666435"></a>
 ### bindChanged
@@ -90,7 +90,7 @@ bindChanged for the Events backend implementation.
 | `context` | `dynamic` | — | context supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7642)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7653)
 
 <a id="static_method-static-method-miniguilib-minigui-events-bindclick-static-function-bindclick-app-control-callback-context-miniguilib-minigui-ml-1176465155"></a>
 ### bindClick
@@ -109,7 +109,7 @@ bindClick for the Events backend implementation.
 | `context` | `dynamic` | — | context supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7609)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7620)
 
 <a id="static_method-static-method-miniguilib-minigui-events-bindclicked-static-function-bindclicked-app-control-callback-context-miniguilib-minigui-ml-1715132163"></a>
 ### bindClicked
@@ -128,7 +128,7 @@ bindClicked for the Events backend implementation.
 | `context` | `dynamic` | — | context supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7620)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7631)
 
 <a id="static_method-static-method-miniguilib-minigui-events-bindclose-static-function-bindclose-app-control-callback-context-miniguilib-minigui-ml-1048849467"></a>
 ### bindClose
@@ -147,7 +147,7 @@ bindClose for the Events backend implementation.
 | `context` | `dynamic` | — | context supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7587)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7598)
 
 <a id="static_method-static-method-miniguilib-minigui-events-bindfocus-static-function-bindfocus-app-control-callback-context-miniguilib-minigui-ml-1848656115"></a>
 ### bindFocus
@@ -166,7 +166,7 @@ bindFocus for the Events backend implementation.
 | `context` | `dynamic` | — | context supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7708)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7719)
 
 <a id="static_method-static-method-miniguilib-minigui-events-bindload-static-function-bindload-app-control-callback-context-miniguilib-minigui-ml-555969393"></a>
 ### bindLoad
@@ -185,7 +185,7 @@ bindLoad for the Events backend implementation.
 | `context` | `dynamic` | — | context supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7576)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7587)
 
 <a id="static_method-static-method-miniguilib-minigui-events-bindresized-static-function-bindresized-app-control-callback-context-miniguilib-minigui-ml-751678663"></a>
 ### bindResized
@@ -204,7 +204,7 @@ bindResized for the Events backend implementation.
 | `context` | `dynamic` | — | context supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7598)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7609)
 
 <a id="static_method-static-method-miniguilib-minigui-events-bindscrollchanged-static-function-bindscrollchanged-app-control-callback-context-miniguilib-minigui-ml-744122627"></a>
 ### bindScrollChanged
@@ -223,7 +223,7 @@ bindScrollChanged for the Events backend implementation.
 | `context` | `dynamic` | — | context supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7697)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7708)
 
 <a id="static_method-static-method-miniguilib-minigui-events-bindselected-static-function-bindselected-app-control-callback-context-miniguilib-minigui-ml-552328163"></a>
 ### bindSelected
@@ -242,7 +242,7 @@ bindSelected for the Events backend implementation.
 | `context` | `dynamic` | — | context supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7675)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7686)
 
 <a id="static_method-static-method-miniguilib-minigui-events-bindselectionchanged-static-function-bindselectionchanged-app-control-callback-context-miniguilib-minigui-ml-971855473"></a>
 ### bindSelectionChanged
@@ -261,7 +261,7 @@ bindSelectionChanged for the Events backend implementation.
 | `context` | `dynamic` | — | context supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7664)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7675)
 
 <a id="static_method-static-method-miniguilib-minigui-events-bindsubmit-static-function-bindsubmit-app-control-callback-context-miniguilib-minigui-ml-199991237"></a>
 ### bindSubmit
@@ -280,7 +280,7 @@ bindSubmit for the Events backend implementation.
 | `context` | `dynamic` | — | context supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7730)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7741)
 
 <a id="static_method-static-method-miniguilib-minigui-events-bindtextchanged-static-function-bindtextchanged-app-control-callback-context-miniguilib-minigui-ml-799711667"></a>
 ### bindTextChanged
@@ -299,7 +299,7 @@ bindTextChanged for the Events backend implementation.
 | `context` | `dynamic` | — | context supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7631)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7642)
 
 <a id="static_method-static-method-miniguilib-minigui-events-bindvalidated-static-function-bindvalidated-app-control-callback-context-miniguilib-minigui-ml-2058014891"></a>
 ### bindValidated
@@ -318,7 +318,7 @@ bindValidated for the Events backend implementation.
 | `context` | `dynamic` | — | context supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7752)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7763)
 
 <a id="static_method-static-method-miniguilib-minigui-events-bindvalidating-static-function-bindvalidating-app-control-callback-context-miniguilib-minigui-ml-596228435"></a>
 ### bindValidating
@@ -337,7 +337,7 @@ bindValidating for the Events backend implementation.
 | `context` | `dynamic` | — | context supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7741)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7752)
 
 <a id="static_method-static-method-miniguilib-minigui-events-bindvaluechanged-static-function-bindvaluechanged-app-control-callback-context-miniguilib-minigui-ml-1918292755"></a>
 ### bindValueChanged
@@ -356,4 +356,4 @@ bindValueChanged for the Events backend implementation.
 | `context` | `dynamic` | — | context supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7686)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7697)

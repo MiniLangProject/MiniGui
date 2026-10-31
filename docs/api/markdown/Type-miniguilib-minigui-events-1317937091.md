@@ -12,7 +12,7 @@ struct Events
 Represents the events data used by the minigui module.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L4904)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L4915)
 
 ## Members
 
@@ -33,7 +33,7 @@ Performs the beginDataGridEdit operation for the minigui events module.
 | `y` | `dynamic` | — | Vertical coordinate used by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5297)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5308)
 
 <a id="static_method-static-method-miniguilib-minigui-events-beginsplitterdrag-static-function-beginsplitterdrag-app-hwndcontrol-x-y-miniguilib-minigui-ml-300141281"></a>
 ### beginSplitterDrag
@@ -52,7 +52,7 @@ Performs the beginSplitterDrag operation for the minigui events module.
 | `y` | `dynamic` | — | Vertical coordinate used by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5221)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5232)
 
 <a id="static_method-static-method-miniguilib-minigui-events-bindblur-static-function-bindblur-app-control-callback-context-miniguilib-minigui-ml-1137879427"></a>
 ### bindBlur
@@ -71,7 +71,7 @@ Performs the bindBlur operation for the minigui events module.
 | `context` | `dynamic` | — | Context that carries state for the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5099)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5110)
 
 <a id="static_method-static-method-miniguilib-minigui-events-bindchange-static-function-bindchange-app-control-callback-context-miniguilib-minigui-ml-1220486673"></a>
 ### bindChange
@@ -90,7 +90,7 @@ Performs the bindChange operation for the minigui events module.
 | `context` | `dynamic` | — | Context that carries state for the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5072)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5083)
 
 <a id="static_method-static-method-miniguilib-minigui-events-bindchanged-static-function-bindchanged-app-control-callback-context-miniguilib-minigui-ml-785666435"></a>
 ### bindChanged
@@ -109,7 +109,7 @@ Performs the bindChanged operation for the minigui events module.
 | `context` | `dynamic` | — | Context that carries state for the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5055)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5066)
 
 <a id="static_method-static-method-miniguilib-minigui-events-bindclick-static-function-bindclick-app-control-callback-context-miniguilib-minigui-ml-1176465155"></a>
 ### bindClick
@@ -128,7 +128,7 @@ Performs the bindClick operation for the minigui events module.
 | `context` | `dynamic` | — | Context that carries state for the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L4940)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L4951)
 
 <a id="static_method-static-method-miniguilib-minigui-events-bindclicked-static-function-bindclicked-app-control-callback-context-miniguilib-minigui-ml-1715132163"></a>
 ### bindClicked
@@ -147,7 +147,7 @@ Performs the bindClicked operation for the minigui events module.
 | `context` | `dynamic` | — | Context that carries state for the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L4950)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L4961)
 
 <a id="static_method-static-method-miniguilib-minigui-events-bindclose-static-function-bindclose-app-window-callback-context-miniguilib-minigui-ml-428660054"></a>
 ### bindClose
@@ -166,7 +166,7 @@ Performs the bindClose operation for the minigui events module.
 | `context` | `dynamic` | — | Context that carries state for the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L4920)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L4931)
 
 <a id="static_method-static-method-miniguilib-minigui-events-bindfocus-static-function-bindfocus-app-control-callback-context-miniguilib-minigui-ml-1848656115"></a>
 ### bindFocus
@@ -185,7 +185,7 @@ Performs the bindFocus operation for the minigui events module.
 | `context` | `dynamic` | — | Context that carries state for the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5089)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5100)
 
 <a id="static_method-static-method-miniguilib-minigui-events-bindload-static-function-bindload-app-window-callback-context-miniguilib-minigui-ml-950824772"></a>
 ### bindLoad
@@ -204,7 +204,7 @@ Performs the bindLoad operation for the minigui events module.
 | `context` | `dynamic` | — | Context that carries state for the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L4910)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L4921)
 
 <a id="static_method-static-method-miniguilib-minigui-events-bindresized-static-function-bindresized-app-window-callback-context-miniguilib-minigui-ml-36859082"></a>
 ### bindResized
@@ -223,7 +223,7 @@ Performs the bindResized operation for the minigui events module.
 | `context` | `dynamic` | — | Context that carries state for the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L4930)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L4941)
 
 <a id="static_method-static-method-miniguilib-minigui-events-bindscrollchanged-static-function-bindscrollchanged-app-control-callback-context-miniguilib-minigui-ml-744122627"></a>
 ### bindScrollChanged
@@ -242,7 +242,7 @@ Performs the bindScrollChanged operation for the minigui events module.
 | `context` | `dynamic` | — | Context that carries state for the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5029)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5040)
 
 <a id="static_method-static-method-miniguilib-minigui-events-bindscrollevent-static-function-bindscrollevent-app-control-callback-context-eventtype-miniguilib-minigui-ml-75689709"></a>
 ### bindScrollEvent
@@ -262,7 +262,7 @@ Performs the bindScrollEvent operation for the minigui events module.
 | `eventType` | `dynamic` | — | eventType value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5016)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5027)
 
 <a id="static_method-static-method-miniguilib-minigui-events-bindselected-static-function-bindselected-app-control-callback-context-miniguilib-minigui-ml-552328163"></a>
 ### bindSelected
@@ -281,7 +281,7 @@ Performs the bindSelected operation for the minigui events module.
 | `context` | `dynamic` | — | Context that carries state for the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5006)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5017)
 
 <a id="static_method-static-method-miniguilib-minigui-events-bindselectionchanged-static-function-bindselectionchanged-app-control-callback-context-miniguilib-minigui-ml-971855473"></a>
 ### bindSelectionChanged
@@ -300,7 +300,7 @@ Performs the bindSelectionChanged operation for the minigui events module.
 | `context` | `dynamic` | — | Context that carries state for the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L4997)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5008)
 
 <a id="static_method-static-method-miniguilib-minigui-events-bindselectionevent-static-function-bindselectionevent-app-control-callback-context-eventtype-miniguilib-minigui-ml-1360804167"></a>
 ### bindSelectionEvent
@@ -320,7 +320,7 @@ Performs the bindSelectionEvent operation for the minigui events module.
 | `eventType` | `dynamic` | — | eventType value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L4984)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L4995)
 
 <a id="static_method-static-method-miniguilib-minigui-events-bindtextchanged-static-function-bindtextchanged-app-control-callback-context-miniguilib-minigui-ml-799711667"></a>
 ### bindTextChanged
@@ -339,7 +339,7 @@ Performs the bindTextChanged operation for the minigui events module.
 | `context` | `dynamic` | — | Context that carries state for the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L4974)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L4985)
 
 <a id="static_method-static-method-miniguilib-minigui-events-bindtextevent-static-function-bindtextevent-app-control-callback-context-eventtype-miniguilib-minigui-ml-1332051617"></a>
 ### bindTextEvent
@@ -359,7 +359,7 @@ Performs the bindTextEvent operation for the minigui events module.
 | `eventType` | `dynamic` | — | eventType value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L4961)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L4972)
 
 <a id="static_method-static-method-miniguilib-minigui-events-bindvaluechanged-static-function-bindvaluechanged-app-control-callback-context-miniguilib-minigui-ml-1918292755"></a>
 ### bindValueChanged
@@ -378,7 +378,7 @@ Performs the bindValueChanged operation for the minigui events module.
 | `context` | `dynamic` | — | Context that carries state for the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5038)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5049)
 
 <a id="static_method-static-method-miniguilib-minigui-events-commitdatagridedit-static-function-commitdatagridedit-app-hwndcontrol-cancel-miniguilib-minigui-ml-1191380676"></a>
 ### commitDataGridEdit
@@ -396,7 +396,7 @@ Performs the commitDataGridEdit operation for the minigui events module.
 | `cancel` | `dynamic` | — | cancel value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5342)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5353)
 
 <a id="static_method-static-method-miniguilib-minigui-events-controlbyhandle-static-function-controlbyhandle-app-hwndcontrol-miniguilib-minigui-ml-301358636"></a>
 ### controlByHandle
@@ -413,7 +413,7 @@ Performs the controlByHandle operation for the minigui events module.
 | `hwndControl` | `dynamic` | — | hwndControl value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5183)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5194)
 
 <a id="static_method-static-method-miniguilib-minigui-events-dispatch-static-function-dispatch-binding-eventtype-oldvalue-newvalue-miniguilib-minigui-ml-398190857"></a>
 ### dispatch
@@ -432,7 +432,7 @@ Performs the dispatch operation for the minigui events module.
 | `newValue` | `dynamic` | — | newValue value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5109)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5120)
 
 <a id="static_method-static-method-miniguilib-minigui-events-dispatchclickbyhandle-static-function-dispatchclickbyhandle-app-hwndcontrol-x-miniguilib-minigui-ml-958683588"></a>
 ### dispatchClickByHandle
@@ -450,7 +450,7 @@ Performs the dispatchClickByHandle operation for the minigui events module.
 | `x` | `dynamic` | — | Horizontal coordinate used by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5481)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5492)
 
 <a id="static_method-static-method-miniguilib-minigui-events-dispatchclose-static-function-dispatchclose-app-window-miniguilib-minigui-ml-1194664832"></a>
 ### dispatchClose
@@ -467,7 +467,7 @@ Performs the dispatchClose operation for the minigui events module.
 | `window` | `dynamic` | — | window value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5147)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5158)
 
 <a id="static_method-static-method-miniguilib-minigui-events-dispatchcommand-static-function-dispatchcommand-app-code-nativeid-hwndcontrol-miniguilib-minigui-ml-639258507"></a>
 ### dispatchCommand
@@ -486,7 +486,7 @@ Performs the dispatchCommand operation for the minigui events module.
 | `hwndControl` | `dynamic` | — | hwndControl value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5742)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5753)
 
 <a id="static_method-static-method-miniguilib-minigui-events-dispatchcontextmenu-static-function-dispatchcontextmenu-app-hwndcontrol-x-y-miniguilib-minigui-ml-4930173"></a>
 ### dispatchContextMenu
@@ -505,7 +505,7 @@ Performs the dispatchContextMenu operation for the minigui events module.
 | `y` | `dynamic` | — | Vertical coordinate used by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5513)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5524)
 
 <a id="static_method-static-method-miniguilib-minigui-events-dispatchcontroltextbindings-static-function-dispatchcontroltextbindings-app-control-eventtype-oldvalue-newvalue-miniguilib-minigui-ml-1520297434"></a>
 ### dispatchControlTextBindings
@@ -525,7 +525,7 @@ Performs the dispatchControlTextBindings operation for the minigui events module
 | `newValue` | `dynamic` | — | newValue value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5202)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5213)
 
 <a id="static_method-static-method-miniguilib-minigui-events-dispatchfocusbyhandle-static-function-dispatchfocusbyhandle-app-hwndcontrol-focused-miniguilib-minigui-ml-1633792875"></a>
 ### dispatchFocusByHandle
@@ -543,7 +543,7 @@ Performs the dispatchFocusByHandle operation for the minigui events module.
 | `focused` | `dynamic` | — | focused value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5374)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5385)
 
 <a id="static_method-static-method-miniguilib-minigui-events-dispatchload-static-function-dispatchload-window-miniguilib-minigui-ml-1055185811"></a>
 ### dispatchLoad
@@ -559,7 +559,7 @@ Performs the dispatchLoad operation for the minigui events module.
 | `window` | `dynamic` | — | window value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5130)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5141)
 
 <a id="static_method-static-method-miniguilib-minigui-events-dispatchnotify-static-function-dispatchnotify-app-hwndcontrol-nativeid-code-lparam-miniguilib-minigui-ml-1423294964"></a>
 ### dispatchNotify
@@ -579,7 +579,7 @@ Performs the dispatchNotify operation for the minigui events module.
 | `lParam` | `dynamic` | — | lParam value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5404)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5415)
 
 <a id="static_method-static-method-miniguilib-minigui-events-dispatchresize-static-function-dispatchresize-app-window-oldvalue-newvalue-miniguilib-minigui-ml-1190526719"></a>
 ### dispatchResize
@@ -598,7 +598,7 @@ Performs the dispatchResize operation for the minigui events module.
 | `newValue` | `dynamic` | — | newValue value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5168)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5179)
 
 <a id="static_method-static-method-miniguilib-minigui-events-dispatchscroll-static-function-dispatchscroll-app-code-pos-hwndcontrol-miniguilib-minigui-ml-1107130731"></a>
 ### dispatchScroll
@@ -617,7 +617,7 @@ Performs the dispatchScroll operation for the minigui events module.
 | `hwndControl` | `dynamic` | — | hwndControl value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5708)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5719)
 
 <a id="static_method-static-method-miniguilib-minigui-events-dispatchscrollviewer-static-function-dispatchscrollviewer-app-hwndcontrol-code-pos-miniguilib-minigui-ml-1380931573"></a>
 ### dispatchScrollViewer
@@ -636,7 +636,7 @@ Performs the dispatchScrollViewer operation for the minigui events module.
 | `pos` | `dynamic` | — | pos value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5672)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5683)
 
 <a id="static_method-static-method-miniguilib-minigui-events-dispatchselectionclickedbyhandle-static-function-dispatchselectionclickedbyhandle-app-hwndcontrol-x-y-miniguilib-minigui-ml-1269257945"></a>
 ### dispatchSelectionClickedByHandle
@@ -655,7 +655,7 @@ Performs the dispatchSelectionClickedByHandle operation for the minigui events m
 | `y` | `dynamic` | — | Vertical coordinate used by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5626)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5637)
 
 <a id="static_method-static-method-miniguilib-minigui-events-dispatchtabchangedbyhandle-static-function-dispatchtabchangedbyhandle-app-hwndcontrol-miniguilib-minigui-ml-1305564996"></a>
 ### dispatchTabChangedByHandle
@@ -672,7 +672,7 @@ Performs the dispatchTabChangedByHandle operation for the minigui events module.
 | `hwndControl` | `dynamic` | — | hwndControl value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5566)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5577)
 
 <a id="static_method-static-method-miniguilib-minigui-events-dispatchtabclickedbyhandle-static-function-dispatchtabclickedbyhandle-app-hwndcontrol-x-y-miniguilib-minigui-ml-1874923951"></a>
 ### dispatchTabClickedByHandle
@@ -691,7 +691,7 @@ Performs the dispatchTabClickedByHandle operation for the minigui events module.
 | `y` | `dynamic` | — | Vertical coordinate used by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5594)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5605)
 
 <a id="static_method-static-method-miniguilib-minigui-events-dragsplitter-static-function-dragsplitter-app-hwndcontrol-flags-x-y-miniguilib-minigui-ml-1556879450"></a>
 ### dragSplitter
@@ -711,7 +711,7 @@ Performs the dragSplitter operation for the minigui events module.
 | `y` | `dynamic` | — | Vertical coordinate used by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5245)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5256)
 
 <a id="static_method-static-method-miniguilib-minigui-events-endsplitterdrag-static-function-endsplitterdrag-app-hwndcontrol-miniguilib-minigui-ml-424822452"></a>
 ### endSplitterDrag
@@ -728,7 +728,7 @@ Performs the endSplitterDrag operation for the minigui events module.
 | `hwndControl` | `dynamic` | — | hwndControl value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5283)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5294)
 
 <a id="static_method-static-method-miniguilib-minigui-events-findwindowbyhandle-static-function-findwindowbyhandle-app-hwnd-miniguilib-minigui-ml-411884925"></a>
 ### findWindowByHandle
@@ -745,7 +745,7 @@ Finds window by handle used by the minigui module.
 | `hwnd` | `dynamic` | — | hwnd value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5118)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5129)
 
 <a id="static_method-static-method-miniguilib-minigui-events-iscontrolkind-static-function-iscontrolkind-app-hwndcontrol-kind-miniguilib-minigui-ml-910295918"></a>
 ### isControlKind
@@ -763,4 +763,4 @@ Returns whether control kind satisfies the required condition.
 | `kind` | `dynamic` | — | kind value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5550)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5561)

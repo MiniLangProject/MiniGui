@@ -12,7 +12,7 @@ struct DataGrid
 Native DataGrid operations.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7013)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7024)
 
 ## Members
 
@@ -40,4 +40,4 @@ create for the DataGrid backend implementation.
 | `selectedIndex` | `dynamic` | — | selectedIndex supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7026)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7037)

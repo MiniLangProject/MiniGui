@@ -12,7 +12,7 @@ struct TextArea
 Native TextArea operations.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6457)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6468)
 
 ## Members
 
@@ -37,4 +37,4 @@ create for the TextArea backend implementation.
 | `height` | `dynamic` | — | height supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6467)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6478)

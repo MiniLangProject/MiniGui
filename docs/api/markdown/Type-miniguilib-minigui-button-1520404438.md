@@ -12,7 +12,7 @@ struct Button
 Represents the button data used by the minigui module.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2413)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2424)
 
 ## Members
 
@@ -37,4 +37,4 @@ Creates button for the minigui button module.
 | `height` | `dynamic` | — | Height in the coordinate or storage units used by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2423)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2434)

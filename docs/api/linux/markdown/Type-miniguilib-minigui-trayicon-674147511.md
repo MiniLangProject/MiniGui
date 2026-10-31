@@ -12,7 +12,7 @@ struct TrayIcon
 Native TrayIcon operations.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8176)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8187)
 
 ## Members
 
@@ -37,7 +37,7 @@ Creates a native TrayIcon control.
 | `height` | `dynamic` | — | height supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8186)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8197)
 
 <a id="static_method-static-method-miniguilib-minigui-trayicon-seticon-static-function-seticon-control-source-miniguilib-minigui-ml-901549157"></a>
 ### setIcon
@@ -54,7 +54,7 @@ Sets an icon file on Windows or icon name/path on Linux.
 | `source` | `dynamic` | — | source supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8200)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8211)
 
 <a id="static_method-static-method-miniguilib-minigui-trayicon-setitems-static-function-setitems-control-items-miniguilib-minigui-ml-1423584774"></a>
 ### setItems
@@ -71,4 +71,4 @@ Sets the system tray context menu labels.
 | `items` | `dynamic` | — | items supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8193)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8204)

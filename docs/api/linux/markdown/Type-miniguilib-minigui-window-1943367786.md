@@ -12,7 +12,7 @@ struct Window
 Native Window operations.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6275)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6286)
 
 ## Members
 
@@ -30,7 +30,7 @@ close for the Window backend implementation.
 | `window` | `dynamic` | — | window supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6295)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6306)
 
 <a id="static_method-static-method-miniguilib-minigui-window-create-static-function-create-app-id-title-width-height-miniguilib-minigui-ml-1508612899"></a>
 ### create
@@ -50,7 +50,7 @@ create for the Window backend implementation.
 | `height` | `dynamic` | — | height supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6282)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6293)
 
 <a id="static_method-static-method-miniguilib-minigui-window-getclientheight-static-function-getclientheight-window-miniguilib-minigui-ml-852548574"></a>
 ### getClientHeight
@@ -66,7 +66,7 @@ getClientHeight for the Window backend implementation.
 | `window` | `dynamic` | — | window supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6315)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6326)
 
 <a id="static_method-static-method-miniguilib-minigui-window-getclientwidth-static-function-getclientwidth-window-miniguilib-minigui-ml-1260740472"></a>
 ### getClientWidth
@@ -82,7 +82,7 @@ getClientWidth for the Window backend implementation.
 | `window` | `dynamic` | — | window supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6309)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6320)
 
 <a id="static_method-static-method-miniguilib-minigui-window-settitle-static-function-settitle-window-title-miniguilib-minigui-ml-74257072"></a>
 ### setTitle
@@ -99,7 +99,7 @@ setTitle for the Window backend implementation.
 | `title` | `dynamic` | — | title supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6303)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6314)
 
 <a id="static_method-static-method-miniguilib-minigui-window-show-static-function-show-window-miniguilib-minigui-ml-1715024080"></a>
 ### show
@@ -115,4 +115,4 @@ show for the Window backend implementation.
 | `window` | `dynamic` | — | window supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6288)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6299)

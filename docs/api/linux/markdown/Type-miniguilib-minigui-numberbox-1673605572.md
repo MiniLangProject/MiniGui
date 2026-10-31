@@ -12,7 +12,7 @@ struct NumberBox
 Native NumberBox operations.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6493)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6504)
 
 ## Members
 
@@ -41,4 +41,4 @@ create for the NumberBox backend implementation.
 | `step` | `dynamic` | — | step supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6507)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6518)

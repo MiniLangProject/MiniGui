@@ -12,7 +12,7 @@ struct StatusBar
 Native StatusBar operations.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6913)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6924)
 
 ## Members
 
@@ -37,4 +37,4 @@ create for the StatusBar backend implementation.
 | `height` | `dynamic` | — | height supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6923)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6934)

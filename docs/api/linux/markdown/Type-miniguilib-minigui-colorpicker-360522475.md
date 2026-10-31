@@ -12,7 +12,7 @@ struct ColorPicker
 Native ColorPicker operations.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6417)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6428)
 
 ## Members
 
@@ -39,4 +39,4 @@ create for the ColorPicker backend implementation.
 | `value` | `dynamic` | — | value supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6429)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6440)

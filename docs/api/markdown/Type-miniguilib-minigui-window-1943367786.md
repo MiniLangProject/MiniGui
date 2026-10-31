@@ -12,7 +12,7 @@ struct Window
 Represents the window data used by the minigui module.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1881)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1892)
 
 ## Members
 
@@ -30,7 +30,7 @@ Closes close owned by the minigui module.
 | `window` | `dynamic` | — | window value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1956)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1967)
 
 <a id="static_method-static-method-miniguilib-minigui-window-create-static-function-create-app-id-title-width-height-miniguilib-minigui-ml-1508612899"></a>
 ### create
@@ -50,7 +50,7 @@ Creates window for the minigui window module.
 | `height` | `dynamic` | — | Height in the coordinate or storage units used by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1888)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1899)
 
 <a id="static_method-static-method-miniguilib-minigui-window-getclientheight-static-function-getclientheight-window-miniguilib-minigui-ml-852548574"></a>
 ### getClientHeight
@@ -66,7 +66,7 @@ Returns client height maintained by the minigui module.
 | `window` | `dynamic` | — | window value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1981)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1992)
 
 <a id="static_method-static-method-miniguilib-minigui-window-getclientwidth-static-function-getclientwidth-window-miniguilib-minigui-ml-1260740472"></a>
 ### getClientWidth
@@ -82,7 +82,7 @@ Returns client width maintained by the minigui module.
 | `window` | `dynamic` | — | window value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1971)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1982)
 
 <a id="static_method-static-method-miniguilib-minigui-window-installproc-static-function-installproc-window-callback-miniguilib-minigui-ml-720019567"></a>
 ### installProc
@@ -99,7 +99,7 @@ Performs the installProc operation for the minigui window module.
 | `callback` | `dynamic` | — | Callback invoked when the operation completes or the event occurs. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1935)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1946)
 
 <a id="static_method-static-method-miniguilib-minigui-window-settitle-static-function-settitle-window-title-miniguilib-minigui-ml-74257072"></a>
 ### setTitle
@@ -116,7 +116,7 @@ Updates title maintained by the minigui module.
 | `title` | `dynamic` | — | Human-readable title presented to the user. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1965)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1976)
 
 <a id="static_method-static-method-miniguilib-minigui-window-show-static-function-show-window-miniguilib-minigui-ml-1715024080"></a>
 ### show
@@ -132,7 +132,7 @@ Performs the show operation for the minigui window module.
 | `window` | `dynamic` | — | window value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1919)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1930)
 
 <a id="static_method-static-method-miniguilib-minigui-window-startresizetimer-static-function-startresizetimer-window-callback-miniguilib-minigui-ml-434667065"></a>
 ### startResizeTimer
@@ -149,4 +149,4 @@ Starts resize timer for the minigui workflow.
 | `callback` | `dynamic` | — | Callback invoked when the operation completes or the event occurs. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1948)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1959)

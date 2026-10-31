@@ -12,7 +12,7 @@ struct SpinBox
 Native SpinBox operations.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6518)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6529)
 
 ## Members
 
@@ -41,4 +41,4 @@ create for the SpinBox backend implementation.
 | `step` | `dynamic` | — | step supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6532)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6543)

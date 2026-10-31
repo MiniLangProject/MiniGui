@@ -12,7 +12,7 @@ struct MenuBar
 Native MenuBar operations.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6873)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6884)
 
 ## Members
 
@@ -38,4 +38,4 @@ create for the MenuBar backend implementation.
 | `items` | `dynamic` | — | items supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6884)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6895)

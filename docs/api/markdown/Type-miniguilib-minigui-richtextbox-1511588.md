@@ -12,7 +12,7 @@ struct RichTextBox
 Native RichTextBox operations.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8087)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8098)
 
 ## Members
 
@@ -37,7 +37,7 @@ Creates a native RichTextBox control.
 | `height` | `dynamic` | — | height supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8097)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8108)
 
 <a id="static_method-static-method-miniguilib-minigui-richtextbox-formatrange-static-function-formatrange-control-start-endindex-color-bold-italic-miniguilib-minigui-ml-1339122560"></a>
 ### formatRange
@@ -58,4 +58,4 @@ Formats a character range; end is exclusive.
 | `italic` | `dynamic` | — | italic supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8108)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8119)

@@ -12,7 +12,7 @@ struct ToolBar
 Native ToolBar operations.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6931)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6942)
 
 ## Members
 
@@ -38,4 +38,4 @@ create for the ToolBar backend implementation.
 | `items` | `dynamic` | — | items supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6942)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6953)

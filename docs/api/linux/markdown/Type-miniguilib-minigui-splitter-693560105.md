@@ -12,7 +12,7 @@ struct Splitter
 Native Splitter operations.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6644)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6655)
 
 ## Members
 
@@ -38,7 +38,7 @@ create for the Splitter backend implementation.
 | `orientation` | `dynamic` | — | orientation supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6655)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6666)
 
 <a id="static_method-static-method-miniguilib-minigui-splitter-createpane-static-function-createpane-app-parent-id-text-x-y-width-height-orientation-targetbefore-targetafter-miniguilib-minigui-ml-215865089"></a>
 ### createPane
@@ -64,4 +64,4 @@ createPane for the Splitter backend implementation.
 | `targetAfter` | `dynamic` | — | targetAfter supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6673)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6684)

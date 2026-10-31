@@ -49,7 +49,7 @@ _advancedCreate for the native backend.
 | `height` | `dynamic` | — | height supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5825)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5836)
 
 <a id="function-function-miniguilib-minigui-advanceddraw-function-advanceddraw-control-op-x-y-width-height-color-text-miniguilib-minigui-ml-638736160"></a>
 ### _advancedDraw
@@ -72,7 +72,7 @@ _advancedDraw for the native backend.
 | `text` | `dynamic` | — | text supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5852)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5863)
 
 <a id="function-function-miniguilib-minigui-advancedformat-function-advancedformat-control-start-endindex-color-bold-italic-miniguilib-minigui-ml-456966350"></a>
 ### _advancedFormat
@@ -93,7 +93,7 @@ _advancedFormat for the native backend.
 | `italic` | `dynamic` | — | italic supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5864)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5875)
 
 <a id="function-function-miniguilib-minigui-advancedproperty-function-advancedproperty-control-key-text-value-miniguilib-minigui-ml-360835394"></a>
 ### _advancedProperty
@@ -112,7 +112,7 @@ _advancedProperty for the native backend.
 | `value` | `dynamic` | — | value supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5839)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5850)
 
 <a id="function-function-miniguilib-minigui-appforwindow-function-appforwindow-hwnd-miniguilib-minigui-ml-312916629"></a>
 ### _appForWindow
@@ -240,7 +240,7 @@ Performs the _dialogInputCancel operation for the minigui module.
 | `event` | `dynamic` | — | event value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1603)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1614)
 
 <a id="function-function-miniguilib-minigui-dialoginputok-function-dialoginputok-context-event-miniguilib-minigui-ml-1619618437"></a>
 ### _dialogInputOk
@@ -257,7 +257,7 @@ Performs the _dialogInputOk operation for the minigui module.
 | `event` | `dynamic` | — | event value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1592)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1603)
 
 <a id="global-global-miniguilib-minigui-dragsplitter-dragsplitter-miniguilib-minigui-ml-999485152"></a>
 ### _dragSplitter
@@ -341,7 +341,7 @@ function _ensureTimerProc()
 Ensures timer proc is available to the minigui workflow.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1411)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1422)
 
 <a id="function-function-miniguilib-minigui-ensurewindowproc-function-ensurewindowproc-miniguilib-minigui-ml-383853280"></a>
 ### _ensureWindowProc
@@ -353,7 +353,7 @@ function _ensureWindowProc()
 Ensures window proc is available to the minigui workflow.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1389)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1400)
 
 <a id="function-function-miniguilib-minigui-getwindowtext-function-getwindowtext-hwnd-miniguilib-minigui-ml-93845995"></a>
 ### _getWindowText
@@ -386,7 +386,7 @@ Performs the _installSpecificWindowProc operation for the minigui module.
 | `cb` | `dynamic` | — | cb value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1429)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1440)
 
 <a id="function-function-miniguilib-minigui-installwindowproc-function-installwindowproc-hwnd-miniguilib-minigui-ml-485678411"></a>
 ### _installWindowProc
@@ -402,7 +402,7 @@ Performs the _installWindowProc operation for the minigui module.
 | `hwnd` | `dynamic` | — | hwnd value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1421)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1432)
 
 <a id="function-function-miniguilib-minigui-itemcount-function-itemcount-itemstext-miniguilib-minigui-ml-2060651443"></a>
 ### _itemCount
@@ -555,7 +555,7 @@ Performs the _miniGuiTimerProc operation for the minigui module.
 | `lParam` | `dynamic` | — | lParam value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1402)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1413)
 
 <a id="function-function-miniguilib-minigui-miniguiwndproc-function-miniguiwndproc-hwnd-msg-wparam-lparam-miniguilib-minigui-ml-1946609607"></a>
 ### _miniGuiWndProc
@@ -681,7 +681,7 @@ function _registerWindowClass()
 Performs the _registerWindowClass operation for the minigui module.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1357)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1368)
 
 <a id="function-function-miniguilib-minigui-releaseruntimeresources-function-releaseruntimeresources-miniguilib-minigui-ml-66777330"></a>
 ### _releaseRuntimeResources
@@ -2647,7 +2647,7 @@ extern function mx_create(kind as cstr, parent as ptr, id as int, text as cstr, 
 | `height` | `int` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5808)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5819)
 
 <a id="extern_function-extern-function-miniguilib-minigui-mx-draw-extern-function-mx-draw-node-as-ptr-op-as-int-x-as-double-y-as-double-width-as-double-height-as-double-color-as-cstr-text-as-cstr-from-minigui-extra-dll-returns-void-miniguilib-minigui-ml-655478187"></a>
 ### mx_draw
@@ -2668,7 +2668,7 @@ extern function mx_draw(node as ptr, op as int, x as double, y as double, width 
 | `text` | `cstr` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5812)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5823)
 
 <a id="extern_function-extern-function-miniguilib-minigui-mx-format-extern-function-mx-format-node-as-ptr-start-as-int-endindex-as-int-color-as-cstr-bold-as-int-italic-as-int-from-minigui-extra-dll-returns-int-miniguilib-minigui-ml-1920620601"></a>
 ### mx_format
@@ -2687,7 +2687,7 @@ extern function mx_format(node as ptr, start as int, endIndex as int, color as c
 | `italic` | `int` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5814)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5825)
 
 <a id="extern_function-extern-function-miniguilib-minigui-mx-property-extern-function-mx-property-node-as-ptr-key-as-cstr-text-as-cstr-value-as-int-from-minigui-extra-dll-returns-int-miniguilib-minigui-ml-1439540546"></a>
 ### mx_property
@@ -2704,7 +2704,7 @@ extern function mx_property(node as ptr, key as cstr, text as cstr, value as int
 | `value` | `int` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5810)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5821)
 
 <a id="extern_function-extern-function-miniguilib-minigui-mx-pump-extern-function-mx-pump-wait-as-int-from-minigui-extra-dll-returns-int-miniguilib-minigui-ml-455583342"></a>
 ### mx_pump
@@ -2718,7 +2718,7 @@ extern function mx_pump(wait as int) from "minigui_extra.dll" returns int
 | `wait` | `int` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5872)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5883)
 
 - [MiniGuiLib.minigui.NativeControl](Type-miniguilib-minigui-nativecontrol-249550938.md) — struct
 - [MiniGuiLib.minigui.NumberBox](Type-miniguilib-minigui-numberbox-1673605572.md) — struct

@@ -12,7 +12,7 @@ struct Panel
 Native Panel operations.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6704)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6715)
 
 ## Members
 
@@ -37,7 +37,7 @@ create for the Panel backend implementation.
 | `height` | `dynamic` | — | height supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6714)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6725)
 
 <a id="static_method-static-method-miniguilib-minigui-panel-createtabpage-static-function-createtabpage-app-tabcontrol-id-text-x-y-width-height-miniguilib-minigui-ml-1972181435"></a>
 ### createTabPage
@@ -60,4 +60,4 @@ Creates the next native notebook page content panel.
 | `height` | `dynamic` | — | height supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6728)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6739)

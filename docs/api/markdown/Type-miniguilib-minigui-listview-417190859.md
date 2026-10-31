@@ -12,7 +12,7 @@ struct ListView
 Represents the list view data used by the minigui module.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L3201)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L3212)
 
 ## Members
 
@@ -39,7 +39,7 @@ Creates list view for the minigui list view module.
 | `selectedIndex` | `dynamic` | — | Zero-based index of selected. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L3213)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L3224)
 
 <a id="static_method-static-method-miniguilib-minigui-listview-createcolumns-static-function-createcolumns-app-parent-id-text-x-y-width-height-columns-items-selectedindex-miniguilib-minigui-ml-1026378948"></a>
 ### createColumns
@@ -65,4 +65,4 @@ Creates columns for the minigui list view module.
 | `selectedIndex` | `dynamic` | — | Zero-based index of selected. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L3239)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L3250)

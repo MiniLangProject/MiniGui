@@ -12,7 +12,7 @@ struct Slider
 Represents the slider data used by the minigui module.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2974)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2985)
 
 ## Members
 
@@ -43,4 +43,4 @@ Creates slider for the minigui slider module.
 | `largeStep` | `dynamic` | — | largeStep value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2990)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L3001)

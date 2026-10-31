@@ -12,7 +12,7 @@ struct RadioButton
 Represents the radio button data used by the minigui module.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2708)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2719)
 
 ## Members
 
@@ -38,4 +38,4 @@ Creates radio button for the minigui radio button module.
 | `checked` | `dynamic` | — | checked value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2719)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2730)

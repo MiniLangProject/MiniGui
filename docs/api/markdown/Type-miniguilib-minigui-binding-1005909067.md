@@ -12,7 +12,7 @@ struct Binding
 Represents the binding data used by the minigui module.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1468)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1479)
 
 ## Members
 
@@ -26,7 +26,7 @@ callback
 Stores the callback value associated with binding.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1472)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1483)
 
 <a id="field-field-miniguilib-minigui-binding-context-context-miniguilib-minigui-ml-1115608556"></a>
 ### context
@@ -38,7 +38,7 @@ context
 Stores the context value associated with binding.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1474)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1485)
 
 <a id="field-field-miniguilib-minigui-binding-control-control-miniguilib-minigui-ml-2088480200"></a>
 ### control
@@ -50,7 +50,7 @@ control
 Stores the control value associated with binding.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1470)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1481)
 
 <a id="field-field-miniguilib-minigui-binding-eventtype-eventtype-miniguilib-minigui-ml-151378460"></a>
 ### eventType
@@ -62,4 +62,4 @@ eventType
 Stores the event type value associated with binding.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1476)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L1487)

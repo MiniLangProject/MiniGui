@@ -12,7 +12,7 @@ struct TabControl
 Native TabControl operations.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6851)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6862)
 
 ## Members
 
@@ -39,4 +39,4 @@ create for the TabControl backend implementation.
 | `selectedIndex` | `dynamic` | — | selectedIndex supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6863)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6874)

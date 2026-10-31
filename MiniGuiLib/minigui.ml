@@ -1202,6 +1202,14 @@ function _miniGuiWndProc(hwnd, msg, wParam, lParam)
     if appClick is void then appClick = _appForWindow(hwnd) end if
     if appClick is void == false then
       if Events.endSplitterDrag(appClick, hwnd) then return 0 end if
+      // BUTTON's native procedure releases mouse capture and emits BN_CLICKED.
+      // Dispatching the click here swallowed WM_LBUTTONUP, leaving capture stuck.
+      buttonControl = Events.controlByHandle(appClick, hwnd)
+      if buttonControl is void == false then
+        if buttonControl.kind == "Button" or buttonControl.kind == "CheckBox" or buttonControl.kind == "RadioButton" or buttonControl.kind == "FilePicker" or buttonControl.kind == "FolderPicker" or buttonControl.kind == "ColorPicker" then
+          return _defaultWndProc(hwnd, msg, wParam, lParam)
+        end if
+      end if
       if Events.isControlKind(appClick, hwnd, "TabControl") then
         tabClickX = lParam & 65535
         tabClickY = (lParam >> 16) & 65535
@@ -1316,9 +1324,12 @@ function _miniGuiWndProc(hwnd, msg, wParam, lParam)
       winSize = Events.findWindowByHandle(appSize, hwnd)
       if winSize is void == false then
         Application.resizeWindow(appSize, winSize, widthSize, heightSize)
+        return 0
       end if
     end if
-    return 0
+    // Native child controls must handle WM_SIZE themselves, otherwise combo
+    // arrows and slider tracks keep their original dimensions after MoveWindow.
+    return _defaultWndProc(hwnd, msg, wParam, lParam)
   end if
 
   if msg == WM_CLOSE then

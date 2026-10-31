@@ -12,7 +12,7 @@ struct FolderPicker
 Represents the folder picker data used by the minigui module.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2481)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2492)
 
 ## Members
 
@@ -38,4 +38,4 @@ Creates folder picker for the minigui folder picker module.
 | `title` | `dynamic` | — | Human-readable title presented to the user. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2492)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2503)

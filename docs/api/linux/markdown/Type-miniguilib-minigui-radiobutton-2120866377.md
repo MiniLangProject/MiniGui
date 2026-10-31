@@ -12,7 +12,7 @@ struct RadioButton
 Native RadioButton operations.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6583)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6594)
 
 ## Members
 
@@ -38,4 +38,4 @@ create for the RadioButton backend implementation.
 | `checked` | `dynamic` | — | checked supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6594)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6605)

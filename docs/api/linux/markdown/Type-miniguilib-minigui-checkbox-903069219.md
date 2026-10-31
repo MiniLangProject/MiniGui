@@ -12,7 +12,7 @@ struct CheckBox
 Native CheckBox operations.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6543)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6554)
 
 ## Members
 
@@ -38,4 +38,4 @@ create for the CheckBox backend implementation.
 | `checked` | `dynamic` | — | checked supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6554)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6565)

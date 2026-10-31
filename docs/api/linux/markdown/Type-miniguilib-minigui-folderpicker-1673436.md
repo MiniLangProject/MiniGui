@@ -12,7 +12,7 @@ struct FolderPicker
 Native FolderPicker operations.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6397)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6408)
 
 ## Members
 
@@ -38,4 +38,4 @@ create for the FolderPicker backend implementation.
 | `title` | `dynamic` | — | title supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6408)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6419)

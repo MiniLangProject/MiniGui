@@ -12,7 +12,7 @@ struct Splitter
 Represents the splitter data used by the minigui module.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2781)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2792)
 
 ## Members
 
@@ -38,7 +38,7 @@ Creates splitter for the minigui splitter module.
 | `orientation` | `dynamic` | — | orientation value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2792)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2803)
 
 <a id="static_method-static-method-miniguilib-minigui-splitter-createpane-static-function-createpane-app-parent-id-text-x-y-width-height-orientation-targetbefore-targetafter-miniguilib-minigui-ml-215865089"></a>
 ### createPane
@@ -64,4 +64,4 @@ Creates pane for the minigui splitter module.
 | `targetAfter` | `dynamic` | — | targetAfter value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2808)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L2819)

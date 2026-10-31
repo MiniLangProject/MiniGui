@@ -12,7 +12,7 @@ struct LinkLabel
 Native LinkLabel operations.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6684)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6695)
 
 ## Members
 
@@ -38,4 +38,4 @@ create for the LinkLabel backend implementation.
 | `url` | `dynamic` | — | url supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6695)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6706)

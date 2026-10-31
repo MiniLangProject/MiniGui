@@ -12,7 +12,7 @@ struct Chart
 Native Chart operations.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8262)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8273)
 
 ## Members
 
@@ -30,7 +30,7 @@ Clears retained drawing commands.
 | `control` | `dynamic` | — | control supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8278)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8289)
 
 <a id="static_method-static-method-miniguilib-minigui-chart-create-static-function-create-app-parent-id-text-x-y-width-height-miniguilib-minigui-ml-509320881"></a>
 ### create
@@ -53,7 +53,7 @@ Creates a native Chart control.
 | `height` | `dynamic` | — | height supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8272)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8283)
 
 <a id="static_method-static-method-miniguilib-minigui-chart-setvalues-static-function-setvalues-control-values-charttype-color-miniguilib-minigui-ml-773549670"></a>
 ### setValues
@@ -72,4 +72,4 @@ Draws a bar or line chart from nonnegative numeric values.
 | `color` | `dynamic` | — | color supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8287)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8298)

@@ -12,7 +12,7 @@ struct Application
 Native Application operations.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6140)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6151)
 
 ## Members
 
@@ -26,7 +26,7 @@ static function create()
 create for the Application backend implementation.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6142)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6153)
 
 <a id="static_method-static-method-miniguilib-minigui-application-dispose-static-function-dispose-app-miniguilib-minigui-ml-1526319089"></a>
 ### dispose
@@ -42,7 +42,7 @@ dispose for the Application backend implementation.
 | `app` | `dynamic` | — | app supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6176)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6187)
 
 <a id="static_method-static-method-miniguilib-minigui-application-pump-static-function-pump-app-wait-miniguilib-minigui-ml-558180210"></a>
 ### pump
@@ -59,7 +59,7 @@ pump for the Application backend implementation.
 | `wait` | `dynamic` | — | wait supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6189)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6200)
 
 <a id="static_method-static-method-miniguilib-minigui-application-resizewindow-static-function-resizewindow-app-window-width-height-miniguilib-minigui-ml-538788546"></a>
 ### resizeWindow
@@ -78,7 +78,7 @@ resizeWindow for the Application backend implementation.
 | `height` | `dynamic` | — | height supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6262)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6273)
 
 <a id="static_method-static-method-miniguilib-minigui-application-run-static-function-run-app-miniguilib-minigui-ml-1153699829"></a>
 ### run
@@ -94,7 +94,7 @@ run for the Application backend implementation.
 | `app` | `dynamic` | — | app supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6161)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6172)
 
 <a id="static_method-static-method-miniguilib-minigui-application-setstartupwindow-static-function-setstartupwindow-app-window-miniguilib-minigui-ml-848416671"></a>
 ### setStartupWindow
@@ -111,4 +111,4 @@ setStartupWindow for the Application backend implementation.
 | `window` | `dynamic` | — | window supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6154)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6165)

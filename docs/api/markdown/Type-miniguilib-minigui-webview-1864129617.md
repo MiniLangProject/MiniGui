@@ -12,7 +12,7 @@ struct WebView
 Native WebView operations.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8139)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8150)
 
 ## Members
 
@@ -37,7 +37,7 @@ Creates a native WebView control.
 | `height` | `dynamic` | — | height supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8149)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8160)
 
 <a id="static_method-static-method-miniguilib-minigui-webview-getstatus-static-function-getstatus-control-miniguilib-minigui-ml-59063324"></a>
 ### getStatus
@@ -53,7 +53,7 @@ Returns 1 when ready, 0 while loading, or -1 after initialization failure.
 | `control` | `dynamic` | — | control supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8169)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8180)
 
 <a id="static_method-static-method-miniguilib-minigui-webview-loadhtml-static-function-loadhtml-control-html-miniguilib-minigui-ml-871340221"></a>
 ### loadHtml
@@ -70,7 +70,7 @@ Displays HTML in the embedded browser.
 | `html` | `dynamic` | — | html supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8163)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8174)
 
 <a id="static_method-static-method-miniguilib-minigui-webview-navigate-static-function-navigate-control-url-miniguilib-minigui-ml-1077046805"></a>
 ### navigate
@@ -87,4 +87,4 @@ Navigates the embedded browser to a URL.
 | `url` | `dynamic` | — | url supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8156)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8167)

@@ -12,7 +12,7 @@ struct Slider
 Native Slider operations.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6801)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6812)
 
 ## Members
 
@@ -43,4 +43,4 @@ create for the Slider backend implementation.
 | `largeStep` | `dynamic` | — | largeStep supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6817)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6828)

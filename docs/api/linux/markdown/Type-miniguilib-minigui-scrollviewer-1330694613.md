@@ -12,7 +12,7 @@ struct ScrollViewer
 Native ScrollViewer operations.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6736)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6747)
 
 ## Members
 
@@ -39,4 +39,4 @@ create for the ScrollViewer backend implementation.
 | `verticalScroll` | `dynamic` | — | verticalScroll supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6748)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6759)

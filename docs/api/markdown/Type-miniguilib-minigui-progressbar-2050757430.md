@@ -12,7 +12,7 @@ struct ProgressBar
 Represents the progress bar data used by the minigui module.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L3007)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L3018)
 
 ## Members
 
@@ -40,4 +40,4 @@ Creates progress bar for the minigui progress bar module.
 | `value` | `dynamic` | — | Value consumed or transformed by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L3020)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L3031)

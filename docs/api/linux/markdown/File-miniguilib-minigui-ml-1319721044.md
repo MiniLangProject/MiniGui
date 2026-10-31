@@ -37,7 +37,7 @@ _advancedCreate for the native backend.
 | `height` | `dynamic` | — | height supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8026)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8037)
 
 <a id="function-function-miniguilib-minigui-advanceddraw-function-advanceddraw-control-op-x-y-width-height-color-text-miniguilib-minigui-ml-638736160"></a>
 ### _advancedDraw
@@ -60,7 +60,7 @@ _advancedDraw for the native backend.
 | `text` | `dynamic` | — | text supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8048)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8059)
 
 <a id="function-function-miniguilib-minigui-advancedformat-function-advancedformat-control-start-endindex-color-bold-italic-miniguilib-minigui-ml-456966350"></a>
 ### _advancedFormat
@@ -81,7 +81,7 @@ _advancedFormat for the native backend.
 | `italic` | `dynamic` | — | italic supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8060)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8071)
 
 <a id="function-function-miniguilib-minigui-advancedproperty-function-advancedproperty-control-key-text-value-miniguilib-minigui-ml-360835394"></a>
 ### _advancedProperty
@@ -100,7 +100,7 @@ _advancedProperty for the native backend.
 | `value` | `dynamic` | — | value supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8035)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8046)
 
 <a id="function-function-miniguilib-minigui-dialoginputcancel-function-dialoginputcancel-context-event-miniguilib-minigui-ml-1040675573"></a>
 ### _dialogInputCancel
@@ -115,7 +115,7 @@ function _dialogInputCancel(context, event)
 | `event` | `dynamic` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8078)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8089)
 
 <a id="function-function-miniguilib-minigui-dialoginputok-function-dialoginputok-context-event-miniguilib-minigui-ml-1619618437"></a>
 ### _dialogInputOk
@@ -130,7 +130,7 @@ function _dialogInputOk(context, event)
 | `event` | `dynamic` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8069)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8080)
 
 <a id="function-function-miniguilib-minigui-hasword-function-hasword-text-word-miniguilib-minigui-ml-1008086879"></a>
 ### _hasWord
@@ -147,7 +147,7 @@ _hasWord for the native backend.
 | `word` | `dynamic` | — | word supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7562)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7573)
 
 <a id="function-function-miniguilib-minigui-itemcount-function-itemcount-itemstext-miniguilib-minigui-ml-2060651443"></a>
 ### _itemCount
@@ -161,7 +161,7 @@ function _itemCount(itemsText)
 | `itemsText` | `dynamic` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6096)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6107)
 
 <a id="function-function-miniguilib-minigui-itemtextat-function-itemtextat-itemstext-index-miniguilib-minigui-ml-1618130501"></a>
 ### _itemTextAt
@@ -176,7 +176,7 @@ function _itemTextAt(itemsText, index)
 | `index` | `dynamic` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6076)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6087)
 
 <a id="function-function-miniguilib-minigui-jointext-function-jointext-items-separator-miniguilib-minigui-ml-190570311"></a>
 ### _joinText
@@ -191,7 +191,7 @@ function _joinText(items, separator)
 | `separator` | `dynamic` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6064)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6075)
 
 <a id="global-global-miniguilib-minigui-linuxbindings-linuxbindings-miniguilib-minigui-ml-2056516418"></a>
 ### _linuxBindings
@@ -201,7 +201,7 @@ _linuxBindings
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6106)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6117)
 
 <a id="global-global-miniguilib-minigui-linuxlayouts-linuxlayouts-miniguilib-minigui-ml-1444837148"></a>
 ### _linuxLayouts
@@ -211,7 +211,7 @@ _linuxLayouts
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6108)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6119)
 
 <a id="function-function-miniguilib-minigui-new-function-new-app-parent-id-kind-text-x-y-width-height-miniguilib-minigui-ml-1447891607"></a>
 ### _new
@@ -235,7 +235,7 @@ _new for the native backend.
 | `height` | `dynamic` | — | height supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6119)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6130)
 
 - [MiniGuiLib.minigui.Application](Type-miniguilib-minigui-application-1605122988.md) — struct
 - [MiniGuiLib.minigui.ApplicationState](Type-miniguilib-minigui-applicationstate-2092619441.md) — struct
@@ -280,7 +280,7 @@ extern function mg_add(node as ptr, row as cstr) from "$ORIGIN/libminigui_gtk.so
 | `row` | `cstr` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5902)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5913)
 
 <a id="extern_function-extern-function-miniguilib-minigui-mg-alive-extern-function-mg-alive-node-as-ptr-from-origin-libminigui-gtk-so-returns-bool-miniguilib-minigui-ml-1178163255"></a>
 ### mg_alive
@@ -294,7 +294,7 @@ extern function mg_alive(node as ptr) from "$ORIGIN/libminigui_gtk.so" returns b
 | `node` | `ptr` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5886)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5897)
 
 <a id="extern_function-extern-function-miniguilib-minigui-mg-bounds-extern-function-mg-bounds-node-as-ptr-x-as-double-y-as-double-width-as-double-height-as-double-from-origin-libminigui-gtk-so-returns-void-miniguilib-minigui-ml-1378647115"></a>
 ### mg_bounds
@@ -312,7 +312,7 @@ extern function mg_bounds(node as ptr, x as double, y as double, width as double
 | `height` | `double` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5892)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5903)
 
 <a id="extern_function-extern-function-miniguilib-minigui-mg-cell-extern-function-mg-cell-node-as-ptr-row-as-int-column-as-int-text-as-cstr-set-as-int-from-origin-libminigui-gtk-so-returns-cstr-miniguilib-minigui-ml-184509355"></a>
 ### mg_cell
@@ -330,7 +330,7 @@ extern function mg_cell(node as ptr, row as int, column as int, text as cstr, se
 | `set` | `int` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5926)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5937)
 
 <a id="extern_function-extern-function-miniguilib-minigui-mg-clear-extern-function-mg-clear-node-as-ptr-from-origin-libminigui-gtk-so-returns-void-miniguilib-minigui-ml-1404499453"></a>
 ### mg_clear
@@ -344,7 +344,7 @@ extern function mg_clear(node as ptr) from "$ORIGIN/libminigui_gtk.so" returns v
 | `node` | `ptr` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5900)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5911)
 
 <a id="extern_function-extern-function-miniguilib-minigui-mg-columns-extern-function-mg-columns-node-as-ptr-columns-as-cstr-from-origin-libminigui-gtk-so-returns-void-miniguilib-minigui-ml-1099803954"></a>
 ### mg_columns
@@ -359,7 +359,7 @@ extern function mg_columns(node as ptr, columns as cstr) from "$ORIGIN/libminigu
 | `columns` | `cstr` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5898)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5909)
 
 <a id="extern_function-extern-function-miniguilib-minigui-mg-create-extern-function-mg-create-kind-as-cstr-parent-as-ptr-id-as-int-text-as-cstr-x-as-int-y-as-int-width-as-int-height-as-int-from-origin-libminigui-gtk-so-returns-ptr-miniguilib-minigui-ml-1905722100"></a>
 ### mg_create
@@ -380,7 +380,7 @@ extern function mg_create(kind as cstr, parent as ptr, id as int, text as cstr, 
 | `height` | `int` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5884)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5895)
 
 <a id="extern_function-extern-function-miniguilib-minigui-mg-destroy-extern-function-mg-destroy-node-as-ptr-from-origin-libminigui-gtk-so-returns-void-miniguilib-minigui-ml-1738797119"></a>
 ### mg_destroy
@@ -394,7 +394,7 @@ extern function mg_destroy(node as ptr) from "$ORIGIN/libminigui_gtk.so" returns
 | `node` | `ptr` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5890)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5901)
 
 <a id="extern_function-extern-function-miniguilib-minigui-mg-dialog-extern-function-mg-dialog-parent-as-ptr-kind-as-int-title-as-cstr-text-as-cstr-from-origin-libminigui-gtk-so-returns-cstr-miniguilib-minigui-ml-2120652727"></a>
 ### mg_dialog
@@ -411,7 +411,7 @@ extern function mg_dialog(parent as ptr, kind as int, title as cstr, text as cst
 | `text` | `cstr` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5920)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5931)
 
 <a id="extern_function-extern-function-miniguilib-minigui-mg-draw-extern-function-mg-draw-node-as-ptr-op-as-int-x-as-double-y-as-double-width-as-double-height-as-double-color-as-cstr-text-as-cstr-from-origin-libminigui-gtk-so-returns-void-miniguilib-minigui-ml-297364427"></a>
 ### mg_draw
@@ -432,7 +432,7 @@ extern function mg_draw(node as ptr, op as int, x as double, y as double, width 
 | `text` | `cstr` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5912)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5923)
 
 <a id="extern_function-extern-function-miniguilib-minigui-mg-event-extern-function-mg-event-field-as-int-from-origin-libminigui-gtk-so-returns-int-miniguilib-minigui-ml-1791562701"></a>
 ### mg_event
@@ -446,7 +446,7 @@ extern function mg_event(field as int) from "$ORIGIN/libminigui_gtk.so" returns 
 | `field` | `int` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5916)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5927)
 
 <a id="extern_function-extern-function-miniguilib-minigui-mg-event-text-extern-function-mg-event-text-from-origin-libminigui-gtk-so-returns-cstr-miniguilib-minigui-ml-1023125147"></a>
 ### mg_event_text
@@ -456,7 +456,7 @@ extern function mg_event_text() from "$ORIGIN/libminigui_gtk.so" returns cstr
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5918)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5929)
 
 <a id="extern_function-extern-function-miniguilib-minigui-mg-format-extern-function-mg-format-node-as-ptr-start-as-int-endindex-as-int-color-as-cstr-bold-as-int-italic-as-int-from-origin-libminigui-gtk-so-returns-int-miniguilib-minigui-ml-305076145"></a>
 ### mg_format
@@ -475,7 +475,7 @@ extern function mg_format(node as ptr, start as int, endIndex as int, color as c
 | `italic` | `int` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5924)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5935)
 
 <a id="extern_function-extern-function-miniguilib-minigui-mg-get-text-extern-function-mg-get-text-node-as-ptr-from-origin-libminigui-gtk-so-returns-cstr-miniguilib-minigui-ml-1409373967"></a>
 ### mg_get_text
@@ -489,7 +489,7 @@ extern function mg_get_text(node as ptr) from "$ORIGIN/libminigui_gtk.so" return
 | `node` | `ptr` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5896)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5907)
 
 <a id="extern_function-extern-function-miniguilib-minigui-mg-init-extern-function-mg-init-from-origin-libminigui-gtk-so-returns-int-miniguilib-minigui-ml-1360152570"></a>
 ### mg_init
@@ -501,7 +501,7 @@ extern function mg_init() from "$ORIGIN/libminigui_gtk.so" returns int
 Native GTK callbacks enqueue events; MiniLang drains them on its UI thread.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5882)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5893)
 
 <a id="extern_function-extern-function-miniguilib-minigui-mg-message-extern-function-mg-message-owner-as-ptr-title-as-cstr-message-as-cstr-buttons-as-cstr-icon-as-cstr-from-origin-libminigui-gtk-so-returns-int-miniguilib-minigui-ml-999053670"></a>
 ### mg_message
@@ -519,7 +519,7 @@ extern function mg_message(owner as ptr, title as cstr, message as cstr, buttons
 | `icon` | `cstr` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5877)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5888)
 
 <a id="extern_function-extern-function-miniguilib-minigui-mg-modal-extern-function-mg-modal-window-as-ptr-owner-as-ptr-enabled-as-int-from-origin-libminigui-gtk-so-returns-void-miniguilib-minigui-ml-1877574950"></a>
 ### mg_modal
@@ -535,7 +535,7 @@ extern function mg_modal(window as ptr, owner as ptr, enabled as int) from "$ORI
 | `enabled` | `int` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5879)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5890)
 
 <a id="extern_function-extern-function-miniguilib-minigui-mg-poll-extern-function-mg-poll-wait-as-int-from-origin-libminigui-gtk-so-returns-int-miniguilib-minigui-ml-1162386722"></a>
 ### mg_poll
@@ -549,7 +549,7 @@ extern function mg_poll(wait as int) from "$ORIGIN/libminigui_gtk.so" returns in
 | `wait` | `int` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5914)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5925)
 
 <a id="extern_function-extern-function-miniguilib-minigui-mg-property-extern-function-mg-property-node-as-ptr-key-as-cstr-text-as-cstr-value-as-int-from-origin-libminigui-gtk-so-returns-int-miniguilib-minigui-ml-359923430"></a>
 ### mg_property
@@ -566,7 +566,7 @@ extern function mg_property(node as ptr, key as cstr, text as cstr, value as int
 | `value` | `int` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5910)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5921)
 
 <a id="extern_function-extern-function-miniguilib-minigui-mg-range-extern-function-mg-range-node-as-ptr-minimum-as-int-maximum-as-int-step-as-int-from-origin-libminigui-gtk-so-returns-void-miniguilib-minigui-ml-1140176400"></a>
 ### mg_range
@@ -583,7 +583,7 @@ extern function mg_range(node as ptr, minimum as int, maximum as int, step as in
 | `step` | `int` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5908)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5919)
 
 <a id="extern_function-extern-function-miniguilib-minigui-mg-selection-extern-function-mg-selection-node-as-ptr-value-as-int-set-as-int-from-origin-libminigui-gtk-so-returns-int-miniguilib-minigui-ml-384891407"></a>
 ### mg_selection
@@ -599,7 +599,7 @@ extern function mg_selection(node as ptr, value as int, set as int) from "$ORIGI
 | `set` | `int` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5904)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5915)
 
 <a id="extern_function-extern-function-miniguilib-minigui-mg-show-extern-function-mg-show-node-as-ptr-visible-as-int-from-origin-libminigui-gtk-so-returns-void-miniguilib-minigui-ml-1609383376"></a>
 ### mg_show
@@ -614,7 +614,7 @@ extern function mg_show(node as ptr, visible as int) from "$ORIGIN/libminigui_gt
 | `visible` | `int` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5888)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5899)
 
 <a id="extern_function-extern-function-miniguilib-minigui-mg-shutdown-extern-function-mg-shutdown-from-origin-libminigui-gtk-so-returns-void-miniguilib-minigui-ml-744777385"></a>
 ### mg_shutdown
@@ -624,7 +624,7 @@ extern function mg_shutdown() from "$ORIGIN/libminigui_gtk.so" returns void
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5922)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5933)
 
 <a id="extern_function-extern-function-miniguilib-minigui-mg-text-extern-function-mg-text-node-as-ptr-text-as-cstr-from-origin-libminigui-gtk-so-returns-void-miniguilib-minigui-ml-1409826188"></a>
 ### mg_text
@@ -639,7 +639,7 @@ extern function mg_text(node as ptr, text as cstr) from "$ORIGIN/libminigui_gtk.
 | `text` | `cstr` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5894)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5905)
 
 <a id="extern_function-extern-function-miniguilib-minigui-mg-value-extern-function-mg-value-node-as-ptr-value-as-int-set-as-int-from-origin-libminigui-gtk-so-returns-int-miniguilib-minigui-ml-1953196053"></a>
 ### mg_value
@@ -655,7 +655,7 @@ extern function mg_value(node as ptr, value as int, set as int) from "$ORIGIN/li
 | `set` | `int` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5906)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5917)
 
 - [MiniGuiLib.minigui.NativeControl](Type-miniguilib-minigui-nativecontrol-249550938.md) — struct
 - [MiniGuiLib.minigui.NumberBox](Type-miniguilib-minigui-numberbox-1673605572.md) — struct

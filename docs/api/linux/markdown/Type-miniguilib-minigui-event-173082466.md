@@ -12,7 +12,7 @@ struct Event
 Runtime Event data.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5928)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5939)
 
 ## Members
 
@@ -26,7 +26,7 @@ cancel
 Stores the cancel value associated with event.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5938)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5949)
 
 <a id="field-field-miniguilib-minigui-event-eventtype-eventtype-miniguilib-minigui-ml-71941269"></a>
 ### eventType
@@ -38,7 +38,7 @@ eventType
 Stores the event type value associated with event.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5932)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5943)
 
 <a id="field-field-miniguilib-minigui-event-newvalue-newvalue-miniguilib-minigui-ml-1187781895"></a>
 ### newValue
@@ -50,7 +50,7 @@ newValue
 Stores the new value value associated with event.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5936)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5947)
 
 <a id="field-field-miniguilib-minigui-event-oldvalue-oldvalue-miniguilib-minigui-ml-774455285"></a>
 ### oldValue
@@ -62,7 +62,7 @@ oldValue
 Stores the old value value associated with event.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5934)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5945)
 
 <a id="field-field-miniguilib-minigui-event-sender-sender-miniguilib-minigui-ml-975068211"></a>
 ### sender
@@ -74,4 +74,4 @@ sender
 Stores the sender value associated with event.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5930)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L5941)
