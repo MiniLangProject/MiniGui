@@ -3,7 +3,7 @@ name = "MiniGui"
 description = "API and implementation reference for the declarative MiniLang GUI toolkit, its native Windows/Linux runtime library, and the MiniGui command-line generator."
 entry = "tools/minigui.ml"
 source_roots = ["MiniGuiLib", "tools"]
-include = ["MiniGuiLib", "tools"]
+include = ["MiniGuiLib", "tools", "../MiniLangCompilerML"]
 exclude = ["build", "dist", "docs/api", "examples", "tests"]
 target = "windows-x64"
 
