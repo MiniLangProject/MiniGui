@@ -1,7 +1,7 @@
 # MiniGui
 
-Current release: **0.1.0**. Requires MiniLang Compiler **1.2.6**.
-See the [release notes](RELEASE_NOTES_0.1.0.md).
+Current release: **0.1.1**. Requires MiniLang Compiler **1.3.9**.
+See the [release notes](RELEASE_NOTES_0.1.1.md).
 
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
 [![Language: MiniLang](https://img.shields.io/badge/written%20in-MiniLang-5b5bd6.svg)](.)
@@ -1194,6 +1194,11 @@ The public MSON shape should stay stable: applications describe the UI
 declaratively while the runtime hides native implementation details.
 
 ## Cross-platform verification
+
+The source tree also supports `--target minux-x64`, with native desktop controls
+and a separately built MinUX bridge. See [platforms](docs/platforms.md) and the
+compiler's [MinUX guide](../MiniLangCompilerPy/docs/MINUX.md) for deployment,
+supported controls and native WAV/AVI output.
 
 Run the existing Windows regression suite and the additional native-control suite:
 

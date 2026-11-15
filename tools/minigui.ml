@@ -30,15 +30,35 @@ extern function _CloseHandle(handle as ptr) from "kernel32.dll" symbol "CloseHan
 extern function _SearchPathW(path as ptr, fileName as wstr, extension as ptr, bufferCount as u32, output as bytes, filePart as ptr) from "kernel32.dll" symbol "SearchPathW" returns u32
 #else
 /// @internal
+#if TARGET_OS == "minux"
+extern function _mkdir(path as cstr, mode as int) from "libc.so.1" symbol "mkdir" returns int
+#else
 extern function _mkdir(path as cstr, mode as int) from "libc.so.6" symbol "mkdir" returns int
+#endif
 /// @internal
+#if TARGET_OS == "minux"
+extern function _fork() from "libc.so.1" symbol "fork" returns int
+#else
 extern function _fork() from "libc.so.6" symbol "fork" returns int
+#endif
 /// @internal
+#if TARGET_OS == "minux"
+extern function _execvp(file as cstr, argv as bytes) from "libc.so.1" symbol "execvp" returns int
+#else
 extern function _execvp(file as cstr, argv as bytes) from "libc.so.6" symbol "execvp" returns int
+#endif
 /// @internal
+#if TARGET_OS == "minux"
+extern function _waitpid(pid as int, status as bytes, options as int) from "libc.so.1" symbol "waitpid" returns int
+#else
 extern function _waitpid(pid as int, status as bytes, options as int) from "libc.so.6" symbol "waitpid" returns int
+#endif
 /// @internal
+#if TARGET_OS == "minux"
+extern function _exit(code as int) from "libc.so.1" symbol "_exit" returns void
+#else
 extern function _exit(code as int) from "libc.so.6" symbol "_exit" returns void
+#endif
 #endif
 
 
@@ -48,9 +68,14 @@ const HOST_TARGET = "windows-x64"
 /// Default compiler for a Windows host.
 const HOST_COMPILER = "..\\MiniLangCompilerML\\build\\mlc_win64.exe"
 #else
+#if TARGET_OS == "minux"
+const HOST_TARGET = "minux-x64"
+const HOST_COMPILER = "mlc"
+#else
 const HOST_TARGET = "linux-x64"
 /// Default compiler for a Linux host.
 const HOST_COMPILER = "../MiniLangCompilerPy/mlc_win64.py"
+#endif
 #endif
 const MAX_MSON_BYTES = 16777216
 /// Maximum JSON container nesting accepted by the MSON parser.
@@ -675,7 +700,7 @@ end function
 /// Performs the pathSlash operation for the minigui module.
 /// @param p p value consumed by this operation.
 function pathSlash(p)
-#if TARGET_OS == "linux"
+#if TARGET_OS == "linux" or TARGET_OS == "minux"
   return str.replaceAll(p, "\\", "/")
 #else
   return str.replaceAll(p, "/", "\\")
@@ -691,7 +716,7 @@ end function
 /// Performs the trimDotSlash operation for the minigui module.
 /// @param p p value consumed by this operation.
 function trimDotSlash(p)
-#if TARGET_OS == "linux"
+#if TARGET_OS == "linux" or TARGET_OS == "minux"
   r = pathSlash(p)
   while str.startsWith(r, "./")
     r = str.substr(r, 2, len(r) - 2)
@@ -709,7 +734,7 @@ end function
 /// Returns whether rooted satisfies the required condition.
 /// @param p p value consumed by this operation.
 function isRooted(p)
-#if TARGET_OS == "linux"
+#if TARGET_OS == "linux" or TARGET_OS == "minux"
   return str.startsWith(pathSlash(p), "/")
 #else
   pp = pathSlash(p)
@@ -722,7 +747,7 @@ end function
 /// Performs the dirname operation for the minigui module.
 /// @param path Path of the file or directory used by the operation.
 function dirname(path)
-#if TARGET_OS == "linux"
+#if TARGET_OS == "linux" or TARGET_OS == "minux"
   pp = pathSlash(path)
   parts = str.split(pp, "/")
   if len(parts) < 2 then return "." end if
@@ -748,7 +773,7 @@ end function
 /// Performs the basenameNoExt operation for the minigui module.
 /// @param path Path of the file or directory used by the operation.
 function basenameNoExt(path)
-#if TARGET_OS == "linux"
+#if TARGET_OS == "linux" or TARGET_OS == "minux"
   pp = pathSlash(path)
   parts = str.split(pp, "/")
   name = parts[len(parts)-1]
@@ -779,7 +804,7 @@ end function
 /// @param a a value consumed by this operation.
 /// @param b b value consumed by this operation.
 function joinPath(a, b)
-#if TARGET_OS == "linux"
+#if TARGET_OS == "linux" or TARGET_OS == "minux"
   if b == "" then return pathSlash(a) end if
   if isRooted(b) then return pathSlash(b) end if
   if a == "" or a == "." then return pathSlash(b) end if
@@ -797,7 +822,7 @@ end function
 /// Normalizes path for the minigui workflow.
 /// @param p p value consumed by this operation.
 function normalizePath(p)
-#if TARGET_OS == "linux"
+#if TARGET_OS == "linux" or TARGET_OS == "minux"
   pp = pathSlash(p)
   absolute = isRooted(pp)
   parts = str.split(pp, "/")
@@ -846,7 +871,7 @@ end function
 /// Splits path parts for the minigui workflow.
 /// @param p p value consumed by this operation.
 function splitPathParts(p)
-#if TARGET_OS == "linux"
+#if TARGET_OS == "linux" or TARGET_OS == "minux"
   return str.split(normalizePath(p), "/")
 #else
   pp = trimDotSlash(normalizePath(p))
@@ -883,7 +908,7 @@ end function
 /// Ensures dir is available to the minigui workflow.
 /// @param path Path of the file or directory used by the operation.
 function ensureDir(path)
-#if TARGET_OS == "linux"
+#if TARGET_OS == "linux" or TARGET_OS == "minux"
   p = normalizePath(path)
   if fs.isDir(p) then return end if
   parent = dirname(p)
@@ -963,7 +988,7 @@ end function
 /// @param executable Executable passed to CreateProcessW.
 /// @param args Exact argv values supplied to the child process.
 function runProcess(executable, args)
-#if TARGET_OS == "linux"
+#if TARGET_OS == "linux" or TARGET_OS == "minux"
   values = [executable] + args
   storage = []
   argv = bytes((len(values) + 1) * 8, 0)
@@ -1015,7 +1040,7 @@ end function
 /// Resolves a named executable without invoking a command shell.
 /// @param name Executable name, including its extension.
 function resolveExecutable(name)
-#if TARGET_OS == "linux"
+#if TARGET_OS == "linux" or TARGET_OS == "minux"
   if isRooted(name) then
     if fs.isFile(name) then return name end if
     return ""
@@ -1039,7 +1064,7 @@ end function
 
 /// Resolves the preferred Python interpreter for the Python MiniLang compiler.
 function resolvePythonInterpreter()
-#if TARGET_OS == "linux"
+#if TARGET_OS == "linux" or TARGET_OS == "minux"
   return resolveExecutable("python3")
 #else
   localAppData = process.environment("LOCALAPPDATA")
@@ -2537,7 +2562,7 @@ function parseOptions(args, start)
     end if
     i = i + 1
   end while
-  if opts[7][1] != "windows-x64" and opts[7][1] != "linux-x64" then return error(2, "Unsupported target: " + opts[7][1]) end if
+  if opts[7][1] != "windows-x64" and opts[7][1] != "linux-x64" and opts[7][1] != "minux-x64" then return error(2, "Unsupported target: " + opts[7][1]) end if
   return [opts, includes.toArray()]
 end function
 
@@ -2556,7 +2581,7 @@ function usage()
   print "Usage:"
   print "  minigui validate <app.mson> [--include-dir <dir>] [--code-behind <file>]"
   print "  minigui generate <app.mson> --output <app.gui.ml>"
-  print "  minigui build <app.mson> --output <app> --target windows-x64|linux-x64 [--no-compile]"
+  print "  minigui build <app.mson> --output <app> --target windows-x64|linux-x64|minux-x64 [--no-compile]"
 end function
 
 /// Runs the selected MiniLang compiler without involving a command shell.
@@ -2564,16 +2589,18 @@ end function
 /// @param generated generated value consumed by this operation.
 /// @param outExe outExe value consumed by this operation.
 /// @param libraryDir libraryDir value consumed by this operation.
-/// @param target Target executable platform, windows-x64 or linux-x64.
+/// @param target Target executable platform, windows-x64, linux-x64 or minux-x64.
 function runCompiler(compiler, generated, outExe, libraryDir, target)
   executable = compiler
   args = [generated, outExe, "-I", libraryDir, "--target", target]
   if target == "windows-x64" then args = args + ["--subsystem", "gui"] end if
   compilerDir = dirname(normalizePath(compiler))
   compilerRoot = compilerDir
-  if fs.isDir(joinPath(compilerRoot, "std")) == false then
-    compilerRoot = dirname(compilerDir)
-  end if
+  while fs.isDir(joinPath(compilerRoot, "std")) == false
+    parent = dirname(compilerRoot)
+    if parent == "" or parent == compilerRoot then break end if
+    compilerRoot = parent
+  end while
   if fs.isDir(joinPath(compilerRoot, "std")) then
     args = args + ["-I", compilerRoot]
   end if
@@ -2635,10 +2662,11 @@ function main(args)
   ensureDir(dirname(outExe))
   nativeName = "libminigui_gtk.so"
   if opt(opts, "target") == "windows-x64" then nativeName = "minigui_extra.dll" end if
+  if opt(opts, "target") == "minux-x64" then nativeName = "libminigui_minux.so" end if
   nativeSource = joinPath(opt(opts, "libraryDir"), "build/native/" + opt(opts, "target") + "/" + nativeName)
   if fs.isFile(nativeSource) == false then
     print "Native backend missing: " + nativeSource
-    print "Build it with native/windows/build.ps1 or native/linux/build.sh before compiling applications."
+    print "Build it with native/windows/build.ps1, native/linux/build.sh or tools/build_minux_native.py before compiling applications."
     return 1
   end if
   copied = fs.copyFile(nativeSource, joinPath(dirname(outExe), nativeName), true)

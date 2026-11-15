@@ -12,7 +12,7 @@ struct JsonValue
 Represents the json value data used by the minigui module.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L66)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L91)
 
 ## Members
 
@@ -26,7 +26,7 @@ flag
 Stores the flag value associated with json value.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L74)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L99)
 
 <a id="field-field-jsonvalue-items-items-tools-minigui-ml-1972165745"></a>
 ### items
@@ -38,7 +38,7 @@ items
 Stores the items value associated with json value.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L80)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L105)
 
 <a id="field-field-jsonvalue-keys-keys-tools-minigui-ml-605955985"></a>
 ### keys
@@ -50,7 +50,7 @@ keys
 Stores the keys value associated with json value.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L76)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L101)
 
 <a id="field-field-jsonvalue-kind-kind-tools-minigui-ml-1019315581"></a>
 ### kind
@@ -62,7 +62,7 @@ kind
 Stores the kind value associated with json value.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L68)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L93)
 
 <a id="field-field-jsonvalue-number-number-tools-minigui-ml-2032970731"></a>
 ### number
@@ -74,7 +74,7 @@ number
 Stores the number value associated with json value.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L72)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L97)
 
 <a id="field-field-jsonvalue-text-text-tools-minigui-ml-371813191"></a>
 ### text
@@ -86,7 +86,7 @@ text
 Stores the text value associated with json value.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L70)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L95)
 
 <a id="field-field-jsonvalue-values-values-tools-minigui-ml-1163603165"></a>
 ### values
@@ -98,4 +98,4 @@ values
 Stores the values value associated with json value.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L78)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L103)

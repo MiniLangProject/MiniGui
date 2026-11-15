@@ -12,7 +12,7 @@ struct Separator
 Native Separator operations.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6635)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6741)
 
 ## Members
 
@@ -38,4 +38,4 @@ create for the Separator backend implementation.
 | `orientation` | `dynamic` | — | orientation supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6646)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6752)

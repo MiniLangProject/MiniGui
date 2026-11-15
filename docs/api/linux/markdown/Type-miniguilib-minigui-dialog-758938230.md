@@ -12,7 +12,7 @@ struct Dialog
 Native Dialog operations.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7794)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7900)
 
 ## Members
 
@@ -30,7 +30,7 @@ Finds the native owner of a dialog.
 | `app` | `dynamic` | — | app supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7797)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7903)
 
 <a id="static_method-static-method-miniguilib-minigui-dialog-abortretryignore-static-function-abortretryignore-app-title-message-miniguilib-minigui-ml-662816968"></a>
 ### abortRetryIgnore
@@ -48,7 +48,7 @@ Implements abortRetryIgnore for Linux dialogs.
 | `message` | `dynamic` | — | message supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7903)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8009)
 
 <a id="static_method-static-method-miniguilib-minigui-dialog-close-static-function-close-dialog-result-miniguilib-minigui-ml-1280988937"></a>
 ### close
@@ -65,7 +65,7 @@ Ends a custom modal dialog without destroying its content.
 | `result` | `dynamic` | — | result supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7971)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8077)
 
 <a id="static_method-static-method-miniguilib-minigui-dialog-confirm-static-function-confirm-app-title-message-miniguilib-minigui-ml-598608940"></a>
 ### confirm
@@ -83,7 +83,7 @@ Returns true only when the user confirms.
 | `message` | `dynamic` | — | message supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7814)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7920)
 
 <a id="static_method-static-method-miniguilib-minigui-dialog-createcustom-static-function-createcustom-app-id-title-width-height-miniguilib-minigui-ml-671246221"></a>
 ### createCustom
@@ -103,7 +103,7 @@ Implements createCustom for Linux dialogs.
 | `height` | `dynamic` | — | height supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7912)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8018)
 
 <a id="static_method-static-method-miniguilib-minigui-dialog-createinput-static-function-createinput-app-id-title-prompt-defaultvalue-width-miniguilib-minigui-ml-1295018710"></a>
 ### createInput
@@ -124,7 +124,7 @@ Implements createInput for Linux dialogs.
 | `width` | `dynamic` | — | width supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7923)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8029)
 
 <a id="static_method-static-method-miniguilib-minigui-dialog-errormessage-static-function-errormessage-app-title-message-miniguilib-minigui-ml-888258862"></a>
 ### errorMessage
@@ -142,7 +142,7 @@ Implements errorMessage for Linux dialogs.
 | `message` | `dynamic` | — | message supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7868)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7974)
 
 <a id="static_method-static-method-miniguilib-minigui-dialog-getresult-static-function-getresult-dialog-miniguilib-minigui-ml-1311561314"></a>
 ### getResult
@@ -158,7 +158,7 @@ Implements getResult for Linux dialogs.
 | `dialog` | `dynamic` | — | dialog supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7955)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8061)
 
 <a id="static_method-static-method-miniguilib-minigui-dialog-getvalue-static-function-getvalue-dialog-miniguilib-minigui-ml-2137203328"></a>
 ### getValue
@@ -174,7 +174,7 @@ Implements getValue for Linux dialogs.
 | `dialog` | `dynamic` | — | dialog supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7948)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8054)
 
 <a id="static_method-static-method-miniguilib-minigui-dialog-info-static-function-info-app-title-message-miniguilib-minigui-ml-133940052"></a>
 ### info
@@ -192,7 +192,7 @@ Implements info for Linux dialogs.
 | `message` | `dynamic` | — | message supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7854)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7960)
 
 <a id="static_method-static-method-miniguilib-minigui-dialog-pickcolor-static-function-pickcolor-app-title-initialcolor-miniguilib-minigui-ml-1616571858"></a>
 ### pickColor
@@ -210,7 +210,7 @@ Opens the native pickColor dialog.
 | `initialColor` | `dynamic` | — | initialColor supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8019)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8125)
 
 <a id="static_method-static-method-miniguilib-minigui-dialog-pickfolder-static-function-pickfolder-app-title-miniguilib-minigui-ml-497446665"></a>
 ### pickFolder
@@ -227,7 +227,7 @@ Opens the native pickFolder dialog.
 | `title` | `dynamic` | — | title supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8010)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8116)
 
 <a id="static_method-static-method-miniguilib-minigui-dialog-pickopenfile-static-function-pickopenfile-app-title-filter-miniguilib-minigui-ml-697429695"></a>
 ### pickOpenFile
@@ -245,7 +245,7 @@ Opens the native pickOpenFile dialog.
 | `filter` | `dynamic` | — | filter supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7993)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8099)
 
 <a id="static_method-static-method-miniguilib-minigui-dialog-picksavefile-static-function-picksavefile-app-title-filter-miniguilib-minigui-ml-344312933"></a>
 ### pickSaveFile
@@ -263,7 +263,7 @@ Opens the native pickSaveFile dialog.
 | `filter` | `dynamic` | — | filter supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8002)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8108)
 
 <a id="static_method-static-method-miniguilib-minigui-dialog-question-static-function-question-app-title-message-miniguilib-minigui-ml-1509293812"></a>
 ### question
@@ -281,7 +281,7 @@ Implements question for Linux dialogs.
 | `message` | `dynamic` | — | message supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7875)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7981)
 
 <a id="static_method-static-method-miniguilib-minigui-dialog-resultname-static-function-resultname-code-miniguilib-minigui-ml-109138141"></a>
 ### resultName
@@ -297,7 +297,7 @@ Implements resultName for Linux dialogs.
 | `code` | `dynamic` | — | code supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7840)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7946)
 
 <a id="static_method-static-method-miniguilib-minigui-dialog-retrycancel-static-function-retrycancel-app-title-message-miniguilib-minigui-ml-466623524"></a>
 ### retryCancel
@@ -315,7 +315,7 @@ Implements retryCancel for Linux dialogs.
 | `message` | `dynamic` | — | message supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7896)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8002)
 
 <a id="static_method-static-method-miniguilib-minigui-dialog-setvalue-static-function-setvalue-dialog-value-miniguilib-minigui-ml-420652195"></a>
 ### setValue
@@ -332,7 +332,7 @@ Implements setValue for Linux dialogs.
 | `value` | `dynamic` | — | value supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7962)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8068)
 
 <a id="static_method-static-method-miniguilib-minigui-dialog-showerror-static-function-showerror-app-title-message-miniguilib-minigui-ml-1379798868"></a>
 ### showError
@@ -350,7 +350,7 @@ Shows a native error message.
 | `message` | `dynamic` | — | message supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7835)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7941)
 
 <a id="static_method-static-method-miniguilib-minigui-dialog-showinfo-static-function-showinfo-app-title-message-miniguilib-minigui-ml-1643086678"></a>
 ### showInfo
@@ -368,7 +368,7 @@ Shows a native info message.
 | `message` | `dynamic` | — | message supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7821)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7927)
 
 <a id="static_method-static-method-miniguilib-minigui-dialog-showinput-static-function-showinput-app-title-prompt-defaultvalue-miniguilib-minigui-ml-1039424635"></a>
 ### showInput
@@ -387,7 +387,7 @@ Implements showInput for Linux dialogs.
 | `defaultValue` | `dynamic` | — | defaultValue supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7940)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8046)
 
 <a id="static_method-static-method-miniguilib-minigui-dialog-showmessage-static-function-showmessage-app-title-message-buttons-icon-miniguilib-minigui-ml-1675846092"></a>
 ### showMessage
@@ -407,7 +407,7 @@ Shows a native message dialog and returns a named result.
 | `icon` | `dynamic` | — | icon supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7807)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7913)
 
 <a id="static_method-static-method-miniguilib-minigui-dialog-showmodal-static-function-showmodal-dialog-miniguilib-minigui-ml-917583810"></a>
 ### showModal
@@ -423,7 +423,7 @@ Runs a custom dialog with native modal ownership.
 | `dialog` | `dynamic` | — | dialog supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7978)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8084)
 
 <a id="static_method-static-method-miniguilib-minigui-dialog-showwarning-static-function-showwarning-app-title-message-miniguilib-minigui-ml-869786756"></a>
 ### showWarning
@@ -441,7 +441,7 @@ Shows a native warning message.
 | `message` | `dynamic` | — | message supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7828)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7934)
 
 <a id="static_method-static-method-miniguilib-minigui-dialog-warning-static-function-warning-app-title-message-miniguilib-minigui-ml-406805796"></a>
 ### warning
@@ -459,7 +459,7 @@ Implements warning for Linux dialogs.
 | `message` | `dynamic` | — | message supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7861)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7967)
 
 <a id="static_method-static-method-miniguilib-minigui-dialog-yesno-static-function-yesno-app-title-message-miniguilib-minigui-ml-94362612"></a>
 ### yesNo
@@ -477,7 +477,7 @@ Implements yesNo for Linux dialogs.
 | `message` | `dynamic` | — | message supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7882)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7988)
 
 <a id="static_method-static-method-miniguilib-minigui-dialog-yesnocancel-static-function-yesnocancel-app-title-message-miniguilib-minigui-ml-1637556960"></a>
 ### yesNoCancel
@@ -495,4 +495,4 @@ Implements yesNoCancel for Linux dialogs.
 | `message` | `dynamic` | — | message supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7889)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7995)

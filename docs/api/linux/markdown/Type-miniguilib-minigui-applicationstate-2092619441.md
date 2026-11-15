@@ -12,7 +12,7 @@ struct ApplicationState
 Runtime ApplicationState data.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6023)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6123)
 
 ## Members
 
@@ -26,7 +26,7 @@ blurBindings
 Stores the blur bindings value associated with application state.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6045)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6145)
 
 <a id="field-field-miniguilib-minigui-applicationstate-clickbindings-clickbindings-miniguilib-minigui-ml-318905406"></a>
 ### clickBindings
@@ -38,7 +38,7 @@ clickBindings
 Stores the click bindings value associated with application state.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6029)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6129)
 
 <a id="field-field-miniguilib-minigui-applicationstate-closebindings-closebindings-miniguilib-minigui-ml-1695053262"></a>
 ### closeBindings
@@ -50,7 +50,7 @@ closeBindings
 Stores the close bindings value associated with application state.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6039)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6139)
 
 <a id="field-field-miniguilib-minigui-applicationstate-controls-controls-miniguilib-minigui-ml-526976122"></a>
 ### controls
@@ -62,7 +62,7 @@ controls
 Stores the controls value associated with application state.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6027)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6127)
 
 <a id="field-field-miniguilib-minigui-applicationstate-focusbindings-focusbindings-miniguilib-minigui-ml-7319614"></a>
 ### focusBindings
@@ -74,7 +74,7 @@ focusBindings
 Stores the focus bindings value associated with application state.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6043)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6143)
 
 <a id="field-field-miniguilib-minigui-applicationstate-loadbindings-loadbindings-miniguilib-minigui-ml-1147233346"></a>
 ### loadBindings
@@ -86,7 +86,7 @@ loadBindings
 Stores the load bindings value associated with application state.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6037)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6137)
 
 <a id="field-field-miniguilib-minigui-applicationstate-nextnativeid-nextnativeid-miniguilib-minigui-ml-477773176"></a>
 ### nextNativeId
@@ -98,7 +98,7 @@ nextNativeId
 Stores the next native id value associated with application state.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6049)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6149)
 
 <a id="field-field-miniguilib-minigui-applicationstate-resizebindings-resizebindings-miniguilib-minigui-ml-806007650"></a>
 ### resizeBindings
@@ -110,7 +110,7 @@ resizeBindings
 Stores the resize bindings value associated with application state.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6041)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6141)
 
 <a id="field-field-miniguilib-minigui-applicationstate-running-running-miniguilib-minigui-ml-124611954"></a>
 ### running
@@ -122,7 +122,7 @@ running
 Stores the running value associated with application state.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6051)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6151)
 
 <a id="field-field-miniguilib-minigui-applicationstate-scrollbindings-scrollbindings-miniguilib-minigui-ml-18574320"></a>
 ### scrollBindings
@@ -134,7 +134,7 @@ scrollBindings
 Stores the scroll bindings value associated with application state.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6035)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6135)
 
 <a id="field-field-miniguilib-minigui-applicationstate-selectionbindings-selectionbindings-miniguilib-minigui-ml-356477970"></a>
 ### selectionBindings
@@ -146,7 +146,7 @@ selectionBindings
 Stores the selection bindings value associated with application state.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6033)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6133)
 
 <a id="field-field-miniguilib-minigui-applicationstate-startupwindow-startupwindow-miniguilib-minigui-ml-1239193974"></a>
 ### startupWindow
@@ -158,7 +158,7 @@ startupWindow
 Stores the startup window value associated with application state.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6047)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6147)
 
 <a id="field-field-miniguilib-minigui-applicationstate-textbindings-textbindings-miniguilib-minigui-ml-390523076"></a>
 ### textBindings
@@ -170,7 +170,7 @@ textBindings
 Stores the text bindings value associated with application state.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6031)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6131)
 
 <a id="field-field-miniguilib-minigui-applicationstate-windows-windows-miniguilib-minigui-ml-186993662"></a>
 ### windows
@@ -182,4 +182,4 @@ windows
 Stores the windows value associated with application state.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6025)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6125)

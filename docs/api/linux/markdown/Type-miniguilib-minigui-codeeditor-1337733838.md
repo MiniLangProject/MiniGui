@@ -12,7 +12,7 @@ struct CodeEditor
 Native CodeEditor operations.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8126)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8232)
 
 ## Members
 
@@ -37,7 +37,7 @@ Creates a native CodeEditor control.
 | `height` | `dynamic` | — | height supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8136)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8242)
 
 <a id="static_method-static-method-miniguilib-minigui-codeeditor-setlanguage-static-function-setlanguage-control-language-miniguilib-minigui-ml-1498686771"></a>
 ### setLanguage
@@ -54,4 +54,4 @@ Selects the syntax language for the editor.
 | `language` | `dynamic` | — | language supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8143)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8249)

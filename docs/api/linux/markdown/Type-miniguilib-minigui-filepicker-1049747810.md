@@ -12,7 +12,7 @@ struct FilePicker
 Native FilePicker operations.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6387)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6493)
 
 ## Members
 
@@ -39,4 +39,4 @@ create for the FilePicker backend implementation.
 | `filter` | `dynamic` | — | filter supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6399)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6505)

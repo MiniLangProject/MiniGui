@@ -12,7 +12,7 @@ struct DrawingCanvas
 Native DrawingCanvas operations.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8218)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8324)
 
 ## Members
 
@@ -30,7 +30,7 @@ Clears retained drawing commands.
 | `control` | `dynamic` | — | control supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8234)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8340)
 
 <a id="static_method-static-method-miniguilib-minigui-drawingcanvas-create-static-function-create-app-parent-id-text-x-y-width-height-miniguilib-minigui-ml-900164703"></a>
 ### create
@@ -53,7 +53,7 @@ Creates a native DrawingCanvas control.
 | `height` | `dynamic` | — | height supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8228)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8334)
 
 <a id="static_method-static-method-miniguilib-minigui-drawingcanvas-drawtext-static-function-drawtext-control-x-y-text-color-miniguilib-minigui-ml-156775394"></a>
 ### drawText
@@ -73,7 +73,7 @@ Appends text at the supplied position.
 | `color` | `dynamic` | — | color supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8266)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8372)
 
 <a id="static_method-static-method-miniguilib-minigui-drawingcanvas-fillrect-static-function-fillrect-control-x-y-width-height-color-miniguilib-minigui-ml-8518074"></a>
 ### fillRect
@@ -94,7 +94,7 @@ Appends a filled rectangle.
 | `color` | `dynamic` | — | color supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8256)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8362)
 
 <a id="static_method-static-method-miniguilib-minigui-drawingcanvas-line-static-function-line-control-x1-y1-x2-y2-color-miniguilib-minigui-ml-1333797116"></a>
 ### line
@@ -115,4 +115,4 @@ Appends a line that is repainted after window exposure.
 | `color` | `dynamic` | — | color supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8245)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8351)

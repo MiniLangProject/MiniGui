@@ -5885,56 +5885,156 @@ extern function mx_pump(wait as int) from "minigui_extra.dll" returns int
 #else
 
 /// @internal
+#if TARGET_OS == "minux"
+extern function mg_message(owner as ptr, title as cstr, message as cstr, buttons as cstr, icon as cstr) from "libminigui_minux.so" returns int
+#else
 extern function mg_message(owner as ptr, title as cstr, message as cstr, buttons as cstr, icon as cstr) from "$ORIGIN/libminigui_gtk.so" returns int
+#endif
 /// @internal
+#if TARGET_OS == "minux"
+extern function mg_modal(window as ptr, owner as ptr, enabled as int) from "libminigui_minux.so" returns void
+#else
 extern function mg_modal(window as ptr, owner as ptr, enabled as int) from "$ORIGIN/libminigui_gtk.so" returns void
+#endif
 // Native GTK callbacks enqueue events; MiniLang drains them on its UI thread.
 /// @internal
+#if TARGET_OS == "minux"
+extern function mg_init() from "libminigui_minux.so" returns int
+#else
 extern function mg_init() from "$ORIGIN/libminigui_gtk.so" returns int
+#endif
 /// @internal
+#if TARGET_OS == "minux"
+extern function mg_create(kind as cstr, parent as ptr, id as int, text as cstr, x as int, y as int, width as int, height as int) from "libminigui_minux.so" returns ptr
+#else
 extern function mg_create(kind as cstr, parent as ptr, id as int, text as cstr, x as int, y as int, width as int, height as int) from "$ORIGIN/libminigui_gtk.so" returns ptr
+#endif
 /// @internal
+#if TARGET_OS == "minux"
+extern function mg_alive(node as ptr) from "libminigui_minux.so" returns bool
+#else
 extern function mg_alive(node as ptr) from "$ORIGIN/libminigui_gtk.so" returns bool
+#endif
 /// @internal
+#if TARGET_OS == "minux"
+extern function mg_show(node as ptr, visible as int) from "libminigui_minux.so" returns void
+#else
 extern function mg_show(node as ptr, visible as int) from "$ORIGIN/libminigui_gtk.so" returns void
+#endif
 /// @internal
+#if TARGET_OS == "minux"
+extern function mg_destroy(node as ptr) from "libminigui_minux.so" returns void
+#else
 extern function mg_destroy(node as ptr) from "$ORIGIN/libminigui_gtk.so" returns void
+#endif
 /// @internal
+#if TARGET_OS == "minux"
+extern function mg_bounds(node as ptr, x as double, y as double, width as double, height as double) from "libminigui_minux.so" returns void
+#else
 extern function mg_bounds(node as ptr, x as double, y as double, width as double, height as double) from "$ORIGIN/libminigui_gtk.so" returns void
+#endif
 /// @internal
+#if TARGET_OS == "minux"
+extern function mg_text(node as ptr, text as cstr) from "libminigui_minux.so" returns void
+#else
 extern function mg_text(node as ptr, text as cstr) from "$ORIGIN/libminigui_gtk.so" returns void
+#endif
 /// @internal
+#if TARGET_OS == "minux"
+extern function mg_get_text(node as ptr) from "libminigui_minux.so" returns cstr
+#else
 extern function mg_get_text(node as ptr) from "$ORIGIN/libminigui_gtk.so" returns cstr
+#endif
 /// @internal
+#if TARGET_OS == "minux"
+extern function mg_columns(node as ptr, columns as cstr) from "libminigui_minux.so" returns void
+#else
 extern function mg_columns(node as ptr, columns as cstr) from "$ORIGIN/libminigui_gtk.so" returns void
+#endif
 /// @internal
+#if TARGET_OS == "minux"
+extern function mg_clear(node as ptr) from "libminigui_minux.so" returns void
+#else
 extern function mg_clear(node as ptr) from "$ORIGIN/libminigui_gtk.so" returns void
+#endif
 /// @internal
+#if TARGET_OS == "minux"
+extern function mg_add(node as ptr, row as cstr) from "libminigui_minux.so" returns void
+#else
 extern function mg_add(node as ptr, row as cstr) from "$ORIGIN/libminigui_gtk.so" returns void
+#endif
 /// @internal
+#if TARGET_OS == "minux"
+extern function mg_selection(node as ptr, value as int, set as int) from "libminigui_minux.so" returns int
+#else
 extern function mg_selection(node as ptr, value as int, set as int) from "$ORIGIN/libminigui_gtk.so" returns int
+#endif
 /// @internal
+#if TARGET_OS == "minux"
+extern function mg_value(node as ptr, value as int, set as int) from "libminigui_minux.so" returns int
+#else
 extern function mg_value(node as ptr, value as int, set as int) from "$ORIGIN/libminigui_gtk.so" returns int
+#endif
 /// @internal
+#if TARGET_OS == "minux"
+extern function mg_range(node as ptr, minimum as int, maximum as int, step as int) from "libminigui_minux.so" returns void
+#else
 extern function mg_range(node as ptr, minimum as int, maximum as int, step as int) from "$ORIGIN/libminigui_gtk.so" returns void
+#endif
 /// @internal
+#if TARGET_OS == "minux"
+extern function mg_property(node as ptr, key as cstr, text as cstr, value as int) from "libminigui_minux.so" returns int
+#else
 extern function mg_property(node as ptr, key as cstr, text as cstr, value as int) from "$ORIGIN/libminigui_gtk.so" returns int
+#endif
 /// @internal
+#if TARGET_OS == "minux"
+extern function mg_draw(node as ptr, op as int, x as double, y as double, width as double, height as double, color as cstr, text as cstr) from "libminigui_minux.so" returns void
+#else
 extern function mg_draw(node as ptr, op as int, x as double, y as double, width as double, height as double, color as cstr, text as cstr) from "$ORIGIN/libminigui_gtk.so" returns void
+#endif
 /// @internal
+#if TARGET_OS == "minux"
+extern function mg_poll(wait as int) from "libminigui_minux.so" returns int
+#else
 extern function mg_poll(wait as int) from "$ORIGIN/libminigui_gtk.so" returns int
+#endif
 /// @internal
+#if TARGET_OS == "minux"
+extern function mg_event(field as int) from "libminigui_minux.so" returns int
+#else
 extern function mg_event(field as int) from "$ORIGIN/libminigui_gtk.so" returns int
+#endif
 /// @internal
+#if TARGET_OS == "minux"
+extern function mg_event_text() from "libminigui_minux.so" returns cstr
+#else
 extern function mg_event_text() from "$ORIGIN/libminigui_gtk.so" returns cstr
+#endif
 /// @internal
+#if TARGET_OS == "minux"
+extern function mg_dialog(parent as ptr, kind as int, title as cstr, text as cstr) from "libminigui_minux.so" returns cstr
+#else
 extern function mg_dialog(parent as ptr, kind as int, title as cstr, text as cstr) from "$ORIGIN/libminigui_gtk.so" returns cstr
+#endif
 /// @internal
+#if TARGET_OS == "minux"
+extern function mg_shutdown() from "libminigui_minux.so" returns void
+#else
 extern function mg_shutdown() from "$ORIGIN/libminigui_gtk.so" returns void
+#endif
 /// @internal
+#if TARGET_OS == "minux"
+extern function mg_format(node as ptr, start as int, endIndex as int, color as cstr, bold as int, italic as int) from "libminigui_minux.so" returns int
+#else
 extern function mg_format(node as ptr, start as int, endIndex as int, color as cstr, bold as int, italic as int) from "$ORIGIN/libminigui_gtk.so" returns int
+#endif
 /// @internal
+#if TARGET_OS == "minux"
+extern function mg_cell(node as ptr, row as int, column as int, text as cstr, set as int) from "libminigui_minux.so" returns cstr
+#else
 extern function mg_cell(node as ptr, row as int, column as int, text as cstr, set as int) from "$ORIGIN/libminigui_gtk.so" returns cstr
+#endif
 /// Runtime Event data.
 struct Event
   /// Stores the sender value associated with event.
@@ -6133,7 +6233,7 @@ function _new(app, parent, id, kind, text, x, y, width, height)
   nid = app.nextNativeId
   app.nextNativeId = nid + 1
   handle = mg_create(kind, handle, nid, text, x, y, width, height)
-  if handle == 0 then return error(700, "GTK could not create " + kind) end if
+  if handle == 0 then return error(700, "Native GUI backend could not create " + kind + " (unsupported control or window/resource limit)") end if
   pw = width
   ph = height
   if parent is void == false then pw = parent.width; ph = parent.height end if
@@ -6155,7 +6255,13 @@ struct Application
     global _linuxLayouts
     if _linuxBindings is void then _linuxBindings = [] end if
     if _linuxLayouts is void then _linuxLayouts = [] end if
-    if mg_init() == 0 then return error(700, "GTK cannot connect to a display") end if
+    if mg_init() == 0 then
+#if TARGET_OS == "minux"
+      return error(700, "MinUX GUI applications must be launched by the desktop with command/snapshot pipes")
+#else
+      return error(700, "GTK cannot connect to a display")
+#endif
+    end if
     return ApplicationState([], [], [], [], [], [], [], [], [], [], [], void, 1000, false)
   end function
 

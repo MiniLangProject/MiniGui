@@ -12,7 +12,7 @@ struct PropertyGrid
 Native PropertyGrid operations.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8325)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8431)
 
 ## Members
 
@@ -38,7 +38,7 @@ Creates an editable two-column property table.
 | `items` | `dynamic` | — | items supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8336)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8442)
 
 <a id="static_method-static-method-miniguilib-minigui-propertygrid-getvalue-static-function-getvalue-control-row-miniguilib-minigui-ml-1586573124"></a>
 ### getValue
@@ -55,7 +55,7 @@ Returns the property value at a row.
 | `row` | `dynamic` | — | row supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8351)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8457)
 
 <a id="static_method-static-method-miniguilib-minigui-propertygrid-setvalue-static-function-setvalue-control-row-value-miniguilib-minigui-ml-1953252095"></a>
 ### setValue
@@ -73,4 +73,4 @@ Updates the property value at a row.
 | `value` | `dynamic` | — | value supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8359)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L8465)

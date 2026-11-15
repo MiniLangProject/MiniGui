@@ -12,7 +12,7 @@ struct ListBox
 Native ListBox operations.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7164)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7270)
 
 ## Members
 
@@ -39,4 +39,4 @@ create for the ListBox backend implementation.
 | `selectedIndex` | `dynamic` | — | selectedIndex supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7176)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7282)

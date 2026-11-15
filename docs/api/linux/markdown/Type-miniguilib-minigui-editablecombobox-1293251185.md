@@ -12,7 +12,7 @@ struct EditableComboBox
 Native EditableComboBox operations.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7142)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7248)
 
 ## Members
 
@@ -39,4 +39,4 @@ create for the EditableComboBox backend implementation.
 | `selectedIndex` | `dynamic` | — | selectedIndex supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7154)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7260)

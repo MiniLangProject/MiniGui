@@ -8,19 +8,19 @@ Static metrics are calculated from target-specific preprocessed MiniLang files i
 
 | Metric | Value |
 | --- | ---: |
-| Blank lines | 2803 |
+| Blank lines | 2934 |
 | Clone groups | 54 |
-| Cognitive complexity | 3121 (maximum per function: 287) |
+| Cognitive complexity | 3126 (maximum per function: 287) |
 | Comment lines | 2297 |
-| Cyclomatic complexity | 2284 (average: 6.04, maximum: 139) |
+| Cyclomatic complexity | 2288 (average: 6.05, maximum: 139) |
 | Documentation coverage | 99.95% (2186 of 2187 documentation items) |
-| Duplicated lines | 370 (6.26%) |
+| Duplicated lines | 370 (6.25%) |
 | Files | 2 |
 | Functions | 378 |
 | Maintainability index | 0 / 100 |
-| Physical lines | 11014 |
-| Source lines | 5914 |
-| Statements | 4937 |
+| Physical lines | 11148 |
+| Source lines | 5917 |
+| Statements | 4942 |
 
 ## Documentation coverage
 
@@ -40,80 +40,80 @@ Coverage is split by documentation contract so strong API summaries cannot hide 
 
 | Distinct operators | Distinct operands | Total operators | Total operands | Vocabulary | Length | Volume | Difficulty | Effort | Estimated defects |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 51 | 2252 | 30890 | 23032 | 2303 | 53922 | 602270.92 | 260.8 | 157070759.4 | 200.76 |
+| 51 | 2254 | 30913 | 23048 | 2305 | 53961 | 602774.1 | 260.75 | 157171609.47 | 200.92 |
 
 ## Files
 
 | File | SLOC | Functions | Cyclomatic total / avg / max | Cognitive total / max | Duplication | Halstead volume | MI |
 | --- | ---: | ---: | --- | --- | --- | ---: | ---: |
 | [`MiniGuiLib/minigui.ml`](File-miniguilib-minigui-ml-1319721044.md) | 3934 | 270 | 1375 / 5.09 / 94 | 1775 / 198 | 331 (8.41%) | 346230.67 | 0 |
-| [`tools/minigui.ml`](File-tools-minigui-ml-742202604.md) | 1980 | 108 | 909 / 8.42 / 139 | 1346 / 287 | 39 (1.97%) | 212332.97 | 0 |
+| [`tools/minigui.ml`](File-tools-minigui-ml-742202604.md) | 1983 | 108 | 913 / 8.45 / 139 | 1351 / 287 | 39 (1.97%) | 212806.74 | 0 |
 
 ## Functions
 
 | Function | Location | LOC | Statements | Cyclomatic | Cognitive | Max nesting | Halstead volume | MI |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| [`addError`](File-tools-minigui-ml-742202604.md#function-function-adderror-function-adderror-result-path-message-tools-minigui-ml-2077416824) | `tools/minigui.ml:224` | 3 | 1 | 1 | 0 | 0 | 104 | 75.33 |
-| [`addGeneratedNode`](File-tools-minigui-ml-742202604.md#function-function-addgeneratednode-function-addgeneratednode-lines-fields-result-path-node-parentvar-parenttype-x-y-width-height-tools-minigui-ml-525139880) | `tools/minigui.ml:2069` | 355 | 352 | 139 | 287 | 6 | 43836.68 | 0 |
-| [`allowedControlEvents`](File-tools-minigui-ml-742202604.md#function-function-allowedcontrolevents-function-allowedcontrolevents-typ-tools-minigui-ml-649350264) | `tools/minigui.ml:1458` | 13 | 20 | 12 | 11 | 1 | 1654.28 | 51.55 |
-| [`allowedControlProps`](File-tools-minigui-ml-742202604.md#function-function-allowedcontrolprops-function-allowedcontrolprops-typ-tools-minigui-ml-1407366198) | `tools/minigui.ml:1479` | 26 | 47 | 26 | 25 | 1 | 3503.73 | 40.82 |
-| [`arrItems`](File-tools-minigui-ml-742202604.md#function-function-arritems-function-arritems-v-tools-minigui-ml-1899234739) | `tools/minigui.ml:312` | 5 | 5 | 4 | 3 | 1 | 169.92 | 68.6 |
-| [`asBool`](File-tools-minigui-ml-742202604.md#function-function-asbool-function-asbool-v-fallback-tools-minigui-ml-1812786413) | `tools/minigui.ml:298` | 4 | 3 | 3 | 2 | 1 | 120.93 | 71.88 |
-| [`asInt`](File-tools-minigui-ml-742202604.md#function-function-asint-function-asint-v-fallback-tools-minigui-ml-416818299) | `tools/minigui.ml:271` | 4 | 3 | 3 | 2 | 1 | 120.93 | 71.88 |
-| [`asString`](File-tools-minigui-ml-742202604.md#function-function-asstring-function-asstring-v-fallback-tools-minigui-ml-75689085) | `tools/minigui.ml:263` | 4 | 3 | 3 | 2 | 1 | 120.93 | 71.88 |
-| [`basenameNoExt`](File-tools-minigui-ml-742202604.md#function-function-basenamenoext-function-basenamenoext-path-tools-minigui-ml-1247929144) | `tools/minigui.ml:750` | 15 | 15 | 7 | 8 | 2 | 625.76 | 53.82 |
-| [`boolProp`](File-tools-minigui-ml-742202604.md#function-function-boolprop-function-boolprop-result-path-node-name-fallback-tools-minigui-ml-812731956) | `tools/minigui.ml:1876` | 5 | 4 | 2 | 1 | 1 | 229.25 | 67.96 |
-| [`charAt`](File-tools-minigui-ml-742202604.md#function-function-charat-inline-function-charat-text-i-tools-minigui-ml-1061914298) | `tools/minigui.ml:321` | 4 | 3 | 3 | 2 | 1 | 133.98 | 71.57 |
-| [`clampDimension`](File-tools-minigui-ml-742202604.md#function-function-clampdimension-function-clampdimension-result-path-node-axis-value-tools-minigui-ml-1785762353) | `tools/minigui.ml:1837` | 13 | 12 | 6 | 5 | 1 | 474.17 | 56.16 |
-| [`cloneJson`](File-tools-minigui-ml-742202604.md#function-function-clonejson-function-clonejson-v-tools-minigui-ml-1085644649) | `tools/minigui.ml:1347` | 21 | 13 | 7 | 12 | 3 | 913.14 | 49.49 |
-| [`codePointUtf8`](File-tools-minigui-ml-742202604.md#function-function-codepointutf8-function-codepointutf8-cp-tools-minigui-ml-1085701668) | `tools/minigui.ml:394` | 8 | 11 | 8 | 7 | 1 | 885.61 | 58.59 |
-| [`collectTreeItemLiterals`](File-tools-minigui-ml-742202604.md#function-function-collecttreeitemliterals-function-collecttreeitemliterals-result-path-parts-item-level-tools-minigui-ml-990768546) | `tools/minigui.ml:1943` | 24 | 20 | 9 | 10 | 2 | 1242.77 | 47.01 |
-| [`commonControlProps`](File-tools-minigui-ml-742202604.md#function-function-commoncontrolprops-function-commoncontrolprops-tools-minigui-ml-437269975) | `tools/minigui.ml:1473` | 3 | 1 | 1 | 0 | 0 | 385.74 | 71.35 |
-| [`componentByName`](File-tools-minigui-ml-742202604.md#function-function-componentbyname-function-componentbyname-result-name-tools-minigui-ml-488755799) | `tools/minigui.ml:1272` | 7 | 6 | 4 | 4 | 2 | 283.28 | 63.86 |
-| [`contains`](File-tools-minigui-ml-742202604.md#function-function-contains-function-contains-arr-value-tools-minigui-ml-1677896927) | `tools/minigui.ml:1062` | 7 | 6 | 4 | 4 | 2 | 220.08 | 64.62 |
-| [`controlDefaultHeight`](File-tools-minigui-ml-742202604.md#function-function-controldefaultheight-function-controldefaultheight-typ-tools-minigui-ml-948488736) | `tools/minigui.ml:1766` | 38 | 71 | 42 | 41 | 1 | 2261.06 | 36.4 |
-| [`controlText`](File-tools-minigui-ml-742202604.md#function-function-controltext-function-controltext-result-path-node-tools-minigui-ml-1407743509) | `tools/minigui.ml:1886` | 5 | 4 | 2 | 1 | 1 | 210.91 | 68.21 |
-| [`copyNodeWithPrefix`](File-tools-minigui-ml-742202604.md#function-function-copynodewithprefix-function-copynodewithprefix-node-prefix-tools-minigui-ml-1311712071) | `tools/minigui.ml:1391` | 14 | 11 | 4 | 4 | 2 | 659.92 | 54.72 |
-| [`createCallFor`](File-tools-minigui-ml-742202604.md#function-function-createcallfor-function-createcallfor-typ-tools-minigui-ml-270679294) | `tools/minigui.ml:2014` | 42 | 79 | 41 | 40 | 1 | 2574.3 | 35.19 |
-| [`dimensionProp`](File-tools-minigui-ml-742202604.md#function-function-dimensionprop-function-dimensionprop-result-path-node-name-fallback-tools-minigui-ml-2039256594) | `tools/minigui.ml:1823` | 7 | 8 | 6 | 5 | 1 | 408.07 | 62.48 |
-| [`dirname`](File-tools-minigui-ml-742202604.md#function-function-dirname-function-dirname-path-tools-minigui-ml-438074904) | `tools/minigui.ml:724` | 10 | 10 | 5 | 5 | 2 | 353.3 | 59.67 |
-| [`documentLoaded`](File-tools-minigui-ml-742202604.md#function-function-documentloaded-function-documentloaded-result-path-tools-minigui-ml-1222007481) | `tools/minigui.ml:1257` | 7 | 6 | 4 | 4 | 2 | 293.25 | 63.75 |
-| [`ensureDir`](File-tools-minigui-ml-742202604.md#function-function-ensuredir-function-ensuredir-path-tools-minigui-ml-1685454382) | `tools/minigui.ml:885` | 14 | 14 | 6 | 10 | 3 | 484.48 | 55.39 |
-| [`expandComponents`](File-tools-minigui-ml-742202604.md#function-function-expandcomponents-function-expandcomponents-result-path-node-tools-minigui-ml-1942712481) | `tools/minigui.ml:1410` | 28 | 21 | 6 | 8 | 2 | 1207.41 | 46.05 |
-| [`findFunctionArity`](File-tools-minigui-ml-742202604.md#function-function-findfunctionarity-function-findfunctionarity-text-name-tools-minigui-ml-296480199) | `tools/minigui.ml:1668` | 11 | 12 | 4 | 3 | 1 | 553.96 | 57.54 |
-| [`generateCode`](File-tools-minigui-ml-742202604.md#function-function-generatecode-function-generatecode-result-outputpath-tools-minigui-ml-1604091608) | `tools/minigui.ml:2430` | 80 | 75 | 30 | 60 | 3 | 8344.77 | 26.99 |
-| [`hasProp`](File-tools-minigui-ml-742202604.md#function-function-hasprop-function-hasprop-obj-name-tools-minigui-ml-1849741609) | `tools/minigui.ml:250` | 9 | 10 | 6 | 6 | 2 | 377.83 | 60.33 |
-| [`hasValue`](File-tools-minigui-ml-742202604.md#function-function-hasvalue-function-hasvalue-v-tools-minigui-ml-496209791) | `tools/minigui.ml:230` | 3 | 1 | 1 | 0 | 0 | 66.61 | 76.69 |
-| [`hexVal`](File-tools-minigui-ml-742202604.md#function-function-hexval-function-hexval-ch-tools-minigui-ml-1410832352) | `tools/minigui.ml:384` | 7 | 8 | 7 | 6 | 1 | 301.85 | 63.26 |
-| [`identOk`](File-tools-minigui-ml-742202604.md#function-function-identok-function-identok-value-tools-minigui-ml-187081004) | `tools/minigui.ml:1083` | 11 | 13 | 8 | 8 | 2 | 1239.1 | 54.55 |
-| [`idSeen`](File-tools-minigui-ml-742202604.md#function-function-idseen-function-idseen-ids-id-tools-minigui-ml-1221354970) | `tools/minigui.ml:1606` | 3 | 1 | 1 | 0 | 0 | 53.15 | 77.38 |
-| [`intArrayLiteral`](File-tools-minigui-ml-742202604.md#function-function-intarrayliteral-function-intarrayliteral-result-path-node-name-tools-minigui-ml-44682596) | `tools/minigui.ml:1925` | 11 | 11 | 5 | 5 | 2 | 784.5 | 56.34 |
-| [`intPart`](File-tools-minigui-ml-742202604.md#function-function-intpart-function-intpart-value-tools-minigui-ml-410095164) | `tools/minigui.ml:278` | 16 | 15 | 7 | 9 | 3 | 587.76 | 53.4 |
-| [`intProp`](File-tools-minigui-ml-742202604.md#function-function-intprop-function-intprop-result-path-node-name-fallback-tools-minigui-ml-1005362488) | `tools/minigui.ml:1811` | 5 | 4 | 2 | 1 | 1 | 229.25 | 67.96 |
-| [`isContainerControl`](File-tools-minigui-ml-742202604.md#function-function-iscontainercontrol-function-iscontainercontrol-typ-tools-minigui-ml-303566540) | `tools/minigui.ml:1515` | 3 | 1 | 1 | 0 | 0 | 85.95 | 75.91 |
-| [`isControl`](File-tools-minigui-ml-742202604.md#function-function-iscontrol-function-iscontrol-typ-tools-minigui-ml-1570622166) | `tools/minigui.ml:1508` | 4 | 3 | 2 | 1 | 1 | 711.69 | 66.63 |
-| [`isDigit`](File-tools-minigui-ml-742202604.md#function-function-isdigit-inline-function-isdigit-ch-tools-minigui-ml-2042969611) | `tools/minigui.ml:335` | 4 | 2 | 1 | 0 | 0 | 88 | 73.12 |
-| [`isIdentChar`](File-tools-minigui-ml-742202604.md#function-function-isidentchar-inline-function-isidentchar-ch-tools-minigui-ml-191393507) | `tools/minigui.ml:355` | 3 | 1 | 1 | 0 | 0 | 81.41 | 76.08 |
-| [`isIdentStart`](File-tools-minigui-ml-742202604.md#function-function-isidentstart-inline-function-isidentstart-ch-tools-minigui-ml-1729391301) | `tools/minigui.ml:349` | 3 | 1 | 1 | 0 | 0 | 60.94 | 76.96 |
-| [`isLayout`](File-tools-minigui-ml-742202604.md#function-function-islayout-function-islayout-typ-tools-minigui-ml-1837265796) | `tools/minigui.ml:1521` | 3 | 1 | 1 | 0 | 0 | 106.27 | 75.27 |
-| [`isLetter`](File-tools-minigui-ml-742202604.md#function-function-isletter-inline-function-isletter-ch-tools-minigui-ml-1421752045) | `tools/minigui.ml:342` | 4 | 2 | 1 | 0 | 0 | 144.43 | 71.61 |
-| [`isNull`](File-tools-minigui-ml-742202604.md#function-function-isnull-function-isnull-v-tools-minigui-ml-261926343) | `tools/minigui.ml:305` | 4 | 3 | 2 | 1 | 1 | 100 | 72.59 |
-| [`isRooted`](File-tools-minigui-ml-742202604.md#function-function-isrooted-function-isrooted-p-tools-minigui-ml-1820017) | `tools/minigui.ml:711` | 6 | 6 | 5 | 4 | 1 | 269.88 | 65.33 |
-| [`isWs`](File-tools-minigui-ml-742202604.md#function-function-isws-inline-function-isws-ch-tools-minigui-ml-1721750953) | `tools/minigui.ml:361` | 3 | 1 | 1 | 0 | 0 | 91.38 | 75.73 |
-| [`jArray`](File-tools-minigui-ml-742202604.md#function-function-jarray-function-jarray-items-tools-minigui-ml-1237117185) | `tools/minigui.ml:199` | 3 | 1 | 1 | 0 | 0 | 101.58 | 75.41 |
-| [`jBool`](File-tools-minigui-ml-742202604.md#function-function-jbool-function-jbool-v-tools-minigui-ml-1513999911) | `tools/minigui.ml:186` | 3 | 1 | 1 | 0 | 0 | 102.8 | 75.37 |
-| [`jNull`](File-tools-minigui-ml-742202604.md#function-function-jnull-function-jnull-tools-minigui-ml-2071308925) | `tools/minigui.ml:168` | 3 | 1 | 1 | 0 | 0 | 98.99 | 75.48 |
-| [`jNumber`](File-tools-minigui-ml-742202604.md#function-function-jnumber-function-jnumber-v-tools-minigui-ml-1998167665) | `tools/minigui.ml:180` | 3 | 1 | 1 | 0 | 0 | 102.8 | 75.37 |
-| [`jObject`](File-tools-minigui-ml-742202604.md#function-function-jobject-function-jobject-keys-values-tools-minigui-ml-835191647) | `tools/minigui.ml:193` | 3 | 1 | 1 | 0 | 0 | 108 | 75.22 |
-| [`joinPath`](File-tools-minigui-ml-742202604.md#function-function-joinpath-function-joinpath-a-b-tools-minigui-ml-1892060280) | `tools/minigui.ml:781` | 8 | 10 | 6 | 5 | 1 | 385.14 | 61.39 |
-| [`jsonParseError`](File-tools-minigui-ml-742202604.md#function-function-jsonparseerror-function-jsonparseerror-message-tools-minigui-ml-1780629814) | `tools/minigui.ml:211` | 3 | 1 | 1 | 0 | 0 | 62.27 | 76.89 |
-| [`jsonParseOk`](File-tools-minigui-ml-742202604.md#function-function-jsonparseok-function-jsonparseok-value-tools-minigui-ml-947883754) | `tools/minigui.ml:205` | 3 | 1 | 1 | 0 | 0 | 55.35 | 77.25 |
-| [`jsonScalarToString`](File-tools-minigui-ml-742202604.md#function-function-jsonscalartostring-function-jsonscalartostring-v-tools-minigui-ml-754868791) | `tools/minigui.ml:1169` | 9 | 9 | 5 | 5 | 2 | 254.19 | 61.67 |
-| [`jString`](File-tools-minigui-ml-742202604.md#function-function-jstring-function-jstring-v-tools-minigui-ml-633572521) | `tools/minigui.ml:174` | 3 | 1 | 1 | 0 | 0 | 102.8 | 75.37 |
-| [`layoutInt`](File-tools-minigui-ml-742202604.md#function-function-layoutint-function-layoutint-node-name-fallback-tools-minigui-ml-1807816104) | `tools/minigui.ml:1864` | 5 | 4 | 2 | 1 | 1 | 171.3 | 68.84 |
-| [`listContains`](File-tools-minigui-ml-742202604.md#function-function-listcontains-function-listcontains-values-value-tools-minigui-ml-1809151114) | `tools/minigui.ml:1073` | 7 | 6 | 5 | 5 | 2 | 266.27 | 63.91 |
-| [`loadGraph`](File-tools-minigui-ml-742202604.md#function-function-loadgraph-function-loadgraph-result-path-includedirs-stack-tools-minigui-ml-1958220261) | `tools/minigui.ml:1285` | 58 | 47 | 21 | 41 | 5 | 3358.02 | 34.02 |
-| [`main`](File-tools-minigui-ml-742202604.md#function-function-main-function-main-args-tools-minigui-ml-1464915318) | `tools/minigui.ml:2602` | 50 | 61 | 21 | 22 | 2 | 2980.57 | 35.79 |
+| [`addError`](File-tools-minigui-ml-742202604.md#function-function-adderror-function-adderror-result-path-message-tools-minigui-ml-2077416824) | `tools/minigui.ml:249` | 3 | 1 | 1 | 0 | 0 | 104 | 75.33 |
+| [`addGeneratedNode`](File-tools-minigui-ml-742202604.md#function-function-addgeneratednode-function-addgeneratednode-lines-fields-result-path-node-parentvar-parenttype-x-y-width-height-tools-minigui-ml-525139880) | `tools/minigui.ml:2094` | 355 | 352 | 139 | 287 | 6 | 43836.68 | 0 |
+| [`allowedControlEvents`](File-tools-minigui-ml-742202604.md#function-function-allowedcontrolevents-function-allowedcontrolevents-typ-tools-minigui-ml-649350264) | `tools/minigui.ml:1483` | 13 | 20 | 12 | 11 | 1 | 1654.28 | 51.55 |
+| [`allowedControlProps`](File-tools-minigui-ml-742202604.md#function-function-allowedcontrolprops-function-allowedcontrolprops-typ-tools-minigui-ml-1407366198) | `tools/minigui.ml:1504` | 26 | 47 | 26 | 25 | 1 | 3503.73 | 40.82 |
+| [`arrItems`](File-tools-minigui-ml-742202604.md#function-function-arritems-function-arritems-v-tools-minigui-ml-1899234739) | `tools/minigui.ml:337` | 5 | 5 | 4 | 3 | 1 | 169.92 | 68.6 |
+| [`asBool`](File-tools-minigui-ml-742202604.md#function-function-asbool-function-asbool-v-fallback-tools-minigui-ml-1812786413) | `tools/minigui.ml:323` | 4 | 3 | 3 | 2 | 1 | 120.93 | 71.88 |
+| [`asInt`](File-tools-minigui-ml-742202604.md#function-function-asint-function-asint-v-fallback-tools-minigui-ml-416818299) | `tools/minigui.ml:296` | 4 | 3 | 3 | 2 | 1 | 120.93 | 71.88 |
+| [`asString`](File-tools-minigui-ml-742202604.md#function-function-asstring-function-asstring-v-fallback-tools-minigui-ml-75689085) | `tools/minigui.ml:288` | 4 | 3 | 3 | 2 | 1 | 120.93 | 71.88 |
+| [`basenameNoExt`](File-tools-minigui-ml-742202604.md#function-function-basenamenoext-function-basenamenoext-path-tools-minigui-ml-1247929144) | `tools/minigui.ml:775` | 15 | 15 | 7 | 8 | 2 | 625.76 | 53.82 |
+| [`boolProp`](File-tools-minigui-ml-742202604.md#function-function-boolprop-function-boolprop-result-path-node-name-fallback-tools-minigui-ml-812731956) | `tools/minigui.ml:1901` | 5 | 4 | 2 | 1 | 1 | 229.25 | 67.96 |
+| [`charAt`](File-tools-minigui-ml-742202604.md#function-function-charat-inline-function-charat-text-i-tools-minigui-ml-1061914298) | `tools/minigui.ml:346` | 4 | 3 | 3 | 2 | 1 | 133.98 | 71.57 |
+| [`clampDimension`](File-tools-minigui-ml-742202604.md#function-function-clampdimension-function-clampdimension-result-path-node-axis-value-tools-minigui-ml-1785762353) | `tools/minigui.ml:1862` | 13 | 12 | 6 | 5 | 1 | 474.17 | 56.16 |
+| [`cloneJson`](File-tools-minigui-ml-742202604.md#function-function-clonejson-function-clonejson-v-tools-minigui-ml-1085644649) | `tools/minigui.ml:1372` | 21 | 13 | 7 | 12 | 3 | 913.14 | 49.49 |
+| [`codePointUtf8`](File-tools-minigui-ml-742202604.md#function-function-codepointutf8-function-codepointutf8-cp-tools-minigui-ml-1085701668) | `tools/minigui.ml:419` | 8 | 11 | 8 | 7 | 1 | 885.61 | 58.59 |
+| [`collectTreeItemLiterals`](File-tools-minigui-ml-742202604.md#function-function-collecttreeitemliterals-function-collecttreeitemliterals-result-path-parts-item-level-tools-minigui-ml-990768546) | `tools/minigui.ml:1968` | 24 | 20 | 9 | 10 | 2 | 1242.77 | 47.01 |
+| [`commonControlProps`](File-tools-minigui-ml-742202604.md#function-function-commoncontrolprops-function-commoncontrolprops-tools-minigui-ml-437269975) | `tools/minigui.ml:1498` | 3 | 1 | 1 | 0 | 0 | 385.74 | 71.35 |
+| [`componentByName`](File-tools-minigui-ml-742202604.md#function-function-componentbyname-function-componentbyname-result-name-tools-minigui-ml-488755799) | `tools/minigui.ml:1297` | 7 | 6 | 4 | 4 | 2 | 283.28 | 63.86 |
+| [`contains`](File-tools-minigui-ml-742202604.md#function-function-contains-function-contains-arr-value-tools-minigui-ml-1677896927) | `tools/minigui.ml:1087` | 7 | 6 | 4 | 4 | 2 | 220.08 | 64.62 |
+| [`controlDefaultHeight`](File-tools-minigui-ml-742202604.md#function-function-controldefaultheight-function-controldefaultheight-typ-tools-minigui-ml-948488736) | `tools/minigui.ml:1791` | 38 | 71 | 42 | 41 | 1 | 2261.06 | 36.4 |
+| [`controlText`](File-tools-minigui-ml-742202604.md#function-function-controltext-function-controltext-result-path-node-tools-minigui-ml-1407743509) | `tools/minigui.ml:1911` | 5 | 4 | 2 | 1 | 1 | 210.91 | 68.21 |
+| [`copyNodeWithPrefix`](File-tools-minigui-ml-742202604.md#function-function-copynodewithprefix-function-copynodewithprefix-node-prefix-tools-minigui-ml-1311712071) | `tools/minigui.ml:1416` | 14 | 11 | 4 | 4 | 2 | 659.92 | 54.72 |
+| [`createCallFor`](File-tools-minigui-ml-742202604.md#function-function-createcallfor-function-createcallfor-typ-tools-minigui-ml-270679294) | `tools/minigui.ml:2039` | 42 | 79 | 41 | 40 | 1 | 2574.3 | 35.19 |
+| [`dimensionProp`](File-tools-minigui-ml-742202604.md#function-function-dimensionprop-function-dimensionprop-result-path-node-name-fallback-tools-minigui-ml-2039256594) | `tools/minigui.ml:1848` | 7 | 8 | 6 | 5 | 1 | 408.07 | 62.48 |
+| [`dirname`](File-tools-minigui-ml-742202604.md#function-function-dirname-function-dirname-path-tools-minigui-ml-438074904) | `tools/minigui.ml:749` | 10 | 10 | 5 | 5 | 2 | 353.3 | 59.67 |
+| [`documentLoaded`](File-tools-minigui-ml-742202604.md#function-function-documentloaded-function-documentloaded-result-path-tools-minigui-ml-1222007481) | `tools/minigui.ml:1282` | 7 | 6 | 4 | 4 | 2 | 293.25 | 63.75 |
+| [`ensureDir`](File-tools-minigui-ml-742202604.md#function-function-ensuredir-function-ensuredir-path-tools-minigui-ml-1685454382) | `tools/minigui.ml:910` | 14 | 14 | 6 | 10 | 3 | 484.48 | 55.39 |
+| [`expandComponents`](File-tools-minigui-ml-742202604.md#function-function-expandcomponents-function-expandcomponents-result-path-node-tools-minigui-ml-1942712481) | `tools/minigui.ml:1435` | 28 | 21 | 6 | 8 | 2 | 1207.41 | 46.05 |
+| [`findFunctionArity`](File-tools-minigui-ml-742202604.md#function-function-findfunctionarity-function-findfunctionarity-text-name-tools-minigui-ml-296480199) | `tools/minigui.ml:1693` | 11 | 12 | 4 | 3 | 1 | 553.96 | 57.54 |
+| [`generateCode`](File-tools-minigui-ml-742202604.md#function-function-generatecode-function-generatecode-result-outputpath-tools-minigui-ml-1604091608) | `tools/minigui.ml:2455` | 80 | 75 | 30 | 60 | 3 | 8344.77 | 26.99 |
+| [`hasProp`](File-tools-minigui-ml-742202604.md#function-function-hasprop-function-hasprop-obj-name-tools-minigui-ml-1849741609) | `tools/minigui.ml:275` | 9 | 10 | 6 | 6 | 2 | 377.83 | 60.33 |
+| [`hasValue`](File-tools-minigui-ml-742202604.md#function-function-hasvalue-function-hasvalue-v-tools-minigui-ml-496209791) | `tools/minigui.ml:255` | 3 | 1 | 1 | 0 | 0 | 66.61 | 76.69 |
+| [`hexVal`](File-tools-minigui-ml-742202604.md#function-function-hexval-function-hexval-ch-tools-minigui-ml-1410832352) | `tools/minigui.ml:409` | 7 | 8 | 7 | 6 | 1 | 301.85 | 63.26 |
+| [`identOk`](File-tools-minigui-ml-742202604.md#function-function-identok-function-identok-value-tools-minigui-ml-187081004) | `tools/minigui.ml:1108` | 11 | 13 | 8 | 8 | 2 | 1239.1 | 54.55 |
+| [`idSeen`](File-tools-minigui-ml-742202604.md#function-function-idseen-function-idseen-ids-id-tools-minigui-ml-1221354970) | `tools/minigui.ml:1631` | 3 | 1 | 1 | 0 | 0 | 53.15 | 77.38 |
+| [`intArrayLiteral`](File-tools-minigui-ml-742202604.md#function-function-intarrayliteral-function-intarrayliteral-result-path-node-name-tools-minigui-ml-44682596) | `tools/minigui.ml:1950` | 11 | 11 | 5 | 5 | 2 | 784.5 | 56.34 |
+| [`intPart`](File-tools-minigui-ml-742202604.md#function-function-intpart-function-intpart-value-tools-minigui-ml-410095164) | `tools/minigui.ml:303` | 16 | 15 | 7 | 9 | 3 | 587.76 | 53.4 |
+| [`intProp`](File-tools-minigui-ml-742202604.md#function-function-intprop-function-intprop-result-path-node-name-fallback-tools-minigui-ml-1005362488) | `tools/minigui.ml:1836` | 5 | 4 | 2 | 1 | 1 | 229.25 | 67.96 |
+| [`isContainerControl`](File-tools-minigui-ml-742202604.md#function-function-iscontainercontrol-function-iscontainercontrol-typ-tools-minigui-ml-303566540) | `tools/minigui.ml:1540` | 3 | 1 | 1 | 0 | 0 | 85.95 | 75.91 |
+| [`isControl`](File-tools-minigui-ml-742202604.md#function-function-iscontrol-function-iscontrol-typ-tools-minigui-ml-1570622166) | `tools/minigui.ml:1533` | 4 | 3 | 2 | 1 | 1 | 711.69 | 66.63 |
+| [`isDigit`](File-tools-minigui-ml-742202604.md#function-function-isdigit-inline-function-isdigit-ch-tools-minigui-ml-2042969611) | `tools/minigui.ml:360` | 4 | 2 | 1 | 0 | 0 | 88 | 73.12 |
+| [`isIdentChar`](File-tools-minigui-ml-742202604.md#function-function-isidentchar-inline-function-isidentchar-ch-tools-minigui-ml-191393507) | `tools/minigui.ml:380` | 3 | 1 | 1 | 0 | 0 | 81.41 | 76.08 |
+| [`isIdentStart`](File-tools-minigui-ml-742202604.md#function-function-isidentstart-inline-function-isidentstart-ch-tools-minigui-ml-1729391301) | `tools/minigui.ml:374` | 3 | 1 | 1 | 0 | 0 | 60.94 | 76.96 |
+| [`isLayout`](File-tools-minigui-ml-742202604.md#function-function-islayout-function-islayout-typ-tools-minigui-ml-1837265796) | `tools/minigui.ml:1546` | 3 | 1 | 1 | 0 | 0 | 106.27 | 75.27 |
+| [`isLetter`](File-tools-minigui-ml-742202604.md#function-function-isletter-inline-function-isletter-ch-tools-minigui-ml-1421752045) | `tools/minigui.ml:367` | 4 | 2 | 1 | 0 | 0 | 144.43 | 71.61 |
+| [`isNull`](File-tools-minigui-ml-742202604.md#function-function-isnull-function-isnull-v-tools-minigui-ml-261926343) | `tools/minigui.ml:330` | 4 | 3 | 2 | 1 | 1 | 100 | 72.59 |
+| [`isRooted`](File-tools-minigui-ml-742202604.md#function-function-isrooted-function-isrooted-p-tools-minigui-ml-1820017) | `tools/minigui.ml:736` | 6 | 6 | 5 | 4 | 1 | 269.88 | 65.33 |
+| [`isWs`](File-tools-minigui-ml-742202604.md#function-function-isws-inline-function-isws-ch-tools-minigui-ml-1721750953) | `tools/minigui.ml:386` | 3 | 1 | 1 | 0 | 0 | 91.38 | 75.73 |
+| [`jArray`](File-tools-minigui-ml-742202604.md#function-function-jarray-function-jarray-items-tools-minigui-ml-1237117185) | `tools/minigui.ml:224` | 3 | 1 | 1 | 0 | 0 | 101.58 | 75.41 |
+| [`jBool`](File-tools-minigui-ml-742202604.md#function-function-jbool-function-jbool-v-tools-minigui-ml-1513999911) | `tools/minigui.ml:211` | 3 | 1 | 1 | 0 | 0 | 102.8 | 75.37 |
+| [`jNull`](File-tools-minigui-ml-742202604.md#function-function-jnull-function-jnull-tools-minigui-ml-2071308925) | `tools/minigui.ml:193` | 3 | 1 | 1 | 0 | 0 | 98.99 | 75.48 |
+| [`jNumber`](File-tools-minigui-ml-742202604.md#function-function-jnumber-function-jnumber-v-tools-minigui-ml-1998167665) | `tools/minigui.ml:205` | 3 | 1 | 1 | 0 | 0 | 102.8 | 75.37 |
+| [`jObject`](File-tools-minigui-ml-742202604.md#function-function-jobject-function-jobject-keys-values-tools-minigui-ml-835191647) | `tools/minigui.ml:218` | 3 | 1 | 1 | 0 | 0 | 108 | 75.22 |
+| [`joinPath`](File-tools-minigui-ml-742202604.md#function-function-joinpath-function-joinpath-a-b-tools-minigui-ml-1892060280) | `tools/minigui.ml:806` | 8 | 10 | 6 | 5 | 1 | 385.14 | 61.39 |
+| [`jsonParseError`](File-tools-minigui-ml-742202604.md#function-function-jsonparseerror-function-jsonparseerror-message-tools-minigui-ml-1780629814) | `tools/minigui.ml:236` | 3 | 1 | 1 | 0 | 0 | 62.27 | 76.89 |
+| [`jsonParseOk`](File-tools-minigui-ml-742202604.md#function-function-jsonparseok-function-jsonparseok-value-tools-minigui-ml-947883754) | `tools/minigui.ml:230` | 3 | 1 | 1 | 0 | 0 | 55.35 | 77.25 |
+| [`jsonScalarToString`](File-tools-minigui-ml-742202604.md#function-function-jsonscalartostring-function-jsonscalartostring-v-tools-minigui-ml-754868791) | `tools/minigui.ml:1194` | 9 | 9 | 5 | 5 | 2 | 254.19 | 61.67 |
+| [`jString`](File-tools-minigui-ml-742202604.md#function-function-jstring-function-jstring-v-tools-minigui-ml-633572521) | `tools/minigui.ml:199` | 3 | 1 | 1 | 0 | 0 | 102.8 | 75.37 |
+| [`layoutInt`](File-tools-minigui-ml-742202604.md#function-function-layoutint-function-layoutint-node-name-fallback-tools-minigui-ml-1807816104) | `tools/minigui.ml:1889` | 5 | 4 | 2 | 1 | 1 | 171.3 | 68.84 |
+| [`listContains`](File-tools-minigui-ml-742202604.md#function-function-listcontains-function-listcontains-values-value-tools-minigui-ml-1809151114) | `tools/minigui.ml:1098` | 7 | 6 | 5 | 5 | 2 | 266.27 | 63.91 |
+| [`loadGraph`](File-tools-minigui-ml-742202604.md#function-function-loadgraph-function-loadgraph-result-path-includedirs-stack-tools-minigui-ml-1958220261) | `tools/minigui.ml:1310` | 58 | 47 | 21 | 41 | 5 | 3358.02 | 34.02 |
+| [`main`](File-tools-minigui-ml-742202604.md#function-function-main-function-main-args-tools-minigui-ml-1464915318) | `tools/minigui.ml:2629` | 51 | 63 | 22 | 23 | 2 | 3093.02 | 35.35 |
 | [`MiniGuiLib.minigui._advancedCreate`](File-miniguilib-minigui-ml-1319721044.md#function-function-miniguilib-minigui-advancedcreate-function-advancedcreate-app-parent-id-kind-text-x-y-width-height-miniguilib-minigui-ml-109142021) | `MiniGuiLib/minigui.ml:5836` | 8 | 7 | 2 | 1 | 1 | 766.38 | 59.83 |
 | [`MiniGuiLib.minigui._advancedDraw`](File-miniguilib-minigui-ml-1319721044.md#function-function-miniguilib-minigui-advanceddraw-function-advanceddraw-control-op-x-y-width-height-color-text-miniguilib-minigui-ml-638736160) | `MiniGuiLib/minigui.ml:5863` | 4 | 2 | 1 | 0 | 0 | 182.66 | 70.9 |
 | [`MiniGuiLib.minigui._advancedFormat`](File-miniguilib-minigui-ml-1319721044.md#function-function-miniguilib-minigui-advancedformat-function-advancedformat-control-start-endindex-color-bold-italic-miniguilib-minigui-ml-456966350) | `MiniGuiLib/minigui.ml:5875` | 6 | 7 | 3 | 2 | 1 | 261.34 | 65.7 |
@@ -160,12 +160,12 @@ Coverage is split by documentation contract so strong API summaries cannot hide 
 | [`MiniGuiLib.minigui.Application.windowProc`](Type-miniguilib-minigui-application-1605122988.md#static_method-static-method-miniguilib-minigui-application-windowproc-static-function-windowproc-hwnd-msg-wparam-lparam-miniguilib-minigui-ml-1793497217) | `MiniGuiLib/minigui.ml:1673` | 3 | 1 | 1 | 0 | 0 | 92.51 | 75.69 |
 | [`MiniGuiLib.minigui.Button.create`](Type-miniguilib-minigui-button-1520404438.md#static_method-static-method-miniguilib-minigui-button-create-static-function-create-app-parent-id-text-x-y-width-height-miniguilib-minigui-ml-424913389) | `MiniGuiLib/minigui.ml:2434` | 8 | 7 | 2 | 1 | 1 | 856.15 | 59.5 |
 | [`MiniGuiLib.minigui.Calendar.create`](Type-miniguilib-minigui-calendar-1740464088.md#static_method-static-method-miniguilib-minigui-calendar-create-static-function-create-app-parent-id-text-x-y-width-height-miniguilib-minigui-ml-210128403) | `MiniGuiLib/minigui.ml:3371` | 9 | 8 | 2 | 1 | 1 | 877.63 | 58.31 |
-| [`MiniGuiLib.minigui.Chart.clear`](Type-miniguilib-minigui-chart-586409834.md#static_method-static-method-miniguilib-minigui-chart-clear-static-function-clear-control-miniguilib-minigui-ml-1139713945) | `MiniGuiLib/minigui.ml:8289` | 3 | 1 | 1 | 0 | 0 | 99.91 | 75.46 |
-| [`MiniGuiLib.minigui.Chart.create`](Type-miniguilib-minigui-chart-586409834.md#static_method-static-method-miniguilib-minigui-chart-create-static-function-create-app-parent-id-text-x-y-width-height-miniguilib-minigui-ml-509320881) | `MiniGuiLib/minigui.ml:8283` | 3 | 1 | 1 | 0 | 0 | 179.31 | 73.68 |
-| [`MiniGuiLib.minigui.Chart.setValues`](Type-miniguilib-minigui-chart-586409834.md#static_method-static-method-miniguilib-minigui-chart-setvalues-static-function-setvalues-control-values-charttype-color-miniguilib-minigui-ml-773549670) | `MiniGuiLib/minigui.ml:8298` | 23 | 22 | 7 | 10 | 3 | 1048.21 | 48.2 |
+| [`MiniGuiLib.minigui.Chart.clear`](Type-miniguilib-minigui-chart-586409834.md#static_method-static-method-miniguilib-minigui-chart-clear-static-function-clear-control-miniguilib-minigui-ml-1139713945) | `MiniGuiLib/minigui.ml:8395` | 3 | 1 | 1 | 0 | 0 | 99.91 | 75.46 |
+| [`MiniGuiLib.minigui.Chart.create`](Type-miniguilib-minigui-chart-586409834.md#static_method-static-method-miniguilib-minigui-chart-create-static-function-create-app-parent-id-text-x-y-width-height-miniguilib-minigui-ml-509320881) | `MiniGuiLib/minigui.ml:8389` | 3 | 1 | 1 | 0 | 0 | 179.31 | 73.68 |
+| [`MiniGuiLib.minigui.Chart.setValues`](Type-miniguilib-minigui-chart-586409834.md#static_method-static-method-miniguilib-minigui-chart-setvalues-static-function-setvalues-control-values-charttype-color-miniguilib-minigui-ml-773549670) | `MiniGuiLib/minigui.ml:8404` | 23 | 22 | 7 | 10 | 3 | 1048.21 | 48.2 |
 | [`MiniGuiLib.minigui.CheckBox.create`](Type-miniguilib-minigui-checkbox-903069219.md#static_method-static-method-miniguilib-minigui-checkbox-create-static-function-create-app-parent-id-text-x-y-width-height-checked-miniguilib-minigui-ml-1111622991) | `MiniGuiLib/minigui.ml:2684` | 9 | 9 | 3 | 2 | 1 | 970.74 | 57.86 |
-| [`MiniGuiLib.minigui.CodeEditor.create`](Type-miniguilib-minigui-codeeditor-1337733838.md#static_method-static-method-miniguilib-minigui-codeeditor-create-static-function-create-app-parent-id-text-x-y-width-height-miniguilib-minigui-ml-1100964581) | `MiniGuiLib/minigui.ml:8136` | 3 | 1 | 1 | 0 | 0 | 179.31 | 73.68 |
-| [`MiniGuiLib.minigui.CodeEditor.setLanguage`](Type-miniguilib-minigui-codeeditor-1337733838.md#static_method-static-method-miniguilib-minigui-codeeditor-setlanguage-static-function-setlanguage-control-language-miniguilib-minigui-ml-1498686771) | `MiniGuiLib/minigui.ml:8143` | 3 | 1 | 1 | 0 | 0 | 77.71 | 76.22 |
+| [`MiniGuiLib.minigui.CodeEditor.create`](Type-miniguilib-minigui-codeeditor-1337733838.md#static_method-static-method-miniguilib-minigui-codeeditor-create-static-function-create-app-parent-id-text-x-y-width-height-miniguilib-minigui-ml-1100964581) | `MiniGuiLib/minigui.ml:8242` | 3 | 1 | 1 | 0 | 0 | 179.31 | 73.68 |
+| [`MiniGuiLib.minigui.CodeEditor.setLanguage`](Type-miniguilib-minigui-codeeditor-1337733838.md#static_method-static-method-miniguilib-minigui-codeeditor-setlanguage-static-function-setlanguage-control-language-miniguilib-minigui-ml-1498686771) | `MiniGuiLib/minigui.ml:8249` | 3 | 1 | 1 | 0 | 0 | 77.71 | 76.22 |
 | [`MiniGuiLib.minigui.ColorPicker.create`](Type-miniguilib-minigui-colorpicker-360522475.md#static_method-static-method-miniguilib-minigui-colorpicker-create-static-function-create-app-parent-id-text-x-y-width-height-title-value-miniguilib-minigui-ml-1393313529) | `MiniGuiLib/minigui.ml:2528` | 10 | 10 | 3 | 2 | 1 | 1008.11 | 56.75 |
 | [`MiniGuiLib.minigui.ComboBox.create`](Type-miniguilib-minigui-combobox-2072734281.md#static_method-static-method-miniguilib-minigui-combobox-create-static-function-create-app-parent-id-text-x-y-width-height-items-selectedindex-miniguilib-minigui-ml-632201435) | `MiniGuiLib/minigui.ml:3395` | 12 | 12 | 3 | 2 | 1 | 1160.75 | 54.6 |
 | [`MiniGuiLib.minigui.ContextMenu.create`](Type-miniguilib-minigui-contextmenu-115441878.md#static_method-static-method-miniguilib-minigui-contextmenu-create-static-function-create-app-parent-id-text-x-y-width-height-items-miniguilib-minigui-ml-1557013991) | `MiniGuiLib/minigui.ml:3126` | 12 | 8 | 3 | 3 | 2 | 887.12 | 55.41 |
@@ -285,11 +285,11 @@ Coverage is split by documentation contract so strong API summaries cannot hide 
 | [`MiniGuiLib.minigui.Dialog.warning`](Type-miniguilib-minigui-dialog-758938230.md#static_method-static-method-miniguilib-minigui-dialog-warning-static-function-warning-app-title-message-miniguilib-minigui-ml-406805796) | `MiniGuiLib/minigui.ml:2181` | 3 | 1 | 1 | 0 | 0 | 108 | 75.22 |
 | [`MiniGuiLib.minigui.Dialog.yesNo`](Type-miniguilib-minigui-dialog-758938230.md#static_method-static-method-miniguilib-minigui-dialog-yesno-static-function-yesno-app-title-message-miniguilib-minigui-ml-94362612) | `MiniGuiLib/minigui.ml:2221` | 3 | 1 | 1 | 0 | 0 | 108 | 75.22 |
 | [`MiniGuiLib.minigui.Dialog.yesNoCancel`](Type-miniguilib-minigui-dialog-758938230.md#static_method-static-method-miniguilib-minigui-dialog-yesnocancel-static-function-yesnocancel-app-title-message-miniguilib-minigui-ml-1637556960) | `MiniGuiLib/minigui.ml:2229` | 3 | 1 | 1 | 0 | 0 | 108 | 75.22 |
-| [`MiniGuiLib.minigui.DrawingCanvas.clear`](Type-miniguilib-minigui-drawingcanvas-1632518052.md#static_method-static-method-miniguilib-minigui-drawingcanvas-clear-static-function-clear-control-miniguilib-minigui-ml-1811991407) | `MiniGuiLib/minigui.ml:8234` | 3 | 1 | 1 | 0 | 0 | 99.91 | 75.46 |
-| [`MiniGuiLib.minigui.DrawingCanvas.create`](Type-miniguilib-minigui-drawingcanvas-1632518052.md#static_method-static-method-miniguilib-minigui-drawingcanvas-create-static-function-create-app-parent-id-text-x-y-width-height-miniguilib-minigui-ml-900164703) | `MiniGuiLib/minigui.ml:8228` | 3 | 1 | 1 | 0 | 0 | 179.31 | 73.68 |
-| [`MiniGuiLib.minigui.DrawingCanvas.drawText`](Type-miniguilib-minigui-drawingcanvas-1632518052.md#static_method-static-method-miniguilib-minigui-drawingcanvas-drawtext-static-function-drawtext-control-x-y-text-color-miniguilib-minigui-ml-156775394) | `MiniGuiLib/minigui.ml:8266` | 3 | 1 | 1 | 0 | 0 | 140 | 74.43 |
-| [`MiniGuiLib.minigui.DrawingCanvas.fillRect`](Type-miniguilib-minigui-drawingcanvas-1632518052.md#static_method-static-method-miniguilib-minigui-drawingcanvas-fillrect-static-function-fillrect-control-x-y-width-height-color-miniguilib-minigui-ml-8518074) | `MiniGuiLib/minigui.ml:8256` | 3 | 1 | 1 | 0 | 0 | 151.24 | 74.2 |
-| [`MiniGuiLib.minigui.DrawingCanvas.line`](Type-miniguilib-minigui-drawingcanvas-1632518052.md#static_method-static-method-miniguilib-minigui-drawingcanvas-line-static-function-line-control-x1-y1-x2-y2-color-miniguilib-minigui-ml-1333797116) | `MiniGuiLib/minigui.ml:8245` | 3 | 1 | 1 | 0 | 0 | 151.24 | 74.2 |
+| [`MiniGuiLib.minigui.DrawingCanvas.clear`](Type-miniguilib-minigui-drawingcanvas-1632518052.md#static_method-static-method-miniguilib-minigui-drawingcanvas-clear-static-function-clear-control-miniguilib-minigui-ml-1811991407) | `MiniGuiLib/minigui.ml:8340` | 3 | 1 | 1 | 0 | 0 | 99.91 | 75.46 |
+| [`MiniGuiLib.minigui.DrawingCanvas.create`](Type-miniguilib-minigui-drawingcanvas-1632518052.md#static_method-static-method-miniguilib-minigui-drawingcanvas-create-static-function-create-app-parent-id-text-x-y-width-height-miniguilib-minigui-ml-900164703) | `MiniGuiLib/minigui.ml:8334` | 3 | 1 | 1 | 0 | 0 | 179.31 | 73.68 |
+| [`MiniGuiLib.minigui.DrawingCanvas.drawText`](Type-miniguilib-minigui-drawingcanvas-1632518052.md#static_method-static-method-miniguilib-minigui-drawingcanvas-drawtext-static-function-drawtext-control-x-y-text-color-miniguilib-minigui-ml-156775394) | `MiniGuiLib/minigui.ml:8372` | 3 | 1 | 1 | 0 | 0 | 140 | 74.43 |
+| [`MiniGuiLib.minigui.DrawingCanvas.fillRect`](Type-miniguilib-minigui-drawingcanvas-1632518052.md#static_method-static-method-miniguilib-minigui-drawingcanvas-fillrect-static-function-fillrect-control-x-y-width-height-color-miniguilib-minigui-ml-8518074) | `MiniGuiLib/minigui.ml:8362` | 3 | 1 | 1 | 0 | 0 | 151.24 | 74.2 |
+| [`MiniGuiLib.minigui.DrawingCanvas.line`](Type-miniguilib-minigui-drawingcanvas-1632518052.md#static_method-static-method-miniguilib-minigui-drawingcanvas-line-static-function-line-control-x1-y1-x2-y2-color-miniguilib-minigui-ml-1333797116) | `MiniGuiLib/minigui.ml:8351` | 3 | 1 | 1 | 0 | 0 | 151.24 | 74.2 |
 | [`MiniGuiLib.minigui.EditableComboBox.create`](Type-miniguilib-minigui-editablecombobox-1293251185.md#static_method-static-method-miniguilib-minigui-editablecombobox-create-static-function-create-app-parent-id-text-x-y-width-height-items-selectedindex-miniguilib-minigui-ml-732586611) | `MiniGuiLib/minigui.ml:3422` | 12 | 12 | 3 | 2 | 1 | 1160.75 | 54.6 |
 | [`MiniGuiLib.minigui.Events.beginDataGridEdit`](Type-miniguilib-minigui-events-1317937091.md#static_method-static-method-miniguilib-minigui-events-begindatagridedit-static-function-begindatagridedit-app-hwndcontrol-x-y-miniguilib-minigui-ml-1172095201) | `MiniGuiLib/minigui.ml:5308` | 40 | 49 | 12 | 11 | 1 | 1967.77 | 40.37 |
 | [`MiniGuiLib.minigui.Events.beginSplitterDrag`](Type-miniguilib-minigui-events-1317937091.md#static_method-static-method-miniguilib-minigui-events-beginsplitterdrag-static-function-beginsplitterdrag-app-hwndcontrol-x-y-miniguilib-minigui-ml-300141281) | `MiniGuiLib/minigui.ml:5232` | 17 | 17 | 3 | 2 | 1 | 398.51 | 54.55 |
@@ -346,12 +346,12 @@ Coverage is split by documentation contract so strong API summaries cannot hide 
 | [`MiniGuiLib.minigui.Panel.createTabPage`](Type-miniguilib-minigui-panel-1796001828.md#static_method-static-method-miniguilib-minigui-panel-createtabpage-static-function-createtabpage-app-tabcontrol-id-text-x-y-width-height-miniguilib-minigui-ml-1972181435) | `MiniGuiLib/minigui.ml:2885` | 18 | 15 | 4 | 4 | 2 | 1128.81 | 50.71 |
 | [`MiniGuiLib.minigui.PasswordBox.create`](Type-miniguilib-minigui-passwordbox-1578552828.md#static_method-static-method-miniguilib-minigui-passwordbox-create-static-function-create-app-parent-id-text-x-y-width-height-miniguilib-minigui-ml-263519015) | `MiniGuiLib/minigui.ml:2596` | 9 | 8 | 2 | 1 | 1 | 909.58 | 58.2 |
 | [`MiniGuiLib.minigui.ProgressBar.create`](Type-miniguilib-minigui-progressbar-2050757430.md#static_method-static-method-miniguilib-minigui-progressbar-create-static-function-create-app-parent-id-text-x-y-width-height-minimum-maximum-value-miniguilib-minigui-ml-228452946) | `MiniGuiLib/minigui.ml:3031` | 11 | 10 | 2 | 1 | 1 | 1004.61 | 55.99 |
-| [`MiniGuiLib.minigui.PropertyGrid.create`](Type-miniguilib-minigui-propertygrid-137288887.md#static_method-static-method-miniguilib-minigui-propertygrid-create-static-function-create-app-parent-id-text-x-y-width-height-items-miniguilib-minigui-ml-129547256) | `MiniGuiLib/minigui.ml:8336` | 11 | 9 | 3 | 3 | 2 | 578.7 | 57.54 |
-| [`MiniGuiLib.minigui.PropertyGrid.getValue`](Type-miniguilib-minigui-propertygrid-137288887.md#static_method-static-method-miniguilib-minigui-propertygrid-getvalue-static-function-getvalue-control-row-miniguilib-minigui-ml-1586573124) | `MiniGuiLib/minigui.ml:8351` | 3 | 1 | 1 | 0 | 0 | 79.95 | 76.13 |
-| [`MiniGuiLib.minigui.PropertyGrid.setValue`](Type-miniguilib-minigui-propertygrid-137288887.md#static_method-static-method-miniguilib-minigui-propertygrid-setvalue-static-function-setvalue-control-row-value-miniguilib-minigui-ml-1953252095) | `MiniGuiLib/minigui.ml:8359` | 3 | 1 | 1 | 0 | 0 | 97.67 | 75.53 |
+| [`MiniGuiLib.minigui.PropertyGrid.create`](Type-miniguilib-minigui-propertygrid-137288887.md#static_method-static-method-miniguilib-minigui-propertygrid-create-static-function-create-app-parent-id-text-x-y-width-height-items-miniguilib-minigui-ml-129547256) | `MiniGuiLib/minigui.ml:8442` | 11 | 9 | 3 | 3 | 2 | 578.7 | 57.54 |
+| [`MiniGuiLib.minigui.PropertyGrid.getValue`](Type-miniguilib-minigui-propertygrid-137288887.md#static_method-static-method-miniguilib-minigui-propertygrid-getvalue-static-function-getvalue-control-row-miniguilib-minigui-ml-1586573124) | `MiniGuiLib/minigui.ml:8457` | 3 | 1 | 1 | 0 | 0 | 79.95 | 76.13 |
+| [`MiniGuiLib.minigui.PropertyGrid.setValue`](Type-miniguilib-minigui-propertygrid-137288887.md#static_method-static-method-miniguilib-minigui-propertygrid-setvalue-static-function-setvalue-control-row-value-miniguilib-minigui-ml-1953252095) | `MiniGuiLib/minigui.ml:8465` | 3 | 1 | 1 | 0 | 0 | 97.67 | 75.53 |
 | [`MiniGuiLib.minigui.RadioButton.create`](Type-miniguilib-minigui-radiobutton-2120866377.md#static_method-static-method-miniguilib-minigui-radiobutton-create-static-function-create-app-parent-id-text-x-y-width-height-checked-miniguilib-minigui-ml-1241716169) | `MiniGuiLib/minigui.ml:2730` | 9 | 9 | 3 | 2 | 1 | 970.74 | 57.86 |
-| [`MiniGuiLib.minigui.RichTextBox.create`](Type-miniguilib-minigui-richtextbox-1511588.md#static_method-static-method-miniguilib-minigui-richtextbox-create-static-function-create-app-parent-id-text-x-y-width-height-miniguilib-minigui-ml-793467903) | `MiniGuiLib/minigui.ml:8108` | 3 | 1 | 1 | 0 | 0 | 179.31 | 73.68 |
-| [`MiniGuiLib.minigui.RichTextBox.formatRange`](Type-miniguilib-minigui-richtextbox-1511588.md#static_method-static-method-miniguilib-minigui-richtextbox-formatrange-static-function-formatrange-control-start-endindex-color-bold-italic-miniguilib-minigui-ml-1339122560) | `MiniGuiLib/minigui.ml:8119` | 3 | 1 | 1 | 0 | 0 | 128.93 | 74.68 |
+| [`MiniGuiLib.minigui.RichTextBox.create`](Type-miniguilib-minigui-richtextbox-1511588.md#static_method-static-method-miniguilib-minigui-richtextbox-create-static-function-create-app-parent-id-text-x-y-width-height-miniguilib-minigui-ml-793467903) | `MiniGuiLib/minigui.ml:8214` | 3 | 1 | 1 | 0 | 0 | 179.31 | 73.68 |
+| [`MiniGuiLib.minigui.RichTextBox.formatRange`](Type-miniguilib-minigui-richtextbox-1511588.md#static_method-static-method-miniguilib-minigui-richtextbox-formatrange-static-function-formatrange-control-start-endindex-color-bold-italic-miniguilib-minigui-ml-1339122560) | `MiniGuiLib/minigui.ml:8225` | 3 | 1 | 1 | 0 | 0 | 128.93 | 74.68 |
 | [`MiniGuiLib.minigui.ScrollBar.create`](Type-miniguilib-minigui-scrollbar-1767258424.md#static_method-static-method-miniguilib-minigui-scrollbar-create-static-function-create-app-parent-id-text-x-y-width-height-orientation-minimum-maximum-value-smallstep-largestep-miniguilib-minigui-ml-575438338) | `MiniGuiLib/minigui.ml:2970` | 12 | 12 | 3 | 2 | 1 | 1178.24 | 54.55 |
 | [`MiniGuiLib.minigui.ScrollViewer.create`](Type-miniguilib-minigui-scrollviewer-1330694613.md#static_method-static-method-miniguilib-minigui-scrollviewer-create-static-function-create-app-parent-id-text-x-y-width-height-horizontalscroll-verticalscroll-miniguilib-minigui-ml-1457975260) | `MiniGuiLib/minigui.ml:2918` | 12 | 14 | 5 | 4 | 1 | 1134.39 | 54.4 |
 | [`MiniGuiLib.minigui.SearchBox.create`](Type-miniguilib-minigui-searchbox-189843555.md#static_method-static-method-miniguilib-minigui-searchbox-create-static-function-create-app-parent-id-text-x-y-width-height-miniguilib-minigui-ml-1343004012) | `MiniGuiLib/minigui.ml:2551` | 9 | 8 | 2 | 1 | 1 | 893.59 | 58.25 |
@@ -368,14 +368,14 @@ Coverage is split by documentation contract so strong API summaries cannot hide 
 | [`MiniGuiLib.minigui.TimePicker.create`](Type-miniguilib-minigui-timepicker-1929323797.md#static_method-static-method-miniguilib-minigui-timepicker-create-static-function-create-app-parent-id-text-x-y-width-height-miniguilib-minigui-ml-1225815818) | `MiniGuiLib/minigui.ml:3349` | 9 | 8 | 2 | 1 | 1 | 893.59 | 58.25 |
 | [`MiniGuiLib.minigui.ToggleSwitch.create`](Type-miniguilib-minigui-toggleswitch-1594220486.md#static_method-static-method-miniguilib-minigui-toggleswitch-create-static-function-create-app-parent-id-text-x-y-width-height-checked-miniguilib-minigui-ml-1643910112) | `MiniGuiLib/minigui.ml:2707` | 9 | 9 | 3 | 2 | 1 | 970.74 | 57.86 |
 | [`MiniGuiLib.minigui.ToolBar.create`](Type-miniguilib-minigui-toolbar-853395957.md#static_method-static-method-miniguilib-minigui-toolbar-create-static-function-create-app-parent-id-text-x-y-width-height-items-miniguilib-minigui-ml-1882497338) | `MiniGuiLib/minigui.ml:3174` | 11 | 11 | 4 | 3 | 1 | 1136.45 | 55.35 |
-| [`MiniGuiLib.minigui.TrayIcon.create`](Type-miniguilib-minigui-trayicon-674147511.md#static_method-static-method-miniguilib-minigui-trayicon-create-static-function-create-app-parent-id-text-x-y-width-height-miniguilib-minigui-ml-1302142384) | `MiniGuiLib/minigui.ml:8197` | 3 | 1 | 1 | 0 | 0 | 179.31 | 73.68 |
-| [`MiniGuiLib.minigui.TrayIcon.setIcon`](Type-miniguilib-minigui-trayicon-674147511.md#static_method-static-method-miniguilib-minigui-trayicon-seticon-static-function-seticon-control-source-miniguilib-minigui-ml-901549157) | `MiniGuiLib/minigui.ml:8211` | 3 | 1 | 1 | 0 | 0 | 77.71 | 76.22 |
-| [`MiniGuiLib.minigui.TrayIcon.setItems`](Type-miniguilib-minigui-trayicon-674147511.md#static_method-static-method-miniguilib-minigui-trayicon-setitems-static-function-setitems-control-items-miniguilib-minigui-ml-1423584774) | `MiniGuiLib/minigui.ml:8204` | 3 | 1 | 1 | 0 | 0 | 101.58 | 75.41 |
+| [`MiniGuiLib.minigui.TrayIcon.create`](Type-miniguilib-minigui-trayicon-674147511.md#static_method-static-method-miniguilib-minigui-trayicon-create-static-function-create-app-parent-id-text-x-y-width-height-miniguilib-minigui-ml-1302142384) | `MiniGuiLib/minigui.ml:8303` | 3 | 1 | 1 | 0 | 0 | 179.31 | 73.68 |
+| [`MiniGuiLib.minigui.TrayIcon.setIcon`](Type-miniguilib-minigui-trayicon-674147511.md#static_method-static-method-miniguilib-minigui-trayicon-seticon-static-function-seticon-control-source-miniguilib-minigui-ml-901549157) | `MiniGuiLib/minigui.ml:8317` | 3 | 1 | 1 | 0 | 0 | 77.71 | 76.22 |
+| [`MiniGuiLib.minigui.TrayIcon.setItems`](Type-miniguilib-minigui-trayicon-674147511.md#static_method-static-method-miniguilib-minigui-trayicon-setitems-static-function-setitems-control-items-miniguilib-minigui-ml-1423584774) | `MiniGuiLib/minigui.ml:8310` | 3 | 1 | 1 | 0 | 0 | 101.58 | 75.41 |
 | [`MiniGuiLib.minigui.TreeView.create`](Type-miniguilib-minigui-treeview-42567539.md#static_method-static-method-miniguilib-minigui-treeview-create-static-function-create-app-parent-id-text-x-y-width-height-items-miniguilib-minigui-ml-427212) | `MiniGuiLib/minigui.ml:3199` | 10 | 9 | 2 | 1 | 1 | 996.66 | 56.92 |
-| [`MiniGuiLib.minigui.WebView.create`](Type-miniguilib-minigui-webview-1864129617.md#static_method-static-method-miniguilib-minigui-webview-create-static-function-create-app-parent-id-text-x-y-width-height-miniguilib-minigui-ml-523381062) | `MiniGuiLib/minigui.ml:8160` | 3 | 1 | 1 | 0 | 0 | 179.31 | 73.68 |
-| [`MiniGuiLib.minigui.WebView.getStatus`](Type-miniguilib-minigui-webview-1864129617.md#static_method-static-method-miniguilib-minigui-webview-getstatus-static-function-getstatus-control-miniguilib-minigui-ml-59063324) | `MiniGuiLib/minigui.ml:8180` | 3 | 1 | 1 | 0 | 0 | 70.31 | 76.52 |
-| [`MiniGuiLib.minigui.WebView.loadHtml`](Type-miniguilib-minigui-webview-1864129617.md#static_method-static-method-miniguilib-minigui-webview-loadhtml-static-function-loadhtml-control-html-miniguilib-minigui-ml-871340221) | `MiniGuiLib/minigui.ml:8174` | 3 | 1 | 1 | 0 | 0 | 77.71 | 76.22 |
-| [`MiniGuiLib.minigui.WebView.navigate`](Type-miniguilib-minigui-webview-1864129617.md#static_method-static-method-miniguilib-minigui-webview-navigate-static-function-navigate-control-url-miniguilib-minigui-ml-1077046805) | `MiniGuiLib/minigui.ml:8167` | 3 | 1 | 1 | 0 | 0 | 77.71 | 76.22 |
+| [`MiniGuiLib.minigui.WebView.create`](Type-miniguilib-minigui-webview-1864129617.md#static_method-static-method-miniguilib-minigui-webview-create-static-function-create-app-parent-id-text-x-y-width-height-miniguilib-minigui-ml-523381062) | `MiniGuiLib/minigui.ml:8266` | 3 | 1 | 1 | 0 | 0 | 179.31 | 73.68 |
+| [`MiniGuiLib.minigui.WebView.getStatus`](Type-miniguilib-minigui-webview-1864129617.md#static_method-static-method-miniguilib-minigui-webview-getstatus-static-function-getstatus-control-miniguilib-minigui-ml-59063324) | `MiniGuiLib/minigui.ml:8286` | 3 | 1 | 1 | 0 | 0 | 70.31 | 76.52 |
+| [`MiniGuiLib.minigui.WebView.loadHtml`](Type-miniguilib-minigui-webview-1864129617.md#static_method-static-method-miniguilib-minigui-webview-loadhtml-static-function-loadhtml-control-html-miniguilib-minigui-ml-871340221) | `MiniGuiLib/minigui.ml:8280` | 3 | 1 | 1 | 0 | 0 | 77.71 | 76.22 |
+| [`MiniGuiLib.minigui.WebView.navigate`](Type-miniguilib-minigui-webview-1864129617.md#static_method-static-method-miniguilib-minigui-webview-navigate-static-function-navigate-control-url-miniguilib-minigui-ml-1077046805) | `MiniGuiLib/minigui.ml:8273` | 3 | 1 | 1 | 0 | 0 | 77.71 | 76.22 |
 | [`MiniGuiLib.minigui.Window.close`](Type-miniguilib-minigui-window-1943367786.md#static_method-static-method-miniguilib-minigui-window-close-static-function-close-window-miniguilib-minigui-ml-1463026958) | `MiniGuiLib/minigui.ml:1967` | 5 | 5 | 3 | 2 | 1 | 140 | 69.32 |
 | [`MiniGuiLib.minigui.Window.create`](Type-miniguilib-minigui-window-1943367786.md#static_method-static-method-miniguilib-minigui-window-create-static-function-create-app-id-title-width-height-miniguilib-minigui-ml-1508612899) | `MiniGuiLib/minigui.ml:1899` | 28 | 30 | 12 | 12 | 2 | 1763.25 | 44.09 |
 | [`MiniGuiLib.minigui.Window.getClientHeight`](Type-miniguilib-minigui-window-1943367786.md#static_method-static-method-miniguilib-minigui-window-getclientheight-static-function-getclientheight-window-miniguilib-minigui-ml-852548574) | `MiniGuiLib/minigui.ml:1992` | 7 | 8 | 4 | 3 | 1 | 326.9 | 63.42 |
@@ -384,53 +384,53 @@ Coverage is split by documentation contract so strong API summaries cannot hide 
 | [`MiniGuiLib.minigui.Window.setTitle`](Type-miniguilib-minigui-window-1943367786.md#static_method-static-method-miniguilib-minigui-window-settitle-static-function-settitle-window-title-miniguilib-minigui-ml-74257072) | `MiniGuiLib/minigui.ml:1976` | 3 | 1 | 1 | 0 | 0 | 70.31 | 76.52 |
 | [`MiniGuiLib.minigui.Window.show`](Type-miniguilib-minigui-window-1943367786.md#static_method-static-method-miniguilib-minigui-window-show-static-function-show-window-miniguilib-minigui-ml-1715024080) | `MiniGuiLib/minigui.ml:1930` | 12 | 14 | 5 | 4 | 1 | 480 | 57.01 |
 | [`MiniGuiLib.minigui.Window.startResizeTimer`](Type-miniguilib-minigui-window-1943367786.md#static_method-static-method-miniguilib-minigui-window-startresizetimer-static-function-startresizetimer-window-callback-miniguilib-minigui-ml-434667065) | `MiniGuiLib/minigui.ml:1959` | 5 | 5 | 3 | 2 | 1 | 200.67 | 68.23 |
-| [`miniGuiTypeName`](File-tools-minigui-ml-742202604.md#function-function-miniguitypename-function-miniguitypename-ns-tools-minigui-ml-542183962) | `tools/minigui.ml:1133` | 12 | 11 | 4 | 4 | 2 | 484.3 | 57.12 |
-| [`miniIdent`](File-tools-minigui-ml-742202604.md#function-function-miniident-function-miniident-value-tools-minigui-ml-1758439038) | `tools/minigui.ml:1097` | 18 | 17 | 7 | 7 | 2 | 650.1 | 51.98 |
-| [`mlString`](File-tools-minigui-ml-742202604.md#function-function-mlstring-function-mlstring-value-tools-minigui-ml-1647320920) | `tools/minigui.ml:1148` | 18 | 17 | 9 | 13 | 2 | 839.58 | 50.93 |
-| [`newResult`](File-tools-minigui-ml-742202604.md#function-function-newresult-function-newresult-tools-minigui-ml-831753929) | `tools/minigui.ml:216` | 3 | 1 | 1 | 0 | 0 | 136.23 | 74.51 |
-| [`normalizePath`](File-tools-minigui-ml-742202604.md#function-function-normalizepath-function-normalizepath-p-tools-minigui-ml-264733573) | `tools/minigui.ml:799` | 24 | 20 | 13 | 19 | 3 | 1137.41 | 46.75 |
-| [`opt`](File-tools-minigui-ml-742202604.md#function-function-opt-function-opt-opts-name-tools-minigui-ml-1308232944) | `tools/minigui.ml:2547` | 6 | 4 | 3 | 3 | 2 | 203.56 | 66.46 |
-| [`ord`](File-tools-minigui-ml-742202604.md#function-function-ord-inline-function-ord-ch-tools-minigui-ml-2135024287) | `tools/minigui.ml:328` | 4 | 3 | 3 | 2 | 1 | 160.54 | 71.02 |
-| [`parseArray`](File-tools-minigui-ml-742202604.md#function-function-parsearray-function-parsearray-p-depth-tools-minigui-ml-1285011962) | `tools/minigui.ml:636` | 25 | 19 | 5 | 6 | 2 | 923.64 | 48.07 |
-| [`parseJson`](File-tools-minigui-ml-742202604.md#function-function-parsejson-function-parsejson-text-tools-minigui-ml-1607346182) | `tools/minigui.ml:664` | 10 | 12 | 6 | 5 | 1 | 623.68 | 57.81 |
-| [`parseJsonString`](File-tools-minigui-ml-742202604.md#function-function-parsejsonstring-function-parsejsonstring-p-tools-minigui-ml-1528965317) | `tools/minigui.ml:405` | 85 | 67 | 35 | 83 | 5 | 4791.54 | 27.43 |
-| [`parseNumber`](File-tools-minigui-ml-742202604.md#function-function-parsenumber-function-parsenumber-p-tools-minigui-ml-1693595001) | `tools/minigui.ml:494` | 51 | 40 | 22 | 29 | 2 | 2632.01 | 35.84 |
-| [`parseObject`](File-tools-minigui-ml-742202604.md#function-function-parseobject-function-parseobject-p-depth-tools-minigui-ml-900807734) | `tools/minigui.ml:592` | 40 | 32 | 7 | 10 | 2 | 1738.59 | 41.42 |
-| [`parseOptions`](File-tools-minigui-ml-742202604.md#function-function-parseoptions-function-parseoptions-args-start-tools-minigui-ml-1906956410) | `tools/minigui.ml:2514` | 28 | 24 | 23 | 40 | 3 | 2323.35 | 41.77 |
-| [`parserError`](File-tools-minigui-ml-742202604.md#function-function-parsererror-function-parsererror-p-message-tools-minigui-ml-2136624246) | `tools/minigui.ml:376` | 3 | 2 | 2 | 1 | 1 | 149.34 | 74.1 |
-| [`parseValue`](File-tools-minigui-ml-742202604.md#function-function-parsevalue-function-parsevalue-p-depth-tools-minigui-ml-1072134) | `tools/minigui.ml:560` | 28 | 25 | 15 | 15 | 2 | 1328.2 | 44.55 |
-| [`pathSlash`](File-tools-minigui-ml-742202604.md#function-function-pathslash-function-pathslash-p-tools-minigui-ml-253320005) | `tools/minigui.ml:677` | 3 | 1 | 1 | 0 | 0 | 66.61 | 76.69 |
-| [`pathUnslash`](File-tools-minigui-ml-742202604.md#function-function-pathunslash-function-pathunslash-p-tools-minigui-ml-1813826991) | `tools/minigui.ml:687` | 3 | 1 | 1 | 0 | 0 | 66.61 | 76.69 |
-| [`prop`](File-tools-minigui-ml-742202604.md#function-function-prop-function-prop-obj-name-tools-minigui-ml-1706235939) | `tools/minigui.ml:237` | 9 | 10 | 6 | 6 | 2 | 445.88 | 59.83 |
-| [`quoteProcessArgument`](File-tools-minigui-ml-742202604.md#function-function-quoteprocessargument-function-quoteprocessargument-value-tools-minigui-ml-1320489556) | `tools/minigui.ml:912` | 31 | 26 | 8 | 14 | 3 | 976.96 | 45.46 |
-| [`readHandle`](File-tools-minigui-ml-742202604.md#function-function-readhandle-inline-function-readhandle-data-offset-tools-minigui-ml-1826800037) | `tools/minigui.ml:954` | 7 | 4 | 2 | 1 | 1 | 187.98 | 65.37 |
-| [`readMson`](File-tools-minigui-ml-742202604.md#function-function-readmson-function-readmson-result-path-tools-minigui-ml-1878109801) | `tools/minigui.ml:1203` | 13 | 9 | 3 | 2 | 1 | 378.92 | 57.24 |
-| [`readU32`](File-tools-minigui-ml-742202604.md#function-function-readu32-inline-function-readu32-data-offset-tools-minigui-ml-1298041247) | `tools/minigui.ml:947` | 3 | 1 | 1 | 0 | 0 | 210.83 | 73.19 |
-| [`relativePath`](File-tools-minigui-ml-742202604.md#function-function-relativepath-function-relativepath-fromdir-topath-tools-minigui-ml-163985424) | `tools/minigui.ml:861` | 21 | 15 | 9 | 10 | 2 | 933.56 | 49.15 |
-| [`resolveExecutable`](File-tools-minigui-ml-742202604.md#function-function-resolveexecutable-function-resolveexecutable-name-tools-minigui-ml-1443494832) | `tools/minigui.ml:1017` | 8 | 8 | 4 | 3 | 1 | 317.29 | 62.25 |
-| [`resolveMsonPath`](File-tools-minigui-ml-742202604.md#function-function-resolvemsonpath-function-resolvemsonpath-importpath-basedir-includedirs-tools-minigui-ml-1322876553) | `tools/minigui.ml:1221` | 17 | 14 | 7 | 14 | 4 | 575 | 52.89 |
-| [`resolvePythonInterpreter`](File-tools-minigui-ml-742202604.md#function-function-resolvepythoninterpreter-function-resolvepythoninterpreter-tools-minigui-ml-1673945279) | `tools/minigui.ml:1041` | 13 | 11 | 5 | 6 | 2 | 422.64 | 56.64 |
-| [`resourceValue`](File-tools-minigui-ml-742202604.md#function-function-resourcevalue-function-resourcevalue-result-path-value-tools-minigui-ml-1226194412) | `tools/minigui.ml:1183` | 16 | 12 | 7 | 10 | 3 | 691.12 | 52.91 |
-| [`runCompiler`](File-tools-minigui-ml-742202604.md#function-function-runcompiler-function-runcompiler-compiler-generated-outexe-librarydir-target-tools-minigui-ml-929809828) | `tools/minigui.ml:2568` | 19 | 16 | 7 | 7 | 2 | 872.72 | 50.57 |
-| [`runProcess`](File-tools-minigui-ml-742202604.md#function-function-runprocess-function-runprocess-executable-args-tools-minigui-ml-483406938) | `tools/minigui.ml:965` | 24 | 24 | 8 | 8 | 2 | 1214.28 | 47.22 |
-| [`setProp`](File-tools-minigui-ml-742202604.md#function-function-setprop-function-setprop-obj-name-value-tools-minigui-ml-1048961806) | `tools/minigui.ml:1373` | 14 | 10 | 5 | 7 | 3 | 470.65 | 55.61 |
-| [`skipWs`](File-tools-minigui-ml-742202604.md#function-function-skipws-function-skipws-p-tools-minigui-ml-988267521) | `tools/minigui.ml:367` | 5 | 2 | 3 | 2 | 1 | 182.66 | 68.51 |
-| [`splitPathParts`](File-tools-minigui-ml-742202604.md#function-function-splitpathparts-function-splitpathparts-p-tools-minigui-ml-1541148269) | `tools/minigui.ml:848` | 5 | 4 | 2 | 1 | 1 | 156.08 | 69.13 |
-| [`stackHas`](File-tools-minigui-ml-742202604.md#function-function-stackhas-function-stackhas-stack-path-tools-minigui-ml-22166058) | `tools/minigui.ml:1242` | 7 | 6 | 4 | 4 | 2 | 252.01 | 64.21 |
-| [`stackSlotWidth`](File-tools-minigui-ml-742202604.md#function-function-stackslotwidth-function-stackslotwidth-result-path-node-fallback-tools-minigui-ml-597787999) | `tools/minigui.ml:1856` | 3 | 1 | 1 | 0 | 0 | 140.87 | 74.41 |
-| [`startsAt`](File-tools-minigui-ml-742202604.md#function-function-startsat-function-startsat-text-pos-needle-tools-minigui-ml-253439729) | `tools/minigui.ml:552` | 4 | 3 | 2 | 1 | 1 | 190.16 | 70.64 |
-| [`stringArrayLiteral`](File-tools-minigui-ml-742202604.md#function-function-stringarrayliteral-function-stringarrayliteral-result-path-node-name-tools-minigui-ml-306204374) | `tools/minigui.ml:1909` | 10 | 9 | 4 | 3 | 1 | 696.22 | 57.74 |
-| [`stringProp`](File-tools-minigui-ml-742202604.md#function-function-stringprop-function-stringprop-result-path-node-name-fallback-tools-minigui-ml-160719356) | `tools/minigui.ml:1898` | 5 | 4 | 2 | 1 | 1 | 229.25 | 67.96 |
-| [`tableArrayLiteral`](File-tools-minigui-ml-742202604.md#function-function-tablearrayliteral-function-tablearrayliteral-result-path-node-name-tools-minigui-ml-936250814) | `tools/minigui.ml:1990` | 21 | 16 | 7 | 12 | 4 | 1323.93 | 48.36 |
-| [`testControlProperties`](File-tools-minigui-ml-742202604.md#function-function-testcontrolproperties-function-testcontrolproperties-result-path-typ-properties-tools-minigui-ml-101126771) | `tools/minigui.ml:1530` | 72 | 70 | 76 | 186 | 9 | 8886.92 | 21.61 |
-| [`testLayoutNode`](File-tools-minigui-ml-742202604.md#function-function-testlayoutnode-function-testlayoutnode-result-path-node-ids-tools-minigui-ml-783250001) | `tools/minigui.ml:1615` | 49 | 35 | 15 | 32 | 6 | 2970 | 36.8 |
-| [`testPropertyNames`](File-tools-minigui-ml-742202604.md#function-function-testpropertynames-function-testpropertynames-result-path-obj-allowed-context-tools-minigui-ml-1413846259) | `tools/minigui.ml:1445` | 10 | 9 | 6 | 6 | 2 | 524.79 | 58.33 |
-| [`treeArrayLiteral`](File-tools-minigui-ml-742202604.md#function-function-treearrayliteral-function-treearrayliteral-result-path-node-name-tools-minigui-ml-113288346) | `tools/minigui.ml:1973` | 11 | 8 | 4 | 4 | 2 | 662.83 | 56.99 |
-| [`trimDotSlash`](File-tools-minigui-ml-742202604.md#function-function-trimdotslash-function-trimdotslash-p-tools-minigui-ml-1643536593) | `tools/minigui.ml:693` | 7 | 4 | 2 | 1 | 1 | 185.84 | 65.41 |
-| [`upperFirst`](File-tools-minigui-ml-742202604.md#function-function-upperfirst-function-upperfirst-s0-tools-minigui-ml-509576888) | `tools/minigui.ml:1118` | 12 | 11 | 5 | 4 | 1 | 471.89 | 57.06 |
-| [`usage`](File-tools-minigui-ml-742202604.md#function-function-usage-function-usage-tools-minigui-ml-654463161) | `tools/minigui.ml:2555` | 6 | 4 | 1 | 0 | 0 | 46.51 | 71.21 |
-| [`validateMson`](File-tools-minigui-ml-742202604.md#function-function-validatemson-function-validatemson-path-includedirs-codebehindoverride-tools-minigui-ml-115174509) | `tools/minigui.ml:1684` | 79 | 73 | 30 | 75 | 7 | 6684.95 | 27.79 |
-| [`writeValidation`](File-tools-minigui-ml-742202604.md#function-function-writevalidation-function-writevalidation-result-tools-minigui-ml-1716886486) | `tools/minigui.ml:2590` | 9 | 5 | 3 | 3 | 2 | 208.97 | 62.54 |
+| [`miniGuiTypeName`](File-tools-minigui-ml-742202604.md#function-function-miniguitypename-function-miniguitypename-ns-tools-minigui-ml-542183962) | `tools/minigui.ml:1158` | 12 | 11 | 4 | 4 | 2 | 484.3 | 57.12 |
+| [`miniIdent`](File-tools-minigui-ml-742202604.md#function-function-miniident-function-miniident-value-tools-minigui-ml-1758439038) | `tools/minigui.ml:1122` | 18 | 17 | 7 | 7 | 2 | 650.1 | 51.98 |
+| [`mlString`](File-tools-minigui-ml-742202604.md#function-function-mlstring-function-mlstring-value-tools-minigui-ml-1647320920) | `tools/minigui.ml:1173` | 18 | 17 | 9 | 13 | 2 | 839.58 | 50.93 |
+| [`newResult`](File-tools-minigui-ml-742202604.md#function-function-newresult-function-newresult-tools-minigui-ml-831753929) | `tools/minigui.ml:241` | 3 | 1 | 1 | 0 | 0 | 136.23 | 74.51 |
+| [`normalizePath`](File-tools-minigui-ml-742202604.md#function-function-normalizepath-function-normalizepath-p-tools-minigui-ml-264733573) | `tools/minigui.ml:824` | 24 | 20 | 13 | 19 | 3 | 1137.41 | 46.75 |
+| [`opt`](File-tools-minigui-ml-742202604.md#function-function-opt-function-opt-opts-name-tools-minigui-ml-1308232944) | `tools/minigui.ml:2572` | 6 | 4 | 3 | 3 | 2 | 203.56 | 66.46 |
+| [`ord`](File-tools-minigui-ml-742202604.md#function-function-ord-inline-function-ord-ch-tools-minigui-ml-2135024287) | `tools/minigui.ml:353` | 4 | 3 | 3 | 2 | 1 | 160.54 | 71.02 |
+| [`parseArray`](File-tools-minigui-ml-742202604.md#function-function-parsearray-function-parsearray-p-depth-tools-minigui-ml-1285011962) | `tools/minigui.ml:661` | 25 | 19 | 5 | 6 | 2 | 923.64 | 48.07 |
+| [`parseJson`](File-tools-minigui-ml-742202604.md#function-function-parsejson-function-parsejson-text-tools-minigui-ml-1607346182) | `tools/minigui.ml:689` | 10 | 12 | 6 | 5 | 1 | 623.68 | 57.81 |
+| [`parseJsonString`](File-tools-minigui-ml-742202604.md#function-function-parsejsonstring-function-parsejsonstring-p-tools-minigui-ml-1528965317) | `tools/minigui.ml:430` | 85 | 67 | 35 | 83 | 5 | 4791.54 | 27.43 |
+| [`parseNumber`](File-tools-minigui-ml-742202604.md#function-function-parsenumber-function-parsenumber-p-tools-minigui-ml-1693595001) | `tools/minigui.ml:519` | 51 | 40 | 22 | 29 | 2 | 2632.01 | 35.84 |
+| [`parseObject`](File-tools-minigui-ml-742202604.md#function-function-parseobject-function-parseobject-p-depth-tools-minigui-ml-900807734) | `tools/minigui.ml:617` | 40 | 32 | 7 | 10 | 2 | 1738.59 | 41.42 |
+| [`parseOptions`](File-tools-minigui-ml-742202604.md#function-function-parseoptions-function-parseoptions-args-start-tools-minigui-ml-1906956410) | `tools/minigui.ml:2539` | 28 | 24 | 24 | 41 | 3 | 2392.96 | 41.54 |
+| [`parserError`](File-tools-minigui-ml-742202604.md#function-function-parsererror-function-parsererror-p-message-tools-minigui-ml-2136624246) | `tools/minigui.ml:401` | 3 | 2 | 2 | 1 | 1 | 149.34 | 74.1 |
+| [`parseValue`](File-tools-minigui-ml-742202604.md#function-function-parsevalue-function-parsevalue-p-depth-tools-minigui-ml-1072134) | `tools/minigui.ml:585` | 28 | 25 | 15 | 15 | 2 | 1328.2 | 44.55 |
+| [`pathSlash`](File-tools-minigui-ml-742202604.md#function-function-pathslash-function-pathslash-p-tools-minigui-ml-253320005) | `tools/minigui.ml:702` | 3 | 1 | 1 | 0 | 0 | 66.61 | 76.69 |
+| [`pathUnslash`](File-tools-minigui-ml-742202604.md#function-function-pathunslash-function-pathunslash-p-tools-minigui-ml-1813826991) | `tools/minigui.ml:712` | 3 | 1 | 1 | 0 | 0 | 66.61 | 76.69 |
+| [`prop`](File-tools-minigui-ml-742202604.md#function-function-prop-function-prop-obj-name-tools-minigui-ml-1706235939) | `tools/minigui.ml:262` | 9 | 10 | 6 | 6 | 2 | 445.88 | 59.83 |
+| [`quoteProcessArgument`](File-tools-minigui-ml-742202604.md#function-function-quoteprocessargument-function-quoteprocessargument-value-tools-minigui-ml-1320489556) | `tools/minigui.ml:937` | 31 | 26 | 8 | 14 | 3 | 976.96 | 45.46 |
+| [`readHandle`](File-tools-minigui-ml-742202604.md#function-function-readhandle-inline-function-readhandle-data-offset-tools-minigui-ml-1826800037) | `tools/minigui.ml:979` | 7 | 4 | 2 | 1 | 1 | 187.98 | 65.37 |
+| [`readMson`](File-tools-minigui-ml-742202604.md#function-function-readmson-function-readmson-result-path-tools-minigui-ml-1878109801) | `tools/minigui.ml:1228` | 13 | 9 | 3 | 2 | 1 | 378.92 | 57.24 |
+| [`readU32`](File-tools-minigui-ml-742202604.md#function-function-readu32-inline-function-readu32-data-offset-tools-minigui-ml-1298041247) | `tools/minigui.ml:972` | 3 | 1 | 1 | 0 | 0 | 210.83 | 73.19 |
+| [`relativePath`](File-tools-minigui-ml-742202604.md#function-function-relativepath-function-relativepath-fromdir-topath-tools-minigui-ml-163985424) | `tools/minigui.ml:886` | 21 | 15 | 9 | 10 | 2 | 933.56 | 49.15 |
+| [`resolveExecutable`](File-tools-minigui-ml-742202604.md#function-function-resolveexecutable-function-resolveexecutable-name-tools-minigui-ml-1443494832) | `tools/minigui.ml:1042` | 8 | 8 | 4 | 3 | 1 | 317.29 | 62.25 |
+| [`resolveMsonPath`](File-tools-minigui-ml-742202604.md#function-function-resolvemsonpath-function-resolvemsonpath-importpath-basedir-includedirs-tools-minigui-ml-1322876553) | `tools/minigui.ml:1246` | 17 | 14 | 7 | 14 | 4 | 575 | 52.89 |
+| [`resolvePythonInterpreter`](File-tools-minigui-ml-742202604.md#function-function-resolvepythoninterpreter-function-resolvepythoninterpreter-tools-minigui-ml-1673945279) | `tools/minigui.ml:1066` | 13 | 11 | 5 | 6 | 2 | 422.64 | 56.64 |
+| [`resourceValue`](File-tools-minigui-ml-742202604.md#function-function-resourcevalue-function-resourcevalue-result-path-value-tools-minigui-ml-1226194412) | `tools/minigui.ml:1208` | 16 | 12 | 7 | 10 | 3 | 691.12 | 52.91 |
+| [`runCompiler`](File-tools-minigui-ml-742202604.md#function-function-runcompiler-function-runcompiler-compiler-generated-outexe-librarydir-target-tools-minigui-ml-929809828) | `tools/minigui.ml:2593` | 21 | 19 | 9 | 10 | 2 | 965.73 | 49.05 |
+| [`runProcess`](File-tools-minigui-ml-742202604.md#function-function-runprocess-function-runprocess-executable-args-tools-minigui-ml-483406938) | `tools/minigui.ml:990` | 24 | 24 | 8 | 8 | 2 | 1214.28 | 47.22 |
+| [`setProp`](File-tools-minigui-ml-742202604.md#function-function-setprop-function-setprop-obj-name-value-tools-minigui-ml-1048961806) | `tools/minigui.ml:1398` | 14 | 10 | 5 | 7 | 3 | 470.65 | 55.61 |
+| [`skipWs`](File-tools-minigui-ml-742202604.md#function-function-skipws-function-skipws-p-tools-minigui-ml-988267521) | `tools/minigui.ml:392` | 5 | 2 | 3 | 2 | 1 | 182.66 | 68.51 |
+| [`splitPathParts`](File-tools-minigui-ml-742202604.md#function-function-splitpathparts-function-splitpathparts-p-tools-minigui-ml-1541148269) | `tools/minigui.ml:873` | 5 | 4 | 2 | 1 | 1 | 156.08 | 69.13 |
+| [`stackHas`](File-tools-minigui-ml-742202604.md#function-function-stackhas-function-stackhas-stack-path-tools-minigui-ml-22166058) | `tools/minigui.ml:1267` | 7 | 6 | 4 | 4 | 2 | 252.01 | 64.21 |
+| [`stackSlotWidth`](File-tools-minigui-ml-742202604.md#function-function-stackslotwidth-function-stackslotwidth-result-path-node-fallback-tools-minigui-ml-597787999) | `tools/minigui.ml:1881` | 3 | 1 | 1 | 0 | 0 | 140.87 | 74.41 |
+| [`startsAt`](File-tools-minigui-ml-742202604.md#function-function-startsat-function-startsat-text-pos-needle-tools-minigui-ml-253439729) | `tools/minigui.ml:577` | 4 | 3 | 2 | 1 | 1 | 190.16 | 70.64 |
+| [`stringArrayLiteral`](File-tools-minigui-ml-742202604.md#function-function-stringarrayliteral-function-stringarrayliteral-result-path-node-name-tools-minigui-ml-306204374) | `tools/minigui.ml:1934` | 10 | 9 | 4 | 3 | 1 | 696.22 | 57.74 |
+| [`stringProp`](File-tools-minigui-ml-742202604.md#function-function-stringprop-function-stringprop-result-path-node-name-fallback-tools-minigui-ml-160719356) | `tools/minigui.ml:1923` | 5 | 4 | 2 | 1 | 1 | 229.25 | 67.96 |
+| [`tableArrayLiteral`](File-tools-minigui-ml-742202604.md#function-function-tablearrayliteral-function-tablearrayliteral-result-path-node-name-tools-minigui-ml-936250814) | `tools/minigui.ml:2015` | 21 | 16 | 7 | 12 | 4 | 1323.93 | 48.36 |
+| [`testControlProperties`](File-tools-minigui-ml-742202604.md#function-function-testcontrolproperties-function-testcontrolproperties-result-path-typ-properties-tools-minigui-ml-101126771) | `tools/minigui.ml:1555` | 72 | 70 | 76 | 186 | 9 | 8886.92 | 21.61 |
+| [`testLayoutNode`](File-tools-minigui-ml-742202604.md#function-function-testlayoutnode-function-testlayoutnode-result-path-node-ids-tools-minigui-ml-783250001) | `tools/minigui.ml:1640` | 49 | 35 | 15 | 32 | 6 | 2970 | 36.8 |
+| [`testPropertyNames`](File-tools-minigui-ml-742202604.md#function-function-testpropertynames-function-testpropertynames-result-path-obj-allowed-context-tools-minigui-ml-1413846259) | `tools/minigui.ml:1470` | 10 | 9 | 6 | 6 | 2 | 524.79 | 58.33 |
+| [`treeArrayLiteral`](File-tools-minigui-ml-742202604.md#function-function-treearrayliteral-function-treearrayliteral-result-path-node-name-tools-minigui-ml-113288346) | `tools/minigui.ml:1998` | 11 | 8 | 4 | 4 | 2 | 662.83 | 56.99 |
+| [`trimDotSlash`](File-tools-minigui-ml-742202604.md#function-function-trimdotslash-function-trimdotslash-p-tools-minigui-ml-1643536593) | `tools/minigui.ml:718` | 7 | 4 | 2 | 1 | 1 | 185.84 | 65.41 |
+| [`upperFirst`](File-tools-minigui-ml-742202604.md#function-function-upperfirst-function-upperfirst-s0-tools-minigui-ml-509576888) | `tools/minigui.ml:1143` | 12 | 11 | 5 | 4 | 1 | 471.89 | 57.06 |
+| [`usage`](File-tools-minigui-ml-742202604.md#function-function-usage-function-usage-tools-minigui-ml-654463161) | `tools/minigui.ml:2580` | 6 | 4 | 1 | 0 | 0 | 46.51 | 71.21 |
+| [`validateMson`](File-tools-minigui-ml-742202604.md#function-function-validatemson-function-validatemson-path-includedirs-codebehindoverride-tools-minigui-ml-115174509) | `tools/minigui.ml:1709` | 79 | 73 | 30 | 75 | 7 | 6684.95 | 27.79 |
+| [`writeValidation`](File-tools-minigui-ml-742202604.md#function-function-writevalidation-function-writevalidation-result-tools-minigui-ml-1716886486) | `tools/minigui.ml:2617` | 9 | 5 | 3 | 3 | 2 | 208.97 | 62.54 |
 
 ## Code duplication
 
@@ -1184,7 +1184,7 @@ Found 54 clone group(s). At most 54 groups are shown.
     if ch == "." then break end if
 
 - [`MiniGuiLib/minigui.ml:962`](File-miniguilib-minigui-ml-1319721044.md)
-- [`tools/minigui.ml:279`](File-tools-minigui-ml-742202604.md)
+- [`tools/minigui.ml:304`](File-tools-minigui-ml-742202604.md)
 
 </details>
 
@@ -1199,7 +1199,7 @@ Found 54 clone group(s). At most 54 groups are shown.
     output . appendString ( ch )
 
 - [`MiniGuiLib/minigui.ml:963`](File-miniguilib-minigui-ml-1319721044.md)
-- [`tools/minigui.ml:280`](File-tools-minigui-ml-742202604.md)
+- [`tools/minigui.ml:305`](File-tools-minigui-ml-742202604.md)
 
 </details>
 
@@ -1214,7 +1214,7 @@ Found 54 clone group(s). At most 54 groups are shown.
     end for
 
 - [`MiniGuiLib/minigui.ml:964`](File-miniguilib-minigui-ml-1319721044.md)
-- [`tools/minigui.ml:281`](File-tools-minigui-ml-742202604.md)
+- [`tools/minigui.ml:306`](File-tools-minigui-ml-742202604.md)
 
 </details>
 
@@ -1229,7 +1229,7 @@ Found 54 clone group(s). At most 54 groups are shown.
     end if
 
 - [`MiniGuiLib/minigui.ml:965`](File-miniguilib-minigui-ml-1319721044.md)
-- [`tools/minigui.ml:282`](File-tools-minigui-ml-742202604.md)
+- [`tools/minigui.ml:307`](File-tools-minigui-ml-742202604.md)
 
 </details>
 
@@ -1243,8 +1243,8 @@ Found 54 clone group(s). At most 54 groups are shown.
     for i = 0 to len ( v . items ) - 1
     item = resourceValue ( result , path , v . items [ i ] )
 
-- [`tools/minigui.ml:1926`](File-tools-minigui-ml-742202604.md)
-- [`tools/minigui.ml:1991`](File-tools-minigui-ml-742202604.md)
+- [`tools/minigui.ml:1951`](File-tools-minigui-ml-742202604.md)
+- [`tools/minigui.ml:2016`](File-tools-minigui-ml-742202604.md)
 
 </details>
 
@@ -1258,9 +1258,9 @@ Found 54 clone group(s). At most 54 groups are shown.
     end while
     end if
 
-- [`tools/minigui.ml:507`](File-tools-minigui-ml-742202604.md)
-- [`tools/minigui.ml:520`](File-tools-minigui-ml-742202604.md)
 - [`tools/minigui.ml:532`](File-tools-minigui-ml-742202604.md)
+- [`tools/minigui.ml:545`](File-tools-minigui-ml-742202604.md)
+- [`tools/minigui.ml:557`](File-tools-minigui-ml-742202604.md)
 
 </details>
 

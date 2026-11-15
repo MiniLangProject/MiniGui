@@ -31,7 +31,7 @@ extern function _execvp(file as cstr, argv as bytes) from "libc.so.6" symbol "ex
 | `argv` | `bytes` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L37)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L48)
 
 <a id="extern_function-extern-function-exit-extern-function-exit-code-as-int-from-libc-so-6-symbol-exit-returns-void-tools-minigui-ml-717165082"></a>
 ### _exit
@@ -45,7 +45,7 @@ extern function _exit(code as int) from "libc.so.6" symbol "_exit" returns void
 | `code` | `int` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L41)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L60)
 
 <a id="extern_function-extern-function-fork-extern-function-fork-from-libc-so-6-symbol-fork-returns-int-tools-minigui-ml-964086408"></a>
 ### _fork
@@ -55,7 +55,7 @@ extern function _fork() from "libc.so.6" symbol "fork" returns int
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L35)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L42)
 
 <a id="extern_function-extern-function-mkdir-extern-function-mkdir-path-as-cstr-mode-as-int-from-libc-so-6-symbol-mkdir-returns-int-tools-minigui-ml-183261564"></a>
 ### _mkdir
@@ -70,7 +70,7 @@ extern function _mkdir(path as cstr, mode as int) from "libc.so.6" symbol "mkdir
 | `mode` | `int` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L33)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L36)
 
 <a id="extern_function-extern-function-waitpid-extern-function-waitpid-pid-as-int-status-as-bytes-options-as-int-from-libc-so-6-symbol-waitpid-returns-int-tools-minigui-ml-607712894"></a>
 ### _waitpid
@@ -86,7 +86,7 @@ extern function _waitpid(pid as int, status as bytes, options as int) from "libc
 | `options` | `int` | — |  |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L39)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L54)
 
 <a id="function-function-adderror-function-adderror-result-path-message-tools-minigui-ml-2077416824"></a>
 ### addError
@@ -104,7 +104,7 @@ Adds error to the state managed by the minigui module.
 | `message` | `dynamic` | — | Human-readable message associated with the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L224)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L249)
 
 <a id="function-function-addgeneratednode-function-addgeneratednode-lines-fields-result-path-node-parentvar-parenttype-x-y-width-height-tools-minigui-ml-525139880"></a>
 ### addGeneratedNode
@@ -130,7 +130,7 @@ Adds generated node to the state managed by the minigui module.
 | `height` | `dynamic` | — | Height in the coordinate or storage units used by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L2069)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L2094)
 
 <a id="function-function-allowedcontrolevents-function-allowedcontrolevents-typ-tools-minigui-ml-649350264"></a>
 ### allowedControlEvents
@@ -146,7 +146,7 @@ Performs the allowedControlEvents operation for the minigui module.
 | `typ` | `dynamic` | — | typ value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1458)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1483)
 
 <a id="function-function-allowedcontrolprops-function-allowedcontrolprops-typ-tools-minigui-ml-1407366198"></a>
 ### allowedControlProps
@@ -162,7 +162,7 @@ Performs the allowedControlProps operation for the minigui module.
 | `typ` | `dynamic` | — | typ value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1479)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1504)
 
 <a id="function-function-arritems-function-arritems-v-tools-minigui-ml-1899234739"></a>
 ### arrItems
@@ -178,7 +178,7 @@ Performs the arrItems operation for the minigui module.
 | `v` | `dynamic` | — | v value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L312)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L337)
 
 <a id="function-function-asbool-function-asbool-v-fallback-tools-minigui-ml-1812786413"></a>
 ### asBool
@@ -195,7 +195,7 @@ Performs the asBool operation for the minigui module.
 | `fallback` | `dynamic` | — | Value returned when no explicit result is available. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L298)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L323)
 
 <a id="function-function-asint-function-asint-v-fallback-tools-minigui-ml-416818299"></a>
 ### asInt
@@ -212,7 +212,7 @@ Performs the asInt operation for the minigui module.
 | `fallback` | `dynamic` | — | Value returned when no explicit result is available. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L271)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L296)
 
 <a id="function-function-asstring-function-asstring-v-fallback-tools-minigui-ml-75689085"></a>
 ### asString
@@ -229,7 +229,7 @@ Performs the asString operation for the minigui module.
 | `fallback` | `dynamic` | — | Value returned when no explicit result is available. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L263)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L288)
 
 <a id="function-function-basenamenoext-function-basenamenoext-path-tools-minigui-ml-1247929144"></a>
 ### basenameNoExt
@@ -245,7 +245,7 @@ Performs the basenameNoExt operation for the minigui module.
 | `path` | `dynamic` | — | Path of the file or directory used by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L750)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L775)
 
 <a id="function-function-boolprop-function-boolprop-result-path-node-name-fallback-tools-minigui-ml-812731956"></a>
 ### boolProp
@@ -265,7 +265,7 @@ Performs the boolProp operation for the minigui module.
 | `fallback` | `dynamic` | — | Value returned when no explicit result is available. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1876)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1901)
 
 <a id="function-function-charat-inline-function-charat-text-i-tools-minigui-ml-1061914298"></a>
 ### charAt
@@ -282,7 +282,7 @@ Performs the charAt operation for the minigui module.
 | `i` | `dynamic` | — | i value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L321)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L346)
 
 <a id="function-function-clampdimension-function-clampdimension-result-path-node-axis-value-tools-minigui-ml-1785762353"></a>
 ### clampDimension
@@ -302,7 +302,7 @@ Performs the clampDimension operation for the minigui module.
 | `value` | `dynamic` | — | Value consumed or transformed by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1837)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1862)
 
 <a id="function-function-clonejson-function-clonejson-v-tools-minigui-ml-1085644649"></a>
 ### cloneJson
@@ -318,7 +318,7 @@ Performs the cloneJson operation for the minigui module.
 | `v` | `dynamic` | — | v value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1347)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1372)
 
 <a id="function-function-codepointutf8-function-codepointutf8-cp-tools-minigui-ml-1085701668"></a>
 ### codePointUtf8
@@ -334,7 +334,7 @@ Encodes one Unicode scalar value as a UTF-8 string.
 | `cp` | `dynamic` | — | Unicode scalar value to encode. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L394)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L419)
 
 <a id="function-function-collecttreeitemliterals-function-collecttreeitemliterals-result-path-parts-item-level-tools-minigui-ml-990768546"></a>
 ### collectTreeItemLiterals
@@ -354,7 +354,7 @@ Collects tree item literals for the minigui workflow.
 | `level` | `dynamic` | — | level value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1943)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1968)
 
 <a id="function-function-commoncontrolprops-function-commoncontrolprops-tools-minigui-ml-437269975"></a>
 ### commonControlProps
@@ -366,7 +366,7 @@ function commonControlProps()
 Performs the commonControlProps operation for the minigui module.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1473)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1498)
 
 <a id="function-function-componentbyname-function-componentbyname-result-name-tools-minigui-ml-488755799"></a>
 ### componentByName
@@ -383,7 +383,7 @@ Performs the componentByName operation for the minigui module.
 | `name` | `dynamic` | — | Name of the affected item. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1272)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1297)
 
 - [ComponentEntry](Type-componententry-375624820.md) — struct
 <a id="function-function-contains-function-contains-arr-value-tools-minigui-ml-1677896927"></a>
@@ -401,7 +401,7 @@ Returns whether the supplied data contains contains.
 | `value` | `dynamic` | — | Value consumed or transformed by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1062)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1087)
 
 <a id="function-function-controldefaultheight-function-controldefaultheight-typ-tools-minigui-ml-948488736"></a>
 ### controlDefaultHeight
@@ -417,7 +417,7 @@ Performs the controlDefaultHeight operation for the minigui module.
 | `typ` | `dynamic` | — | typ value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1766)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1791)
 
 <a id="function-function-controltext-function-controltext-result-path-node-tools-minigui-ml-1407743509"></a>
 ### controlText
@@ -435,7 +435,7 @@ Performs the controlText operation for the minigui module.
 | `node` | `dynamic` | — | node value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1886)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1911)
 
 <a id="function-function-copynodewithprefix-function-copynodewithprefix-node-prefix-tools-minigui-ml-1311712071"></a>
 ### copyNodeWithPrefix
@@ -452,7 +452,7 @@ Performs the copyNodeWithPrefix operation for the minigui module.
 | `prefix` | `dynamic` | — | prefix value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1391)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1416)
 
 <a id="function-function-createcallfor-function-createcallfor-typ-tools-minigui-ml-270679294"></a>
 ### createCallFor
@@ -468,7 +468,7 @@ Creates call for for the minigui module.
 | `typ` | `dynamic` | — | typ value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L2014)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L2039)
 
 <a id="function-function-dimensionprop-function-dimensionprop-result-path-node-name-fallback-tools-minigui-ml-2039256594"></a>
 ### dimensionProp
@@ -488,7 +488,7 @@ Performs the dimensionProp operation for the minigui module.
 | `fallback` | `dynamic` | — | Value returned when no explicit result is available. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1823)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1848)
 
 <a id="function-function-dirname-function-dirname-path-tools-minigui-ml-438074904"></a>
 ### dirname
@@ -504,7 +504,7 @@ Performs the dirname operation for the minigui module.
 | `path` | `dynamic` | — | Path of the file or directory used by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L724)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L749)
 
 - [DocEntry](Type-docentry-423808419.md) — struct
 <a id="function-function-documentloaded-function-documentloaded-result-path-tools-minigui-ml-1222007481"></a>
@@ -522,7 +522,7 @@ Returns whether a normalized MSON path has already been loaded.
 | `path` | `dynamic` | — | Normalized path to find. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1257)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1282)
 
 <a id="function-function-ensuredir-function-ensuredir-path-tools-minigui-ml-1685454382"></a>
 ### ensureDir
@@ -538,7 +538,7 @@ Ensures dir is available to the minigui workflow.
 | `path` | `dynamic` | — | Path of the file or directory used by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L885)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L910)
 
 - [EventEntry](Type-evententry-1878163913.md) — struct
 <a id="function-function-expandcomponents-function-expandcomponents-result-path-node-tools-minigui-ml-1942712481"></a>
@@ -557,7 +557,7 @@ Performs the expandComponents operation for the minigui module.
 | `node` | `dynamic` | — | node value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1410)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1435)
 
 <a id="function-function-findfunctionarity-function-findfunctionarity-text-name-tools-minigui-ml-296480199"></a>
 ### findFunctionArity
@@ -574,7 +574,7 @@ Finds function arity used by the minigui module.
 | `name` | `dynamic` | — | Name of the affected item. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1668)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1693)
 
 <a id="function-function-generatecode-function-generatecode-result-outputpath-tools-minigui-ml-1604091608"></a>
 ### generateCode
@@ -591,7 +591,7 @@ Generates code for the minigui workflow.
 | `outputPath` | `dynamic` | — | Path associated with output. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L2430)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L2455)
 
 <a id="function-function-hasprop-function-hasprop-obj-name-tools-minigui-ml-1849741609"></a>
 ### hasProp
@@ -608,7 +608,7 @@ Returns whether prop is available.
 | `name` | `dynamic` | — | Name of the affected item. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L250)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L275)
 
 <a id="function-function-hasvalue-function-hasvalue-v-tools-minigui-ml-496209791"></a>
 ### hasValue
@@ -624,7 +624,7 @@ Returns whether value is available.
 | `v` | `dynamic` | — | v value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L230)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L255)
 
 <a id="function-function-hexval-function-hexval-ch-tools-minigui-ml-1410832352"></a>
 ### hexVal
@@ -640,7 +640,7 @@ Performs the hexVal operation for the minigui module.
 | `ch` | `dynamic` | — | ch value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L384)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L409)
 
 <a id="constant-constant-host-compiler-const-host-compiler-minilangcompilerpy-mlc-win64-py-tools-minigui-ml-329731861"></a>
 ### HOST_COMPILER
@@ -652,7 +652,7 @@ const HOST_COMPILER = "../MiniLangCompilerPy/mlc_win64.py"
 Default compiler for a Linux host.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L53)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L77)
 
 <a id="constant-constant-host-target-const-host-target-linux-x64-tools-minigui-ml-118300793"></a>
 ### HOST_TARGET
@@ -664,7 +664,7 @@ const HOST_TARGET = "linux-x64"
 Maximum accepted MSON document size in UTF-8 bytes (16 MiB).
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L51)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L75)
 
 <a id="function-function-identok-function-identok-value-tools-minigui-ml-187081004"></a>
 ### identOk
@@ -680,7 +680,7 @@ Performs the identOk operation for the minigui module.
 | `value` | `dynamic` | — | Value consumed or transformed by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1083)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1108)
 
 <a id="function-function-idseen-function-idseen-ids-id-tools-minigui-ml-1221354970"></a>
 ### idSeen
@@ -697,7 +697,7 @@ Performs the idSeen operation for the minigui module.
 | `id` | `dynamic` | — | Stable identifier of the affected item. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1606)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1631)
 
 <a id="constant-constant-infinite-const-infinite-4294967295-tools-minigui-ml-1216919397"></a>
 ### INFINITE
@@ -709,7 +709,7 @@ const INFINITE = 4294967295
 Infinite timeout value used while waiting for the compiler process.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L61)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L86)
 
 <a id="function-function-intarrayliteral-function-intarrayliteral-result-path-node-name-tools-minigui-ml-44682596"></a>
 ### intArrayLiteral
@@ -728,7 +728,7 @@ Performs the intArrayLiteral operation for the minigui module.
 | `name` | `dynamic` | — | Name of the affected item. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1925)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1950)
 
 <a id="function-function-intpart-function-intpart-value-tools-minigui-ml-410095164"></a>
 ### intPart
@@ -744,7 +744,7 @@ Performs the intPart operation for the minigui module.
 | `value` | `dynamic` | — | Value consumed or transformed by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L278)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L303)
 
 <a id="function-function-intprop-function-intprop-result-path-node-name-fallback-tools-minigui-ml-1005362488"></a>
 ### intProp
@@ -764,7 +764,7 @@ Performs the intProp operation for the minigui module.
 | `fallback` | `dynamic` | — | Value returned when no explicit result is available. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1811)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1836)
 
 <a id="function-function-iscontainercontrol-function-iscontainercontrol-typ-tools-minigui-ml-303566540"></a>
 ### isContainerControl
@@ -780,7 +780,7 @@ Returns whether container control satisfies the required condition.
 | `typ` | `dynamic` | — | typ value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1515)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1540)
 
 <a id="function-function-iscontrol-function-iscontrol-typ-tools-minigui-ml-1570622166"></a>
 ### isControl
@@ -796,7 +796,7 @@ Returns whether control satisfies the required condition.
 | `typ` | `dynamic` | — | typ value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1508)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1533)
 
 <a id="function-function-isdigit-inline-function-isdigit-ch-tools-minigui-ml-2042969611"></a>
 ### isDigit
@@ -812,7 +812,7 @@ Returns whether digit satisfies the required condition.
 | `ch` | `dynamic` | — | ch value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L335)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L360)
 
 <a id="function-function-isidentchar-inline-function-isidentchar-ch-tools-minigui-ml-191393507"></a>
 ### isIdentChar
@@ -828,7 +828,7 @@ Returns whether ident char satisfies the required condition.
 | `ch` | `dynamic` | — | ch value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L355)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L380)
 
 <a id="function-function-isidentstart-inline-function-isidentstart-ch-tools-minigui-ml-1729391301"></a>
 ### isIdentStart
@@ -844,7 +844,7 @@ Returns whether ident start satisfies the required condition.
 | `ch` | `dynamic` | — | ch value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L349)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L374)
 
 <a id="function-function-islayout-function-islayout-typ-tools-minigui-ml-1837265796"></a>
 ### isLayout
@@ -860,7 +860,7 @@ Returns whether layout satisfies the required condition.
 | `typ` | `dynamic` | — | typ value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1521)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1546)
 
 <a id="function-function-isletter-inline-function-isletter-ch-tools-minigui-ml-1421752045"></a>
 ### isLetter
@@ -876,7 +876,7 @@ Returns whether letter satisfies the required condition.
 | `ch` | `dynamic` | — | ch value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L342)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L367)
 
 <a id="function-function-isnull-function-isnull-v-tools-minigui-ml-261926343"></a>
 ### isNull
@@ -892,7 +892,7 @@ Returns whether null satisfies the required condition.
 | `v` | `dynamic` | — | v value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L305)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L330)
 
 <a id="function-function-isrooted-function-isrooted-p-tools-minigui-ml-1820017"></a>
 ### isRooted
@@ -908,7 +908,7 @@ Returns whether rooted satisfies the required condition.
 | `p` | `dynamic` | — | p value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L711)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L736)
 
 <a id="function-function-isws-inline-function-isws-ch-tools-minigui-ml-1721750953"></a>
 ### isWs
@@ -924,7 +924,7 @@ Returns whether ws satisfies the required condition.
 | `ch` | `dynamic` | — | ch value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L361)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L386)
 
 <a id="function-function-jarray-function-jarray-items-tools-minigui-ml-1237117185"></a>
 ### jArray
@@ -940,7 +940,7 @@ Performs the jArray operation for the minigui module.
 | `items` | `dynamic` | — | Items consumed or updated by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L199)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L224)
 
 <a id="function-function-jbool-function-jbool-v-tools-minigui-ml-1513999911"></a>
 ### jBool
@@ -956,7 +956,7 @@ Performs the jBool operation for the minigui module.
 | `v` | `dynamic` | — | v value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L186)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L211)
 
 <a id="function-function-jnull-function-jnull-tools-minigui-ml-2071308925"></a>
 ### jNull
@@ -968,7 +968,7 @@ function jNull()
 Performs the jNull operation for the minigui module.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L168)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L193)
 
 <a id="function-function-jnumber-function-jnumber-v-tools-minigui-ml-1998167665"></a>
 ### jNumber
@@ -984,7 +984,7 @@ Performs the jNumber operation for the minigui module.
 | `v` | `dynamic` | — | v value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L180)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L205)
 
 <a id="function-function-jobject-function-jobject-keys-values-tools-minigui-ml-835191647"></a>
 ### jObject
@@ -1001,7 +1001,7 @@ Performs the jObject operation for the minigui module.
 | `values` | `dynamic` | — | values value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L193)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L218)
 
 <a id="function-function-joinpath-function-joinpath-a-b-tools-minigui-ml-1892060280"></a>
 ### joinPath
@@ -1018,7 +1018,7 @@ Joins path for the minigui workflow.
 | `b` | `dynamic` | — | b value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L781)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L806)
 
 <a id="function-function-jsonparseerror-function-jsonparseerror-message-tools-minigui-ml-1780629814"></a>
 ### jsonParseError
@@ -1034,7 +1034,7 @@ Performs the jsonParseError operation for the minigui module.
 | `message` | `dynamic` | — | Human-readable message associated with the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L211)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L236)
 
 <a id="function-function-jsonparseok-function-jsonparseok-value-tools-minigui-ml-947883754"></a>
 ### jsonParseOk
@@ -1050,7 +1050,7 @@ Performs the jsonParseOk operation for the minigui module.
 | `value` | `dynamic` | — | Value consumed or transformed by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L205)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L230)
 
 - [JsonParseResult](Type-jsonparseresult-342564927.md) — struct
 <a id="function-function-jsonscalartostring-function-jsonscalartostring-v-tools-minigui-ml-754868791"></a>
@@ -1067,7 +1067,7 @@ Performs the jsonScalarToString operation for the minigui module.
 | `v` | `dynamic` | — | v value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1169)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1194)
 
 - [JsonValue](Type-jsonvalue-1775147072.md) — struct
 <a id="function-function-jstring-function-jstring-v-tools-minigui-ml-633572521"></a>
@@ -1084,7 +1084,7 @@ Performs the jString operation for the minigui module.
 | `v` | `dynamic` | — | v value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L174)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L199)
 
 <a id="function-function-layoutint-function-layoutint-node-name-fallback-tools-minigui-ml-1807816104"></a>
 ### layoutInt
@@ -1102,7 +1102,7 @@ Performs the layoutInt operation for the minigui module.
 | `fallback` | `dynamic` | — | Value returned when no explicit result is available. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1864)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1889)
 
 <a id="function-function-listcontains-function-listcontains-values-value-tools-minigui-ml-1809151114"></a>
 ### listContains
@@ -1119,7 +1119,7 @@ Returns whether a growable list contains the supplied value.
 | `value` | `dynamic` | — | Value to find. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1073)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1098)
 
 <a id="function-function-loadgraph-function-loadgraph-result-path-includedirs-stack-tools-minigui-ml-1958220261"></a>
 ### loadGraph
@@ -1138,7 +1138,7 @@ Loads graph for the minigui module.
 | `stack` | `dynamic` | — | stack value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1285)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1310)
 
 <a id="function-function-main-function-main-args-tools-minigui-ml-1464915318"></a>
 ### main
@@ -1154,7 +1154,7 @@ Performs the main operation for the minigui module.
 | `args` | `dynamic` | — | Command-line or caller-supplied arguments. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L2602)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L2629)
 
 <a id="constant-constant-max-mson-bytes-const-max-mson-bytes-16777216-tools-minigui-ml-1688875265"></a>
 ### MAX_MSON_BYTES
@@ -1164,7 +1164,7 @@ const MAX_MSON_BYTES = 16777216
 ```
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L55)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L80)
 
 <a id="constant-constant-max-mson-depth-const-max-mson-depth-128-tools-minigui-ml-728260393"></a>
 ### MAX_MSON_DEPTH
@@ -1176,7 +1176,7 @@ const MAX_MSON_DEPTH = 128
 Maximum JSON container nesting accepted by the MSON parser.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L57)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L82)
 
 <a id="constant-constant-max-mson-documents-const-max-mson-documents-4096-tools-minigui-ml-1697145171"></a>
 ### MAX_MSON_DOCUMENTS
@@ -1188,7 +1188,7 @@ const MAX_MSON_DOCUMENTS = 4096
 Maximum number of distinct files in one MSON import graph.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L59)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L84)
 
 <a id="constant-constant-max-windows-path-chars-const-max-windows-path-chars-32768-tools-minigui-ml-113210618"></a>
 ### MAX_WINDOWS_PATH_CHARS
@@ -1200,7 +1200,7 @@ const MAX_WINDOWS_PATH_CHARS = 32768
 Maximum UTF-16 path capacity used for executable resolution.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L63)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L88)
 
 <a id="function-function-miniguitypename-function-miniguitypename-ns-tools-minigui-ml-542183962"></a>
 ### miniGuiTypeName
@@ -1216,7 +1216,7 @@ Performs the miniGuiTypeName operation for the minigui module.
 | `ns` | `dynamic` | — | ns value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1133)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1158)
 
 <a id="function-function-miniident-function-miniident-value-tools-minigui-ml-1758439038"></a>
 ### miniIdent
@@ -1232,7 +1232,7 @@ Performs the miniIdent operation for the minigui module.
 | `value` | `dynamic` | — | Value consumed or transformed by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1097)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1122)
 
 <a id="function-function-mlstring-function-mlstring-value-tools-minigui-ml-1647320920"></a>
 ### mlString
@@ -1248,7 +1248,7 @@ Performs the mlString operation for the minigui module.
 | `value` | `dynamic` | — | Value consumed or transformed by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1148)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1173)
 
 <a id="function-function-newresult-function-newresult-tools-minigui-ml-831753929"></a>
 ### newResult
@@ -1260,7 +1260,7 @@ function newResult()
 Creates result for the minigui module.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L216)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L241)
 
 <a id="function-function-normalizepath-function-normalizepath-p-tools-minigui-ml-264733573"></a>
 ### normalizePath
@@ -1276,7 +1276,7 @@ Normalizes path for the minigui workflow.
 | `p` | `dynamic` | — | p value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L799)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L824)
 
 <a id="function-function-opt-function-opt-opts-name-tools-minigui-ml-1308232944"></a>
 ### opt
@@ -1293,7 +1293,7 @@ Performs the opt operation for the minigui module.
 | `name` | `dynamic` | — | Name of the affected item. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L2547)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L2572)
 
 <a id="function-function-ord-inline-function-ord-ch-tools-minigui-ml-2135024287"></a>
 ### ord
@@ -1309,7 +1309,7 @@ Performs the ord operation for the minigui module.
 | `ch` | `dynamic` | — | ch value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L328)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L353)
 
 <a id="function-function-parsearray-function-parsearray-p-depth-tools-minigui-ml-1285011962"></a>
 ### parseArray
@@ -1326,7 +1326,7 @@ Parses array for the minigui workflow.
 | `depth` | `dynamic` | — | Current JSON container nesting depth. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L636)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L661)
 
 <a id="function-function-parsejson-function-parsejson-text-tools-minigui-ml-1607346182"></a>
 ### parseJson
@@ -1342,7 +1342,7 @@ Parses json for the minigui workflow.
 | `text` | `dynamic` | — | Text consumed by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L664)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L689)
 
 <a id="function-function-parsejsonstring-function-parsejsonstring-p-tools-minigui-ml-1528965317"></a>
 ### parseJsonString
@@ -1358,7 +1358,7 @@ Parses json string for the minigui workflow.
 | `p` | `dynamic` | — | p value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L405)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L430)
 
 <a id="function-function-parsenumber-function-parsenumber-p-tools-minigui-ml-1693595001"></a>
 ### parseNumber
@@ -1374,7 +1374,7 @@ Parses number for the minigui workflow.
 | `p` | `dynamic` | — | p value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L494)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L519)
 
 <a id="function-function-parseobject-function-parseobject-p-depth-tools-minigui-ml-900807734"></a>
 ### parseObject
@@ -1391,7 +1391,7 @@ Parses object for the minigui workflow.
 | `depth` | `dynamic` | — | Current JSON container nesting depth. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L592)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L617)
 
 <a id="function-function-parseoptions-function-parseoptions-args-start-tools-minigui-ml-1906956410"></a>
 ### parseOptions
@@ -1408,7 +1408,7 @@ Parses options for the minigui workflow.
 | `start` | `dynamic` | — | start value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L2514)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L2539)
 
 - [Parser](Type-parser-895089114.md) — struct
 <a id="function-function-parsererror-function-parsererror-p-message-tools-minigui-ml-2136624246"></a>
@@ -1426,7 +1426,7 @@ Performs the parserError operation for the minigui module.
 | `message` | `dynamic` | — | Human-readable message associated with the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L376)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L401)
 
 <a id="function-function-parsevalue-function-parsevalue-p-depth-tools-minigui-ml-1072134"></a>
 ### parseValue
@@ -1443,7 +1443,7 @@ Parses value for the minigui workflow.
 | `depth` | `dynamic` | — | Current JSON container nesting depth. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L560)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L585)
 
 <a id="function-function-pathslash-function-pathslash-p-tools-minigui-ml-253320005"></a>
 ### pathSlash
@@ -1459,7 +1459,7 @@ Performs the pathSlash operation for the minigui module.
 | `p` | `dynamic` | — | p value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L677)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L702)
 
 <a id="function-function-pathunslash-function-pathunslash-p-tools-minigui-ml-1813826991"></a>
 ### pathUnslash
@@ -1475,7 +1475,7 @@ Performs the pathUnslash operation for the minigui module.
 | `p` | `dynamic` | — | p value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L687)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L712)
 
 <a id="function-function-prop-function-prop-obj-name-tools-minigui-ml-1706235939"></a>
 ### prop
@@ -1492,7 +1492,7 @@ Performs the prop operation for the minigui module.
 | `name` | `dynamic` | — | Name of the affected item. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L237)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L262)
 
 <a id="function-function-quoteprocessargument-function-quoteprocessargument-value-tools-minigui-ml-1320489556"></a>
 ### quoteProcessArgument
@@ -1508,7 +1508,7 @@ Quotes one argument according to the Windows CRT command-line rules. CreateProce
 | `value` | `dynamic` | — | Argument value to quote. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L912)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L937)
 
 <a id="function-function-readhandle-inline-function-readhandle-data-offset-tools-minigui-ml-1826800037"></a>
 ### readHandle
@@ -1525,7 +1525,7 @@ Reads a native 64-bit handle from a PROCESS_INFORMATION buffer.
 | `offset` | `dynamic` | — | Zero-based byte offset. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L954)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L979)
 
 <a id="function-function-readmson-function-readmson-result-path-tools-minigui-ml-1878109801"></a>
 ### readMson
@@ -1542,7 +1542,7 @@ Reads mson for the minigui workflow.
 | `path` | `dynamic` | — | Path of the file or directory used by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1203)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1228)
 
 <a id="function-function-readu32-inline-function-readu32-data-offset-tools-minigui-ml-1298041247"></a>
 ### readU32
@@ -1559,7 +1559,7 @@ Reads an unsigned little-endian 32-bit value.
 | `offset` | `dynamic` | — | Zero-based byte offset. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L947)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L972)
 
 <a id="function-function-relativepath-function-relativepath-fromdir-topath-tools-minigui-ml-163985424"></a>
 ### relativePath
@@ -1576,7 +1576,7 @@ Performs the relativePath operation for the minigui module.
 | `toPath` | `dynamic` | — | Path associated with to. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L861)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L886)
 
 <a id="function-function-resolveexecutable-function-resolveexecutable-name-tools-minigui-ml-1443494832"></a>
 ### resolveExecutable
@@ -1592,7 +1592,7 @@ Resolves a named executable without invoking a command shell.
 | `name` | `dynamic` | — | Executable name, including its extension. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1017)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1042)
 
 <a id="function-function-resolvemsonpath-function-resolvemsonpath-importpath-basedir-includedirs-tools-minigui-ml-1322876553"></a>
 ### resolveMsonPath
@@ -1610,7 +1610,7 @@ Resolves mson path for the minigui workflow.
 | `includeDirs` | `dynamic` | — | includeDirs value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1221)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1246)
 
 <a id="function-function-resolvepythoninterpreter-function-resolvepythoninterpreter-tools-minigui-ml-1673945279"></a>
 ### resolvePythonInterpreter
@@ -1622,7 +1622,7 @@ function resolvePythonInterpreter()
 Resolves the preferred Python interpreter for the Python MiniLang compiler.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1041)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1066)
 
 <a id="function-function-resourcevalue-function-resourcevalue-result-path-value-tools-minigui-ml-1226194412"></a>
 ### resourceValue
@@ -1640,7 +1640,7 @@ Performs the resourceValue operation for the minigui module.
 | `value` | `dynamic` | — | Value consumed or transformed by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1183)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1208)
 
 - [Result](Type-result-1347088452.md) — struct
 <a id="function-function-runcompiler-function-runcompiler-compiler-generated-outexe-librarydir-target-tools-minigui-ml-929809828"></a>
@@ -1658,10 +1658,10 @@ Runs the selected MiniLang compiler without involving a command shell.
 | `generated` | `dynamic` | — | generated value consumed by this operation. |
 | `outExe` | `dynamic` | — | outExe value consumed by this operation. |
 | `libraryDir` | `dynamic` | — | libraryDir value consumed by this operation. |
-| `target` | `dynamic` | — | Target executable platform, windows-x64 or linux-x64. |
+| `target` | `dynamic` | — | Target executable platform, windows-x64, linux-x64 or minux-x64. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L2568)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L2593)
 
 <a id="function-function-runprocess-function-runprocess-executable-args-tools-minigui-ml-483406938"></a>
 ### runProcess
@@ -1678,7 +1678,7 @@ Runs a child process directly and returns its exit code.
 | `args` | `dynamic` | — | Exact argv values supplied to the child process. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L965)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L990)
 
 <a id="function-function-setprop-function-setprop-obj-name-value-tools-minigui-ml-1048961806"></a>
 ### setProp
@@ -1696,7 +1696,7 @@ Updates prop maintained by the minigui module.
 | `value` | `dynamic` | — | Value consumed or transformed by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1373)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1398)
 
 <a id="function-function-skipws-function-skipws-p-tools-minigui-ml-988267521"></a>
 ### skipWs
@@ -1712,7 +1712,7 @@ Performs the skipWs operation for the minigui module.
 | `p` | `dynamic` | — | p value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L367)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L392)
 
 <a id="function-function-splitpathparts-function-splitpathparts-p-tools-minigui-ml-1541148269"></a>
 ### splitPathParts
@@ -1728,7 +1728,7 @@ Splits path parts for the minigui workflow.
 | `p` | `dynamic` | — | p value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L848)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L873)
 
 <a id="function-function-stackhas-function-stackhas-stack-path-tools-minigui-ml-22166058"></a>
 ### stackHas
@@ -1745,7 +1745,7 @@ Performs the stackHas operation for the minigui module.
 | `path` | `dynamic` | — | Path of the file or directory used by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1242)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1267)
 
 <a id="function-function-stackslotwidth-function-stackslotwidth-result-path-node-fallback-tools-minigui-ml-597787999"></a>
 ### stackSlotWidth
@@ -1764,7 +1764,7 @@ Performs the stackSlotWidth operation for the minigui module.
 | `fallback` | `dynamic` | — | Value returned when no explicit result is available. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1856)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1881)
 
 <a id="function-function-startsat-function-startsat-text-pos-needle-tools-minigui-ml-253439729"></a>
 ### startsAt
@@ -1782,7 +1782,7 @@ Performs the startsAt operation for the minigui module.
 | `needle` | `dynamic` | — | needle value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L552)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L577)
 
 <a id="function-function-stringarrayliteral-function-stringarrayliteral-result-path-node-name-tools-minigui-ml-306204374"></a>
 ### stringArrayLiteral
@@ -1801,7 +1801,7 @@ Performs the stringArrayLiteral operation for the minigui module.
 | `name` | `dynamic` | — | Name of the affected item. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1909)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1934)
 
 <a id="function-function-stringprop-function-stringprop-result-path-node-name-fallback-tools-minigui-ml-160719356"></a>
 ### stringProp
@@ -1821,7 +1821,7 @@ Performs the stringProp operation for the minigui module.
 | `fallback` | `dynamic` | — | Value returned when no explicit result is available. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1898)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1923)
 
 <a id="function-function-tablearrayliteral-function-tablearrayliteral-result-path-node-name-tools-minigui-ml-936250814"></a>
 ### tableArrayLiteral
@@ -1840,7 +1840,7 @@ Performs the tableArrayLiteral operation for the minigui module.
 | `name` | `dynamic` | — | Name of the affected item. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1990)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L2015)
 
 <a id="function-function-testcontrolproperties-function-testcontrolproperties-result-path-typ-properties-tools-minigui-ml-101126771"></a>
 ### testControlProperties
@@ -1859,7 +1859,7 @@ Performs the testControlProperties operation for the minigui module.
 | `properties` | `dynamic` | — | properties value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1530)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1555)
 
 <a id="function-function-testlayoutnode-function-testlayoutnode-result-path-node-ids-tools-minigui-ml-783250001"></a>
 ### testLayoutNode
@@ -1878,7 +1878,7 @@ Performs the testLayoutNode operation for the minigui module.
 | `ids` | `dynamic` | — | ids value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1615)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1640)
 
 <a id="function-function-testpropertynames-function-testpropertynames-result-path-obj-allowed-context-tools-minigui-ml-1413846259"></a>
 ### testPropertyNames
@@ -1898,7 +1898,7 @@ Performs the testPropertyNames operation for the minigui module.
 | `context` | `dynamic` | — | Context that carries state for the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1445)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1470)
 
 <a id="function-function-treearrayliteral-function-treearrayliteral-result-path-node-name-tools-minigui-ml-113288346"></a>
 ### treeArrayLiteral
@@ -1917,7 +1917,7 @@ Performs the treeArrayLiteral operation for the minigui module.
 | `name` | `dynamic` | — | Name of the affected item. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1973)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1998)
 
 <a id="function-function-trimdotslash-function-trimdotslash-p-tools-minigui-ml-1643536593"></a>
 ### trimDotSlash
@@ -1933,7 +1933,7 @@ Performs the trimDotSlash operation for the minigui module.
 | `p` | `dynamic` | — | p value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L693)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L718)
 
 <a id="function-function-upperfirst-function-upperfirst-s0-tools-minigui-ml-509576888"></a>
 ### upperFirst
@@ -1949,7 +1949,7 @@ Performs the upperFirst operation for the minigui module.
 | `s0` | `dynamic` | — | s0 value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1118)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1143)
 
 <a id="function-function-usage-function-usage-tools-minigui-ml-654463161"></a>
 ### usage
@@ -1961,7 +1961,7 @@ function usage()
 Performs the usage operation for the minigui module.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L2555)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L2580)
 
 <a id="function-function-validatemson-function-validatemson-path-includedirs-codebehindoverride-tools-minigui-ml-115174509"></a>
 ### validateMson
@@ -1979,7 +1979,7 @@ Validates mson for the minigui workflow.
 | `codeBehindOverride` | `dynamic` | — | codeBehindOverride value consumed by this operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1684)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L1709)
 
 - [WindowEntry](Type-windowentry-778171323.md) — struct
 <a id="function-function-writevalidation-function-writevalidation-result-tools-minigui-ml-1716886486"></a>
@@ -1996,4 +1996,4 @@ Writes validation for the minigui workflow.
 | `result` | `dynamic` | — | Result object populated or inspected by the operation. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L2590)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/tools/minigui.ml#L2617)

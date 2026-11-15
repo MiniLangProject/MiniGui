@@ -1,3 +1,6 @@
+[CmdletBinding()]
+param([string]$SelfCompiler = "")
+
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
@@ -6,7 +9,11 @@ $Root = [System.IO.Path]::GetFullPath((Join-Path $Here "..\.."))
 $CompilerRoot = [System.IO.Path]::GetFullPath((Join-Path $Root "..\MiniLangCompilerPy"))
 $Compiler = Join-Path $CompilerRoot "mlc_win64.py"
 $SelfCompilerRoot = [System.IO.Path]::GetFullPath((Join-Path $Root "..\MiniLangCompilerML"))
-$SelfCompiler = Join-Path $SelfCompilerRoot "build\mlc_win64.exe"
+if ($SelfCompiler -eq "") {
+  $SelfCompiler = Join-Path $SelfCompilerRoot "build\mlc_win64.exe"
+} else {
+  $SelfCompiler = [IO.Path]::GetFullPath($SelfCompiler)
+}
 $ToolSource = Join-Path $Root "tools\minigui.ml"
 $Tool = Join-Path $Root "tools\minigui.exe"
 $Tmp = Join-Path $Root "tests\tmp\minigui"
@@ -697,8 +704,9 @@ Assert-Ok (Invoke-Compiler @((Join-Path $Root "tests\minigui\hello_full_ui_smoke
 Assert-Ok (Invoke-Capture $helloFullUiExe @()) "run hello full UI smoke"
 
 $packageOut = Join-Path $Tmp "release"
-Assert-Ok (Invoke-Capture "powershell" @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", (Join-Path $Root "tools\package-release.ps1"), "-Version", "test", "-Compiler", $Compiler, "-OutputDir", $packageOut)) "package release"
-$packageZip = Join-Path $packageOut "MiniGui-test.zip"
+$packageVersion = (Get-Content -LiteralPath (Join-Path $Root 'VERSION') -Raw).Trim()
+Assert-Ok (Invoke-Capture "powershell" @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", (Join-Path $Root "tools\package-release.ps1"), "-Version", $packageVersion, "-Compiler", $Compiler, "-OutputDir", $packageOut)) "package release"
+$packageZip = Join-Path $packageOut "MiniGui-$packageVersion.zip"
 $packageSha = "$packageZip.sha256"
 if (-not (Test-Path -LiteralPath $packageZip)) { throw "release package zip was not created." }
 if (-not (Test-Path -LiteralPath $packageSha)) { throw "release package sha256 file was not created." }

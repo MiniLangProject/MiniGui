@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.1 - 2026-11-15
+
+- Add the native MinUX desktop bridge and `minux-x64` generator/deployment path.
+- Package the MinUX runtime alongside Windows and Linux runtime libraries.
+- Verify native GUI controls, events, dialogs and video frames in a MinUX guest.
+- Retain explicit unsupported-control errors; document the one-window limit.
+
 ## 0.1.0 - 2026-09-05
 
 - Added a GTK 3 Linux backend with native event queuing, controls, dialogs,

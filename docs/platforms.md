@@ -1,10 +1,24 @@
-# Windows and Linux builds
+# Windows, Linux and MinUX builds
 
 MiniGui uses one MSON format and one public MiniLang API. The compiler selects
 the runtime with `--target windows-x64` or `--target linux-x64`. Generated source
 contains conditional Windows callback wiring and can be reused for either target.
 
-Use the current MiniLang Compiler 1.2.6 checkout. The Python compiler must include
+Starting with MiniGui 0.1.1, `--target minux-x64` selects a native MinUX desktop bridge.
+On Linux/WSL run `python3 tools/build_minux_native.py --minux-root ../../MinUX`;
+the output is `build/native/minux-x64/libminigui_minux.so`. Install it into
+MinUX `/lib` and launch the ELF through the native desktop app channel. The CLI
+also accepts MinUX as a host target and bundles the library beside cross-built
+applications for deployment to `/lib`.
+
+Native controls and modals use snapshot/command records. There is one independent
+window per process; path/color dialogs use text entry. Unsupported WebView, tray,
+editor and canvas controls report an error. Widgets retain native limits and
+UI-thread affinity. Stdout is reserved for frames. See the compiler's
+[MinUX guide](../../MiniLangCompilerPy/docs/MINUX.md) for native libraries,
+WAV/AVI output and guest acceptance checks.
+
+Use the current MiniLang Compiler 1.3.9 checkout. The Python compiler must include
 the native C-string return fix delivered with this change; an older binary may
 crash when a Linux widget returns text. Rebuild an old self-hosted compiler before
 comparing compiler output.
@@ -76,7 +90,7 @@ tools or a separately prepared Windows artifact.
 
 ## Deployment
 
-The 0.1.0 SDK release contains generator executables for both hosts, native
+The 0.1.1 SDK release contains generator executables for all three hosts, native
 bridges, sources, examples and documentation. After extracting the ZIP on Linux,
 run `chmod +x tools/minigui`. The SDK does not bundle the compiler or the system
 GTK/WebView runtime dependencies.
@@ -84,10 +98,10 @@ GTK/WebView runtime dependencies.
 To reproduce the SDK after building both native bridges, run from Windows:
 
 ```powershell
-pwsh ./tools/package-release.ps1 -Version 0.1.0 -IncludeLinux
+pwsh ./tools/package-release.ps1 -Version 0.1.1 -IncludeLinux -IncludeMinux
 ```
 
-The script writes `dist/MiniGui-0.1.0.zip` and its SHA-256 checksum.
+The script writes `dist/MiniGui-0.1.1.zip` and its SHA-256 checksum.
 
 `minigui build` copies the selected native library next to the output executable.
 It fails with an actionable path if that library has not been built.

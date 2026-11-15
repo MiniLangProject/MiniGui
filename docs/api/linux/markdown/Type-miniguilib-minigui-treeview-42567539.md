@@ -12,7 +12,7 @@ struct TreeView
 Native TreeView operations.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6962)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7068)
 
 ## Members
 
@@ -38,4 +38,4 @@ create for the TreeView backend implementation.
 | `items` | `dynamic` | — | items supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L6973)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7079)

@@ -12,7 +12,7 @@ struct Control
 Native Control operations.
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7186)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7292)
 
 ## Members
 
@@ -31,7 +31,7 @@ _resizeChildren for the Control backend implementation.
 | `parent` | `dynamic` | — | parent supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7448)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7554)
 
 <a id="static_method-static-method-miniguilib-minigui-control-additem-static-function-additem-control-text-miniguilib-minigui-ml-436639455"></a>
 ### addItem
@@ -48,7 +48,7 @@ addItem for the Control backend implementation.
 | `text` | `dynamic` | — | text supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7363)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7469)
 
 <a id="static_method-static-method-miniguilib-minigui-control-clearitems-static-function-clearitems-control-miniguilib-minigui-ml-1975727740"></a>
 ### clearItems
@@ -64,7 +64,7 @@ clearItems for the Control backend implementation.
 | `control` | `dynamic` | — | control supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7370)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7476)
 
 <a id="static_method-static-method-miniguilib-minigui-control-focus-static-function-focus-control-miniguilib-minigui-ml-1853982098"></a>
 ### focus
@@ -80,7 +80,7 @@ Moves keyboard focus to a native control.
 | `control` | `dynamic` | — | control supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7547)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7653)
 
 <a id="static_method-static-method-miniguilib-minigui-control-getcelltext-static-function-getcelltext-control-row-column-miniguilib-minigui-ml-1566890508"></a>
 ### getCellText
@@ -98,7 +98,7 @@ getCellText for the Control backend implementation.
 | `column` | `dynamic` | — | column supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7402)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7508)
 
 <a id="static_method-static-method-miniguilib-minigui-control-getchecked-static-function-getchecked-control-miniguilib-minigui-ml-1297341492"></a>
 ### getChecked
@@ -114,7 +114,7 @@ getChecked for the Control backend implementation.
 | `control` | `dynamic` | — | control supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7295)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7401)
 
 <a id="static_method-static-method-miniguilib-minigui-control-getselectedindex-static-function-getselectedindex-control-miniguilib-minigui-ml-1755985608"></a>
 ### getSelectedIndex
@@ -130,7 +130,7 @@ getSelectedIndex for the Control backend implementation.
 | `control` | `dynamic` | — | control supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7387)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7493)
 
 <a id="static_method-static-method-miniguilib-minigui-control-getselectedtext-static-function-getselectedtext-control-miniguilib-minigui-ml-240685330"></a>
 ### getSelectedText
@@ -146,7 +146,7 @@ getSelectedText for the Control backend implementation.
 | `control` | `dynamic` | — | control supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7393)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7499)
 
 <a id="static_method-static-method-miniguilib-minigui-control-gettext-static-function-gettext-control-miniguilib-minigui-ml-2101156482"></a>
 ### getText
@@ -162,7 +162,7 @@ getText for the Control backend implementation.
 | `control` | `dynamic` | — | control supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7199)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7305)
 
 <a id="static_method-static-method-miniguilib-minigui-control-getvalue-static-function-getvalue-control-miniguilib-minigui-ml-1058234584"></a>
 ### getValue
@@ -178,7 +178,7 @@ getValue for the Control backend implementation.
 | `control` | `dynamic` | — | control supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7311)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7417)
 
 <a id="static_method-static-method-miniguilib-minigui-control-ischecked-static-function-ischecked-control-miniguilib-minigui-ml-1875340054"></a>
 ### isChecked
@@ -194,7 +194,7 @@ Reads the native checkbox state.
 | `control` | `dynamic` | — | control supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7554)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7660)
 
 <a id="static_method-static-method-miniguilib-minigui-control-setbackground-static-function-setbackground-control-color-miniguilib-minigui-ml-1836358903"></a>
 ### setBackground
@@ -211,7 +211,7 @@ setBackground for the Control backend implementation.
 | `color` | `dynamic` | — | color supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7497)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7603)
 
 <a id="static_method-static-method-miniguilib-minigui-control-setborder-static-function-setborder-control-color-width-miniguilib-minigui-ml-887880001"></a>
 ### setBorder
@@ -229,7 +229,7 @@ setBorder for the Control backend implementation.
 | `width` | `dynamic` | — | width supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7515)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7621)
 
 <a id="static_method-static-method-miniguilib-minigui-control-setbounds-static-function-setbounds-control-x-y-width-height-miniguilib-minigui-ml-1835310032"></a>
 ### setBounds
@@ -249,7 +249,7 @@ setBounds for the Control backend implementation.
 | `height` | `dynamic` | — | height supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7422)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7528)
 
 <a id="static_method-static-method-miniguilib-minigui-control-setcelltext-static-function-setcelltext-control-row-column-value-miniguilib-minigui-ml-1778153831"></a>
 ### setCellText
@@ -268,7 +268,7 @@ setCellText for the Control backend implementation.
 | `value` | `dynamic` | — | value supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7411)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7517)
 
 <a id="static_method-static-method-miniguilib-minigui-control-setchecked-static-function-setchecked-control-checked-miniguilib-minigui-ml-1737039223"></a>
 ### setChecked
@@ -285,7 +285,7 @@ setChecked for the Control backend implementation.
 | `checked` | `dynamic` | — | checked supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7286)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7392)
 
 <a id="static_method-static-method-miniguilib-minigui-control-setcolumns-static-function-setcolumns-control-columns-miniguilib-minigui-ml-1613073181"></a>
 ### setColumns
@@ -302,7 +302,7 @@ setColumns for the Control backend implementation.
 | `columns` | `dynamic` | — | columns supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7338)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7444)
 
 <a id="static_method-static-method-miniguilib-minigui-control-setcolumnwidth-static-function-setcolumnwidth-control-column-width-miniguilib-minigui-ml-461085764"></a>
 ### setColumnWidth
@@ -320,7 +320,7 @@ Sets a native table column width.
 | `width` | `dynamic` | — | width supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7530)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7636)
 
 <a id="static_method-static-method-miniguilib-minigui-control-setcolumnwidths-static-function-setcolumnwidths-control-widths-miniguilib-minigui-ml-128633677"></a>
 ### setColumnWidths
@@ -337,7 +337,7 @@ Applies widths to successive table columns.
 | `widths` | `dynamic` | — | widths supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7537)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7643)
 
 <a id="static_method-static-method-miniguilib-minigui-control-seteditable-static-function-seteditable-control-editable-miniguilib-minigui-ml-1111949810"></a>
 ### setEditable
@@ -354,7 +354,7 @@ setEditable for the Control backend implementation.
 | `editable` | `dynamic` | — | editable supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7235)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7341)
 
 <a id="static_method-static-method-miniguilib-minigui-control-setenabled-static-function-setenabled-control-enabled-miniguilib-minigui-ml-140519927"></a>
 ### setEnabled
@@ -371,7 +371,7 @@ setEnabled for the Control backend implementation.
 | `enabled` | `dynamic` | — | enabled supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7217)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7323)
 
 <a id="static_method-static-method-miniguilib-minigui-control-setfont-static-function-setfont-control-family-size-weight-miniguilib-minigui-ml-1721283901"></a>
 ### setFont
@@ -390,7 +390,7 @@ setFont for the Control backend implementation.
 | `weight` | `dynamic` | — | weight supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7506)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7612)
 
 <a id="static_method-static-method-miniguilib-minigui-control-setforeground-static-function-setforeground-control-color-miniguilib-minigui-ml-1020013207"></a>
 ### setForeground
@@ -407,7 +407,7 @@ setForeground for the Control backend implementation.
 | `color` | `dynamic` | — | color supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7490)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7596)
 
 <a id="static_method-static-method-miniguilib-minigui-control-setimagesource-static-function-setimagesource-control-source-miniguilib-minigui-ml-2080240489"></a>
 ### setImageSource
@@ -424,7 +424,7 @@ setImageSource for the Control backend implementation.
 | `source` | `dynamic` | — | source supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7258)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7364)
 
 <a id="static_method-static-method-miniguilib-minigui-control-setitems-static-function-setitems-control-items-miniguilib-minigui-ml-1155598642"></a>
 ### setItems
@@ -441,7 +441,7 @@ setItems for the Control backend implementation.
 | `items` | `dynamic` | — | items supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7347)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7453)
 
 <a id="static_method-static-method-miniguilib-minigui-control-setlayout-static-function-setlayout-control-mode-anchor-minwidth-minheight-maxwidth-maxheight-miniguilib-minigui-ml-141219450"></a>
 ### setLayout
@@ -463,7 +463,7 @@ setLayout for the Control backend implementation.
 | `maxHeight` | `dynamic` | — | maxHeight supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7439)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7545)
 
 <a id="static_method-static-method-miniguilib-minigui-control-setmaxlength-static-function-setmaxlength-control-maxlength-miniguilib-minigui-ml-2015921332"></a>
 ### setMaxLength
@@ -480,7 +480,7 @@ setMaxLength for the Control backend implementation.
 | `maxLength` | `dynamic` | — | maxLength supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7279)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7385)
 
 <a id="static_method-static-method-miniguilib-minigui-control-setplaceholder-static-function-setplaceholder-control-text-miniguilib-minigui-ml-54201713"></a>
 ### setPlaceholder
@@ -497,7 +497,7 @@ setPlaceholder for the Control backend implementation.
 | `text` | `dynamic` | — | text supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7251)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7357)
 
 <a id="static_method-static-method-miniguilib-minigui-control-setrange-static-function-setrange-control-minimum-maximum-miniguilib-minigui-ml-2123205638"></a>
 ### setRange
@@ -515,7 +515,7 @@ setRange for the Control backend implementation.
 | `maximum` | `dynamic` | — | maximum supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7319)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7425)
 
 <a id="static_method-static-method-miniguilib-minigui-control-setreadonly-static-function-setreadonly-control-readonly-miniguilib-minigui-ml-904919164"></a>
 ### setReadOnly
@@ -532,7 +532,7 @@ setReadOnly for the Control backend implementation.
 | `readOnly` | `dynamic` | — | readOnly supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7226)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7332)
 
 <a id="static_method-static-method-miniguilib-minigui-control-setscrollsteps-static-function-setscrollsteps-control-smallstep-largestep-miniguilib-minigui-ml-655846264"></a>
 ### setScrollSteps
@@ -550,7 +550,7 @@ Sets keyboard and page increments for a range control.
 | `largeStep` | `dynamic` | — | largeStep supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7561)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7667)
 
 <a id="static_method-static-method-miniguilib-minigui-control-setselectedindex-static-function-setselectedindex-control-index-miniguilib-minigui-ml-1357404376"></a>
 ### setSelectedIndex
@@ -567,7 +567,7 @@ setSelectedIndex for the Control backend implementation.
 | `index` | `dynamic` | — | index supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7379)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7485)
 
 <a id="static_method-static-method-miniguilib-minigui-control-setsource-static-function-setsource-control-source-miniguilib-minigui-ml-1786247141"></a>
 ### setSource
@@ -584,7 +584,7 @@ setSource for the Control backend implementation.
 | `source` | `dynamic` | — | source supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7265)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7371)
 
 <a id="static_method-static-method-miniguilib-minigui-control-setstep-static-function-setstep-control-step-miniguilib-minigui-ml-1255615328"></a>
 ### setStep
@@ -601,7 +601,7 @@ setStep for the Control backend implementation.
 | `step` | `dynamic` | — | step supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7329)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7435)
 
 <a id="static_method-static-method-miniguilib-minigui-control-settabindex-static-function-settabindex-control-tabindex-miniguilib-minigui-ml-1519533725"></a>
 ### setTabIndex
@@ -618,7 +618,7 @@ Orders keyboard focus among sibling controls.
 | `tabIndex` | `dynamic` | — | tabIndex supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7522)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7628)
 
 <a id="static_method-static-method-miniguilib-minigui-control-settext-static-function-settext-control-text-miniguilib-minigui-ml-113968263"></a>
 ### setText
@@ -635,7 +635,7 @@ setText for the Control backend implementation.
 | `text` | `dynamic` | — | text supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7190)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7296)
 
 <a id="static_method-static-method-miniguilib-minigui-control-settooltip-static-function-settooltip-control-text-miniguilib-minigui-ml-1453905537"></a>
 ### setTooltip
@@ -652,7 +652,7 @@ setTooltip for the Control backend implementation.
 | `text` | `dynamic` | — | text supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7244)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7350)
 
 <a id="static_method-static-method-miniguilib-minigui-control-seturl-static-function-seturl-control-url-miniguilib-minigui-ml-715902199"></a>
 ### setUrl
@@ -669,7 +669,7 @@ setUrl for the Control backend implementation.
 | `url` | `dynamic` | — | url supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7272)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7378)
 
 <a id="static_method-static-method-miniguilib-minigui-control-setvalue-static-function-setvalue-control-value-miniguilib-minigui-ml-1798949747"></a>
 ### setValue
@@ -686,7 +686,7 @@ setValue for the Control backend implementation.
 | `value` | `dynamic` | — | value supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7302)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7408)
 
 <a id="static_method-static-method-miniguilib-minigui-control-setvisible-static-function-setvisible-control-visible-miniguilib-minigui-ml-1846519804"></a>
 ### setVisible
@@ -703,4 +703,4 @@ setVisible for the Control backend implementation.
 | `visible` | `dynamic` | — | visible supplied by the caller. |
 
 
-[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7206)
+[View source](https://github.com/MiniLangProject/MiniGui/blob/main/MiniGuiLib/minigui.ml#L7312)
